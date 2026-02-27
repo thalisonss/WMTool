@@ -108,34 +108,16 @@ namespace WMTool
 
         #region |Functions|
         #region |Bucket Functions (BO x CEC)|
+        private const string S3FiscalDocPrefix = "FiscalDoc: ";
+        private const string S3FiscalDocPath = "FiscalDoc/";
+
         //Função para conectar no bucket e carregar imagem na tela
         private async void LoadImageFromS3(string key)
         {
-            //converte o nome da chave do banco de dados para o formato para buscar no bucket
-            key = key.Replace("FiscalDoc: ", "FiscalDoc/");
-
-            //Seta a região para acesso ao bucket
-            RegionEndpoint region = RegionEndpoint.USEast1;
             try
             {
-                using (var client = new AmazonS3Client(awsAccessKeyId, awsSecretAccessKey, region))
-                {
-                    var request = new GetObjectRequest
-                    {
-                        BucketName = bucketName,
-                        Key = key
-                    };
-
-                    using (GetObjectResponse response = await client.GetObjectAsync(request))
-                    using (Stream responseStream = response.ResponseStream)
-                    using (MemoryStream memoryStream = new MemoryStream())
-                    {
-                        await responseStream.CopyToAsync(memoryStream);
-                        memoryStream.Position = 0;
-                        tempImagePath = Path.Combine(Path.GetTempPath(), "tempImage.png");
-                        File.WriteAllBytes(tempImagePath, memoryStream.ToArray());
-                    }
-                }
+                var fileContent = await DownloadS3ObjectAsBytesAsync(key);
+                SaveTempImage(fileContent);
             }
             catch (Exception ex)
             {
@@ -152,14 +134,17 @@ namespace WMTool
         {
             try
             {
-                var client = new AmazonS3Client(awsAccessKeyId, awsSecretAccessKey, RegionEndpoint.USEast1);
-                var request = new GetObjectMetadataRequest
+                using (var client = CreateS3Client())
                 {
-                    BucketName = bucketName,
-                    Key = fileName
-                };
+                    var request = new GetObjectMetadataRequest
+                    {
+                        BucketName = bucketName,
+                        Key = fileName
+                    };
 
-                await client.GetObjectMetadataAsync(request);
+                    await client.GetObjectMetadataAsync(request);
+                }
+
                 return true;
             }
             catch (AmazonS3Exception ex)
@@ -184,31 +169,11 @@ namespace WMTool
         }
         private async Task<bool> DownloadFileFromS3Async(string key, string saveFilePath)
         {
-            key = key.Replace("FiscalDoc: ", "FiscalDoc/");
-            RegionEndpoint region = RegionEndpoint.USEast1;
-
             try
             {
-                using (var client = new AmazonS3Client(awsAccessKeyId, awsSecretAccessKey, region))
-                {
-                    var request = new GetObjectRequest
-                    {
-                        BucketName = bucketName,
-                        Key = key
-                    };
-
-                    using (GetObjectResponse response = await client.GetObjectAsync(request))
-                    using (Stream responseStream = response.ResponseStream)
-                    using (MemoryStream memoryStream = new MemoryStream())
-                    {
-                        await responseStream.CopyToAsync(memoryStream);
-                        memoryStream.Position = 0;
-
-                        File.WriteAllBytes(saveFilePath, memoryStream.ToArray());
-
-                        return true;
-                    }
-                }
+                var fileContent = await DownloadS3ObjectAsBytesAsync(key);
+                File.WriteAllBytes(saveFilePath, fileContent);
+                return true;
             }
             catch (Exception ex)
             {
@@ -218,37 +183,59 @@ namespace WMTool
         }
         private async Task LoadImageFromS3Async(string key, PictureBox pictureBox)
         {
-            key = key.Replace("FiscalDoc: ", "FiscalDoc/");
-            RegionEndpoint region = RegionEndpoint.USEast1;
-
             try
             {
-                using (var client = new AmazonS3Client(awsAccessKeyId, awsSecretAccessKey, region))
+                var fileContent = await DownloadS3ObjectAsBytesAsync(key);
+
+                using (var memoryStream = new MemoryStream(fileContent))
                 {
-                    var request = new GetObjectRequest
-                    {
-                        BucketName = bucketName,
-                        Key = key
-                    };
-
-                    using (GetObjectResponse response = await client.GetObjectAsync(request))
-                    using (Stream responseStream = response.ResponseStream)
-                    using (MemoryStream memoryStream = new MemoryStream())
-                    {
-                        await responseStream.CopyToAsync(memoryStream);
-                        memoryStream.Position = 0;
-
-                        pictureBox.Image = System.Drawing.Image.FromStream(memoryStream);
-
-                        tempImagePath = Path.Combine(Path.GetTempPath(), "tempImage.png");
-                        File.WriteAllBytes(tempImagePath, memoryStream.ToArray());
-                    }
+                    pictureBox.Image = System.Drawing.Image.FromStream(memoryStream);
                 }
+
+                SaveTempImage(fileContent);
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Erro ao carregar a imagem: {ex.Message}");
             }
+        }
+
+        private AmazonS3Client CreateS3Client()
+        {
+            return new AmazonS3Client(awsAccessKeyId, awsSecretAccessKey, RegionEndpoint.USEast1);
+        }
+
+        private string NormalizeS3Key(string key)
+        {
+            return key.Replace(S3FiscalDocPrefix, S3FiscalDocPath);
+        }
+
+        private async Task<byte[]> DownloadS3ObjectAsBytesAsync(string key)
+        {
+            string normalizedKey = NormalizeS3Key(key);
+
+            using (var client = CreateS3Client())
+            {
+                var request = new GetObjectRequest
+                {
+                    BucketName = bucketName,
+                    Key = normalizedKey
+                };
+
+                using (GetObjectResponse response = await client.GetObjectAsync(request))
+                using (Stream responseStream = response.ResponseStream)
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    await responseStream.CopyToAsync(memoryStream);
+                    return memoryStream.ToArray();
+                }
+            }
+        }
+
+        private void SaveTempImage(byte[] fileContent)
+        {
+            tempImagePath = Path.Combine(Path.GetTempPath(), "tempImage.png");
+            File.WriteAllBytes(tempImagePath, fileContent);
         }
 
         private string GenerateFileNameFromRow(DataGridViewRow row)
