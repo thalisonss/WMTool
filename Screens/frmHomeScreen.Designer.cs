@@ -95,6 +95,15 @@
             this.Joker = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.txtQueryCECs = new System.Windows.Forms.TextBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPageRequest = new System.Windows.Forms.TabPage();
+            this.txtRequestUser = new System.Windows.Forms.TextBox();
+            this.btnRequest = new System.Windows.Forms.Button();
+            this.lblRequestStatus = new System.Windows.Forms.Label();
+            this.txtRequestPassword = new System.Windows.Forms.TextBox();
+            this.txtRequestDomain = new System.Windows.Forms.TextBox();
+            this.txtRequestEnvironment = new System.Windows.Forms.TextBox();
+            this.txtRequestURLToken = new System.Windows.Forms.TextBox();
+            this.txtRequestURLSync = new System.Windows.Forms.TextBox();
             this.tabPage2.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -106,6 +115,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.imgCECs)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCECs)).BeginInit();
             this.tabControl1.SuspendLayout();
+            this.tabPageRequest.SuspendLayout();
             this.SuspendLayout();
             // 
             // label10
@@ -204,7 +214,7 @@
             this.groupBox3.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox3.Size = new System.Drawing.Size(523, 250);
+            this.groupBox3.Size = new System.Drawing.Size(484, 250);
             this.groupBox3.TabIndex = 11;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Search CEC";
@@ -250,7 +260,7 @@
             this.groupBox2.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox2.Size = new System.Drawing.Size(523, 295);
+            this.groupBox2.Size = new System.Drawing.Size(484, 295);
             this.groupBox2.TabIndex = 10;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "CEC not exists in the bucket";
@@ -856,6 +866,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl1.Controls.Add(this.tabPage6);
             this.tabControl1.Controls.Add(this.tabPage3);
+            this.tabControl1.Controls.Add(this.tabPageRequest);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Location = new System.Drawing.Point(4, 5);
             this.tabControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -864,6 +875,92 @@
             this.tabControl1.Size = new System.Drawing.Size(1349, 747);
             this.tabControl1.TabIndex = 0;
             this.tabControl1.TabStop = false;
+            // 
+            // tabPageRequest
+            // 
+            this.tabPageRequest.Controls.Add(this.txtRequestURLSync);
+            this.tabPageRequest.Controls.Add(this.txtRequestURLToken);
+            this.tabPageRequest.Controls.Add(this.txtRequestEnvironment);
+            this.tabPageRequest.Controls.Add(this.txtRequestDomain);
+            this.tabPageRequest.Controls.Add(this.txtRequestPassword);
+            this.tabPageRequest.Controls.Add(this.lblRequestStatus);
+            this.tabPageRequest.Controls.Add(this.btnRequest);
+            this.tabPageRequest.Controls.Add(this.txtRequestUser);
+            this.tabPageRequest.Location = new System.Drawing.Point(4, 25);
+            this.tabPageRequest.Name = "tabPageRequest";
+            this.tabPageRequest.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageRequest.Size = new System.Drawing.Size(1341, 718);
+            this.tabPageRequest.TabIndex = 7;
+            this.tabPageRequest.Text = "Request";
+            this.tabPageRequest.UseVisualStyleBackColor = true;
+            // 
+            // txtRequestUser
+            // 
+            this.txtRequestUser.Location = new System.Drawing.Point(58, 50);
+            this.txtRequestUser.Margin = new System.Windows.Forms.Padding(4);
+            this.txtRequestUser.Name = "txtRequestUser";
+            this.txtRequestUser.Size = new System.Drawing.Size(427, 22);
+            this.txtRequestUser.TabIndex = 36;
+            // 
+            // btnRequest
+            // 
+            this.btnRequest.Location = new System.Drawing.Point(390, 318);
+            this.btnRequest.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnRequest.Name = "btnRequest";
+            this.btnRequest.Size = new System.Drawing.Size(113, 23);
+            this.btnRequest.TabIndex = 37;
+            this.btnRequest.Text = "Request";
+            this.btnRequest.UseVisualStyleBackColor = true;
+            this.btnRequest.Click += new System.EventHandler(this.btnRequest_Click);
+            // 
+            // lblRequestStatus
+            // 
+            this.lblRequestStatus.AutoSize = true;
+            this.lblRequestStatus.Location = new System.Drawing.Point(459, 370);
+            this.lblRequestStatus.Name = "lblRequestStatus";
+            this.lblRequestStatus.Size = new System.Drawing.Size(44, 16);
+            this.lblRequestStatus.TabIndex = 38;
+            this.lblRequestStatus.Text = "label7";
+            // 
+            // txtRequestPassword
+            // 
+            this.txtRequestPassword.Location = new System.Drawing.Point(58, 96);
+            this.txtRequestPassword.Margin = new System.Windows.Forms.Padding(4);
+            this.txtRequestPassword.Name = "txtRequestPassword";
+            this.txtRequestPassword.Size = new System.Drawing.Size(427, 22);
+            this.txtRequestPassword.TabIndex = 39;
+            // 
+            // txtRequestDomain
+            // 
+            this.txtRequestDomain.Location = new System.Drawing.Point(58, 140);
+            this.txtRequestDomain.Margin = new System.Windows.Forms.Padding(4);
+            this.txtRequestDomain.Name = "txtRequestDomain";
+            this.txtRequestDomain.Size = new System.Drawing.Size(427, 22);
+            this.txtRequestDomain.TabIndex = 40;
+            // 
+            // txtRequestEnvironment
+            // 
+            this.txtRequestEnvironment.Location = new System.Drawing.Point(58, 186);
+            this.txtRequestEnvironment.Margin = new System.Windows.Forms.Padding(4);
+            this.txtRequestEnvironment.Name = "txtRequestEnvironment";
+            this.txtRequestEnvironment.Size = new System.Drawing.Size(427, 22);
+            this.txtRequestEnvironment.TabIndex = 41;
+            // 
+            // txtRequestURLToken
+            // 
+            this.txtRequestURLToken.Location = new System.Drawing.Point(58, 227);
+            this.txtRequestURLToken.Margin = new System.Windows.Forms.Padding(4);
+            this.txtRequestURLToken.Name = "txtRequestURLToken";
+            this.txtRequestURLToken.Size = new System.Drawing.Size(427, 22);
+            this.txtRequestURLToken.TabIndex = 42;
+            // 
+            // txtRequestURLSync
+            // 
+            this.txtRequestURLSync.Location = new System.Drawing.Point(58, 267);
+            this.txtRequestURLSync.Margin = new System.Windows.Forms.Padding(4);
+            this.txtRequestURLSync.Name = "txtRequestURLSync";
+            this.txtRequestURLSync.Size = new System.Drawing.Size(427, 22);
+            this.txtRequestURLSync.TabIndex = 43;
             // 
             // frmHomeScreen
             // 
@@ -894,6 +991,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.imgCECs)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCECs)).EndInit();
             this.tabControl1.ResumeLayout(false);
+            this.tabPageRequest.ResumeLayout(false);
+            this.tabPageRequest.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -969,6 +1068,15 @@
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.Button btnCECOpenFolder;
         private System.Windows.Forms.Button btnCECSaveImage;
+        private System.Windows.Forms.TabPage tabPageRequest;
+        private System.Windows.Forms.Label lblRequestStatus;
+        private System.Windows.Forms.Button btnRequest;
+        private System.Windows.Forms.TextBox txtRequestUser;
+        private System.Windows.Forms.TextBox txtRequestURLToken;
+        private System.Windows.Forms.TextBox txtRequestEnvironment;
+        private System.Windows.Forms.TextBox txtRequestDomain;
+        private System.Windows.Forms.TextBox txtRequestPassword;
+        private System.Windows.Forms.TextBox txtRequestURLSync;
     }
 }
 

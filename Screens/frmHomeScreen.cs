@@ -52,20 +52,30 @@ namespace WMTool
         string database = Properties.Settings.Default.configDatabase;
         string server = Properties.Settings.Default.configServer;
         string connectionString = string.Empty;
-        WMDatabase _db;
         WMBusiness _business;
         int verifiedCount = 0;
-        int verifiedCountSignature = 0;
-        int totalCountSignature = 0;
         int totalCount = 0;
         int totalInvoiceWithoutCEC = 0;
         System.Data.DataTable dataTableCECs;
         private CancellationTokenSource _cancellationTokenSource;
 
+        string urlToken = Properties.Settings.Default.configURLToken;
+        string urlSync = Properties.Settings.Default.configURLSync;
+        string domain = Properties.Settings.Default.configDomain;
+        string enviroment = Properties.Settings.Default.configEnvironment;
+        string login = Properties.Settings.Default.configLogin;
+        string password = Properties.Settings.Default.configPassword;
+
 
         #endregion
 
         #region |Load Inicial|
+
+        private async void frmHomeScreen_Load(object sender, EventArgs e)
+        {
+            await CheckForUpdates();
+        }
+
         private void LoadInitial()
         {
             //Carrega as variaveis nos controles
@@ -84,6 +94,12 @@ namespace WMTool
             txtQueryCECs.Text = sqlQuerySearchCEC;
             lblDirectoryTripExceptionCSV.Text = directoryPathTripExceptionCSV;
             lblDirectoryCECs.Text = directoryPathCECs;
+            txtRequestDomain.Text = domain;
+            txtRequestEnvironment.Text = enviroment;
+            txtRequestURLSync.Text = urlSync;
+            txtRequestURLToken.Text = urlToken;
+            txtRequestUser.Text = login;
+            txtRequestPassword.Text = password; 
         }
 
       
@@ -159,6 +175,13 @@ namespace WMTool
         #endregion
 
         #region |Bucket Functions (Search CEC)|
+        private void SetCheckStateForAllRows(bool state)
+        {
+            foreach (DataGridViewRow row in dgvCECs.Rows)
+            {
+                row.Cells["CheckCEC"].Value = state;
+            }
+        }
         private async Task<bool> DownloadFileFromS3Async(string key, string saveFilePath)
         {
             key = key.Replace("FiscalDoc: ", "FiscalDoc/");
@@ -247,10 +270,13 @@ namespace WMTool
         #endregion
 
         #region |Control events (BO X CEC)|
-
-
-
         #region|Control events (CEC exists in the bucket)|
+
+        private void btnCancelCompare_Click(object sender, EventArgs e)
+        {
+            _cancellationTokenSource.Cancel();
+        }
+
         private async void btn_businessCEC_Click(object sender, EventArgs e)
         {
             try
@@ -618,6 +644,57 @@ namespace WMTool
         #endregion
 
         #region |Control events (Settings)|
+        private void btnSetDirectoryCECs_Click(object sender, EventArgs e)
+        {
+            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
+            {
+                DialogResult result = folderBrowserDialog.ShowDialog();
+
+                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderBrowserDialog.SelectedPath))
+                {
+                    directoryPathCECs = folderBrowserDialog.SelectedPath;
+
+                    WMTool.Properties.Settings.Default.configSaveCECFolder = directoryPathCECs;
+                    WMTool.Properties.Settings.Default.Save();
+
+                    MessageBox.Show("Diretório salvo com sucesso!");
+
+                    lblDirectoryCECs.Text = directoryPathCECs;
+                }
+            }
+        }
+
+        private void btnSaveSettingsDB_Click(object sender, EventArgs e)
+        {
+            WMTool.Properties.Settings.Default.configServer = txtServerDB.Text;
+            WMTool.Properties.Settings.Default.configDatabase = txtNameDB.Text;
+
+            server = txtServerDB.Text;
+            database = txtNameDB.Text;
+
+            WMTool.Properties.Settings.Default.Save();
+        }
+
+        private void btnSetDirectoryTripExceptionCSV_Click(object sender, EventArgs e)
+        {
+            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
+            {
+                DialogResult result = folderBrowserDialog.ShowDialog();
+
+                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderBrowserDialog.SelectedPath))
+                {
+                    directoryPathTripExceptionCSV = folderBrowserDialog.SelectedPath;
+
+                    WMTool.Properties.Settings.Default.configSaveTripExceptionCSVFolder = directoryPathTripExceptionCSV;
+                    WMTool.Properties.Settings.Default.Save();
+
+                    MessageBox.Show("Diretório salvo com sucesso!");
+
+                    lblDirectoryTripExceptionCSV.Text = directoryPathTripExceptionCSV;
+                }
+            }
+        }
+
         private void btnSetDirectory_Click(object sender, EventArgs e)
         {
             using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
@@ -677,35 +754,100 @@ namespace WMTool
         }
         #endregion
 
-        #endregion
-       
-        
-        private void btnCancelCompare_Click(object sender, EventArgs e)
+        #region |Control events (Request)|
+        private async void btnRequest_Click(object sender, EventArgs e)
         {
-            _cancellationTokenSource.Cancel();
-        }
-
-        private void btnSetDirectoryTripExceptionCSV_Click(object sender, EventArgs e)
-        {
-            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
+            try
             {
-                DialogResult result = folderBrowserDialog.ShowDialog();
+                WMTool.Properties.Settings.Default.configURLSync = txtRequestURLSync.Text;
+                WMTool.Properties.Settings.Default.configURLToken = txtRequestURLToken.Text;
+                WMTool.Properties.Settings.Default.configDomain = txtRequestDomain.Text;
+                WMTool.Properties.Settings.Default.configEnvironment = txtRequestEnvironment.Text;
+                WMTool.Properties.Settings.Default.configLogin = txtRequestUser.Text;
+                WMTool.Properties.Settings.Default.configPassword = txtRequestPassword.Text;
+                WMTool.Properties.Settings.Default.Save();
 
-                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderBrowserDialog.SelectedPath))
+                var urlToken = txtRequestURLToken.Text;
+                var urlSync = txtRequestURLSync.Text;
+                var domain = txtRequestDomain.Text;
+                var environment = int.Parse(txtRequestEnvironment.Text);
+                var login = txtRequestUser.Text;
+                var password = txtRequestPassword.Text;
+
+                using (var httpClient = new HttpClient())
                 {
-                    directoryPathTripExceptionCSV = folderBrowserDialog.SelectedPath;
+                    httpClient.Timeout = TimeSpan.FromSeconds(30);
 
-                    WMTool.Properties.Settings.Default.configSaveTripExceptionCSVFolder = directoryPathTripExceptionCSV;
-                    WMTool.Properties.Settings.Default.Save();
+                    var tokenPayload = new
+                    {
+                        cProjectGUI = domain,
+                        nEnvironment = environment,
+                        cLogin = login,
+                        cPassword = password
+                    };
 
-                    MessageBox.Show("Diretório salvo com sucesso!");
+                    var tokenJson = JsonConvert.SerializeObject(tokenPayload);
+                    var tokenContent = new StringContent(tokenJson, Encoding.UTF8, "application/json");
 
-                    lblDirectoryTripExceptionCSV.Text = directoryPathTripExceptionCSV;
+                    var tokenResponse = await httpClient.PostAsync(urlToken, tokenContent);
+                    tokenResponse.EnsureSuccessStatusCode();
+
+                    var tokenResponseString = await tokenResponse.Content.ReadAsStringAsync();
+
+                    dynamic tokenObj = JsonConvert.DeserializeObject(tokenResponseString);
+                    string token = tokenObj.token;
+
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        MessageBox.Show("Token não retornado.");
+                        return;
+                    }
+
+                    httpClient.DefaultRequestHeaders.Clear();
+                    httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+
+                    var syncPayload = tokenPayload;
+                    var syncJson = JsonConvert.SerializeObject(syncPayload);
+                    var syncContent = new StringContent(syncJson, Encoding.UTF8, "application/json");
+
+                    var syncResponse = await httpClient.PostAsync(urlSync, syncContent);
+                    syncResponse.EnsureSuccessStatusCode();
+
+                    MessageBox.Show("Refresh realizado com sucesso.");
                 }
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro na requisição: " + ex.Message);
+            }
         }
+        #endregion
 
-       
+        #region |Control events (Search CEC)|
+        private async void dgvCECs_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == 1 && e.RowIndex >= 0)
+            {
+                var row = dgvCECs.Rows[e.RowIndex];
+
+                var key = row.Cells["cPathCECCC"].Value?.ToString();
+                if (string.IsNullOrWhiteSpace(key)) return;
+
+                var fileName = GenerateFileNameFromRow(row);
+                if (fileName == null) return;
+
+                string savePath = Path.Combine(directoryPathCECs, fileName);
+
+                bool success = await DownloadFileFromS3Async(key, savePath);
+
+                if (success)
+                    MessageBox.Show($"Arquivo salvo em: {savePath}");
+            }
+        }
+        private void btnSelecionarTodasCECs_Click(object sender, EventArgs e) => SetCheckStateForAllRows(true);
+
+        private void btnDesmarcarTodasCECs_Click(object sender, EventArgs e) => SetCheckStateForAllRows(false);
+
         private async void btnPesquisarCECs_Click(object sender, EventArgs e)
         {
             try
@@ -720,11 +862,11 @@ namespace WMTool
                 dataTableCECs = await business.ConsultDB(txtQueryCECs.Text, connectionString);
 
                 dgvCECs.DataSource = dataTableCECs;
-           }
-           catch (Exception ex)
-           {
-               MessageBox.Show("Erro ao consultar CECs: " + ex.Message);
-           }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao consultar CECs: " + ex.Message);
+            }
         }
 
 
@@ -761,70 +903,9 @@ namespace WMTool
                     await LoadImageFromS3Async(key, imgCECs);
             }
         }
+        #endregion
 
-        private void SetCheckStateForAllRows(bool state)
-        {
-            foreach (DataGridViewRow row in dgvCECs.Rows)
-            {
-                row.Cells["CheckCEC"].Value = state;
-            }
-        }
-
-        private void btnSelecionarTodasCECs_Click(object sender, EventArgs e) => SetCheckStateForAllRows(true);
-
-        private void btnDesmarcarTodasCECs_Click(object sender, EventArgs e) => SetCheckStateForAllRows(false);
-
-        private async void dgvCECs_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.ColumnIndex == 1 && e.RowIndex >= 0)
-            {
-                var row = dgvCECs.Rows[e.RowIndex];
-
-                var key = row.Cells["cPathCECCC"].Value?.ToString();
-                if (string.IsNullOrWhiteSpace(key)) return;
-
-                var fileName = GenerateFileNameFromRow(row);
-                if (fileName == null) return;
-
-                string savePath = Path.Combine(directoryPathCECs, fileName);
-
-                bool success = await DownloadFileFromS3Async(key, savePath);
-
-                if (success)
-                    MessageBox.Show($"Arquivo salvo em: {savePath}");
-            }
-        }
-
-        private void btnSetDirectoryCECs_Click(object sender, EventArgs e)
-        {
-            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
-            {
-                DialogResult result = folderBrowserDialog.ShowDialog();
-
-                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderBrowserDialog.SelectedPath))
-                {
-                    directoryPathCECs = folderBrowserDialog.SelectedPath;
-
-                    WMTool.Properties.Settings.Default.configSaveCECFolder = directoryPathCECs;
-                    WMTool.Properties.Settings.Default.Save();
-
-                    MessageBox.Show("Diretório salvo com sucesso!");
-
-                    lblDirectoryCECs.Text = directoryPathCECs;
-                }
-            }
-        }
-
-        private void btnSaveSettingsDB_Click(object sender, EventArgs e)
-        {
-            WMTool.Properties.Settings.Default.configServer = txtServerDB.Text;
-            WMTool.Properties.Settings.Default.configDatabase = txtNameDB.Text;
-
-            server = txtServerDB.Text;
-            database = txtNameDB.Text;
-
-            WMTool.Properties.Settings.Default.Save();
-        }
+        #endregion
 
         private void btn_Click(object sender, EventArgs e)
         {
@@ -923,11 +1004,6 @@ namespace WMTool
             }
         }
 
-        private async void frmHomeScreen_Load(object sender, EventArgs e)
-        {
-            await CheckForUpdates();
-        }
-
         public class GitHubRelease
         {
             public string tag_name { get; set; }
@@ -939,5 +1015,6 @@ namespace WMTool
         {
             public string browser_download_url { get; set; }
         }
+     
     }
 }
