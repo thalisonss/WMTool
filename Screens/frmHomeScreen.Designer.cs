@@ -76,6 +76,8 @@
             this.dExportCECDanf = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnCompareCEC = new System.Windows.Forms.Button();
             this.tabPage6 = new System.Windows.Forms.TabPage();
+            this.btnCECSaveImage = new System.Windows.Forms.Button();
+            this.btnCECOpenFolder = new System.Windows.Forms.Button();
             this.btnCECOpenImage = new System.Windows.Forms.Button();
             this.imgCECs = new System.Windows.Forms.PictureBox();
             this.btnDesmarcarTodasCECs = new System.Windows.Forms.Button();
@@ -93,8 +95,6 @@
             this.Joker = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.txtQueryCECs = new System.Windows.Forms.TextBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.btnCECOpenFolder = new System.Windows.Forms.Button();
-            this.btnCECSaveImage = new System.Windows.Forms.Button();
             this.tabPage2.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -633,6 +633,32 @@
             this.tabPage6.Text = "Search CEC";
             this.tabPage6.UseVisualStyleBackColor = true;
             // 
+            // btnCECSaveImage
+            // 
+            this.btnCECSaveImage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCECSaveImage.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnCECSaveImage.Location = new System.Drawing.Point(974, 10);
+            this.btnCECSaveImage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnCECSaveImage.Name = "btnCECSaveImage";
+            this.btnCECSaveImage.Size = new System.Drawing.Size(125, 26);
+            this.btnCECSaveImage.TabIndex = 12;
+            this.btnCECSaveImage.Text = "Salvar Imagem";
+            this.btnCECSaveImage.UseVisualStyleBackColor = true;
+            this.btnCECSaveImage.Click += new System.EventHandler(this.btnCECSaveImage_Click);
+            // 
+            // btnCECOpenFolder
+            // 
+            this.btnCECOpenFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCECOpenFolder.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnCECOpenFolder.Location = new System.Drawing.Point(840, 10);
+            this.btnCECOpenFolder.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnCECOpenFolder.Name = "btnCECOpenFolder";
+            this.btnCECOpenFolder.Size = new System.Drawing.Size(128, 26);
+            this.btnCECOpenFolder.TabIndex = 11;
+            this.btnCECOpenFolder.Text = "Abrir Pasta";
+            this.btnCECOpenFolder.UseVisualStyleBackColor = true;
+            this.btnCECOpenFolder.Click += new System.EventHandler(this.btnCECOpenFolder_Click);
+            // 
             // btnCECOpenImage
             // 
             this.btnCECOpenImage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -839,32 +865,6 @@
             this.tabControl1.TabIndex = 0;
             this.tabControl1.TabStop = false;
             // 
-            // btnCECOpenFolder
-            // 
-            this.btnCECOpenFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCECOpenFolder.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCECOpenFolder.Location = new System.Drawing.Point(840, 10);
-            this.btnCECOpenFolder.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.btnCECOpenFolder.Name = "btnCECOpenFolder";
-            this.btnCECOpenFolder.Size = new System.Drawing.Size(128, 26);
-            this.btnCECOpenFolder.TabIndex = 11;
-            this.btnCECOpenFolder.Text = "Abrir Pasta";
-            this.btnCECOpenFolder.UseVisualStyleBackColor = true;
-            this.btnCECOpenFolder.Click += new System.EventHandler(this.btnCECOpenFolder_Click);
-            // 
-            // btnCECSaveImage
-            // 
-            this.btnCECSaveImage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCECSaveImage.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCECSaveImage.Location = new System.Drawing.Point(974, 10);
-            this.btnCECSaveImage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.btnCECSaveImage.Name = "btnCECSaveImage";
-            this.btnCECSaveImage.Size = new System.Drawing.Size(125, 26);
-            this.btnCECSaveImage.TabIndex = 12;
-            this.btnCECSaveImage.Text = "Salvar Imagem";
-            this.btnCECSaveImage.UseVisualStyleBackColor = true;
-            this.btnCECSaveImage.Click += new System.EventHandler(this.btnCECSaveImage_Click);
-            // 
             // frmHomeScreen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -876,6 +876,7 @@
             this.Name = "frmHomeScreen";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "WMTool";
+            this.Load += new System.EventHandler(this.frmHomeScreen_Load);
             this.tabPage2.ResumeLayout(false);
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
