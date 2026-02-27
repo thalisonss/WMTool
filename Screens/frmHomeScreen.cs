@@ -1,0 +1,881 @@
+﻿using Amazon.S3;
+using Amazon.S3.Model;
+using Amazon;
+using System;
+using System.Drawing;
+using System.IO;
+using System.Windows.Forms;
+using System.Diagnostics;
+using WMTool.Databases;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Text;
+using System.Data;
+using System.Globalization;
+using System.Threading;
+using WMTool.Business;
+using System.Windows.Controls;
+using Microsoft.Office.Interop.Excel;
+using System.Data.SqlClient;
+using System.Xml.Linq;
+
+namespace WMTool
+{
+    public partial class frmHomeScreen : Form
+    {
+        private string tempImagePath;
+
+        public frmHomeScreen()
+        {
+            InitializeComponent();
+
+            LoadInitial();
+        }
+
+        #region |Variables|
+
+        
+        string directoryPathCSV = Properties.Settings.Default.configSaveCSVFolder;
+        string directoryPathTripExceptionCSV = Properties.Settings.Default.configSaveTripExceptionCSVFolder;
+        string directoryPathCECs = Properties.Settings.Default.configSaveCECFolder;
+        bool preProd = Properties.Settings.Default.configPreProd;
+        string sqlQuery = Properties.Settings.Default.configQuerySQL;
+        string sqlQuerySearchCEC = Properties.Settings.Default.configQuerySearchCEC;
+        string awsAccessKeyId = Properties.Settings.Default.configAccessKey;
+        string awsSecretAccessKey = Properties.Settings.Default.configSecretKey;   
+        string bucketName = Properties.Settings.Default.configBucketName;
+        string database = Properties.Settings.Default.configDatabase;
+        string server = Properties.Settings.Default.configServer;
+        string connectionString = string.Empty;
+        WMDatabase _db;
+        WMBusiness _business;
+        int verifiedCount = 0;
+        int verifiedCountSignature = 0;
+        int totalCountSignature = 0;
+        int totalCount = 0;
+        int totalInvoiceWithoutCEC = 0;
+        System.Data.DataTable dataTableCECs;
+        private CancellationTokenSource _cancellationTokenSource;
+
+
+        #endregion
+
+        #region |Load Inicial|
+        private void LoadInitial()
+        {
+            //Carrega as variaveis nos controles
+            LoadConfig();
+
+            dgvInvoicesWithoutCEC.AutoGenerateColumns = true;
+        }
+
+        private void LoadConfig()
+        {
+            // Carrega as configurações salvas nas variaveis nos controles
+            lblDirectoryCSV.Text = directoryPathCSV;
+            txtServerDB.Text = server;
+            txtNameDB.Text = database;
+            txtSQLQuery.Text = sqlQuery;
+            txtQueryCECs.Text = sqlQuerySearchCEC;
+            lblDirectoryTripExceptionCSV.Text = directoryPathTripExceptionCSV;
+            lblDirectoryCECs.Text = directoryPathCECs;
+        }
+
+      
+
+        #endregion
+
+        #region |Functions|
+        #region |Bucket Functions (BO x CEC)|
+        //Função para conectar no bucket e carregar imagem na tela
+        private async void LoadImageFromS3(string key)
+        {
+            //converte o nome da chave do banco de dados para o formato para buscar no bucket
+            key = key.Replace("FiscalDoc: ", "FiscalDoc/");
+
+            //Seta a região para acesso ao bucket
+            RegionEndpoint region = RegionEndpoint.USEast1;
+            try
+            {
+                using (var client = new AmazonS3Client(awsAccessKeyId, awsSecretAccessKey, region))
+                {
+                    var request = new GetObjectRequest
+                    {
+                        BucketName = bucketName,
+                        Key = key
+                    };
+
+                    using (GetObjectResponse response = await client.GetObjectAsync(request))
+                    using (Stream responseStream = response.ResponseStream)
+                    using (MemoryStream memoryStream = new MemoryStream())
+                    {
+                        await responseStream.CopyToAsync(memoryStream);
+                        memoryStream.Position = 0;
+                        tempImagePath = Path.Combine(Path.GetTempPath(), "tempImage.png");
+                        File.WriteAllBytes(tempImagePath, memoryStream.ToArray());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao carregar a imagem: {ex.Message}");
+            }
+        }
+
+       
+
+        #endregion
+
+        #region |Bucket Functions (CEC exists in the bucket)|
+        private async Task<bool> FileExistsInBucketAsync(string fileName)
+        {
+            try
+            {
+                var client = new AmazonS3Client(awsAccessKeyId, awsSecretAccessKey, RegionEndpoint.USEast1);
+                var request = new GetObjectMetadataRequest
+                {
+                    BucketName = bucketName,
+                    Key = fileName
+                };
+
+                await client.GetObjectMetadataAsync(request);
+                return true;
+            }
+            catch (AmazonS3Exception ex)
+            {
+                if (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    return false;
+                }
+
+                throw;
+            }
+        }
+        #endregion
+
+        #region |Bucket Functions (Search CEC)|
+        private async Task<bool> DownloadFileFromS3Async(string key, string saveFilePath)
+        {
+            key = key.Replace("FiscalDoc: ", "FiscalDoc/");
+            RegionEndpoint region = RegionEndpoint.USEast1;
+
+            try
+            {
+                using (var client = new AmazonS3Client(awsAccessKeyId, awsSecretAccessKey, region))
+                {
+                    var request = new GetObjectRequest
+                    {
+                        BucketName = bucketName,
+                        Key = key
+                    };
+
+                    using (GetObjectResponse response = await client.GetObjectAsync(request))
+                    using (Stream responseStream = response.ResponseStream)
+                    using (MemoryStream memoryStream = new MemoryStream())
+                    {
+                        await responseStream.CopyToAsync(memoryStream);
+                        memoryStream.Position = 0;
+
+                        File.WriteAllBytes(saveFilePath, memoryStream.ToArray());
+
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao baixar o arquivo {key}: {ex.Message}");
+                return false;
+            }
+        }
+        private async Task LoadImageFromS3Async(string key, PictureBox pictureBox)
+        {
+            key = key.Replace("FiscalDoc: ", "FiscalDoc/");
+            RegionEndpoint region = RegionEndpoint.USEast1;
+
+            try
+            {
+                using (var client = new AmazonS3Client(awsAccessKeyId, awsSecretAccessKey, region))
+                {
+                    var request = new GetObjectRequest
+                    {
+                        BucketName = bucketName,
+                        Key = key
+                    };
+
+                    using (GetObjectResponse response = await client.GetObjectAsync(request))
+                    using (Stream responseStream = response.ResponseStream)
+                    using (MemoryStream memoryStream = new MemoryStream())
+                    {
+                        await responseStream.CopyToAsync(memoryStream);
+                        memoryStream.Position = 0;
+
+                        pictureBox.Image = System.Drawing.Image.FromStream(memoryStream);
+
+                        tempImagePath = Path.Combine(Path.GetTempPath(), "tempImage.png");
+                        File.WriteAllBytes(tempImagePath, memoryStream.ToArray());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao carregar a imagem: {ex.Message}");
+            }
+        }
+
+        private string GenerateFileNameFromRow(DataGridViewRow row)
+        {
+            string branch = row.Cells["CECcIDBranchInvoice"]?.Value?.ToString();
+            string invoice = row.Cells["CECcIDInvoice"]?.Value?.ToString();
+            string serie = row.Cells["CECcSerie"]?.Value?.ToString();
+
+            if (string.IsNullOrWhiteSpace(branch) || string.IsNullOrWhiteSpace(invoice) || string.IsNullOrWhiteSpace(serie))
+            {
+                return null; // ou lançar uma exceção, conforme desejado
+            }
+
+            return $"{branch}-{invoice}-{serie}.png";
+        }
+
+        #endregion
+
+        #endregion
+
+        #region |Control events (BO X CEC)|
+
+
+
+        #region|Control events (CEC exists in the bucket)|
+        private async void btn_businessCEC_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                _business = new WMBusiness();
+                _cancellationTokenSource = new CancellationTokenSource();
+                var cancellationToken = _cancellationTokenSource.Token;
+
+                // Salvar a query nas configurações da aplicação
+                WMTool.Properties.Settings.Default.configQuerySQL = txtSQLQuery.Text;
+                WMTool.Properties.Settings.Default.Save();
+
+                // Limpar e resetar a dgvInvoicesWithoutCEC e variáveis de contagem
+                dgvInvoicesWithoutCEC.Rows.Clear();
+                totalCount = 0;
+                verifiedCount = 0;
+                totalInvoiceWithoutCEC = 0;
+
+                // Desabilitar os controles para impedir bugs no momento da execução
+                btnCompareCEC.Enabled = false;
+                btnExcel.Enabled = false;
+                txtSQLQuery.Enabled = false;
+                btnInsertDataCECTableTemporary.Enabled = false;
+                chkTripException.Enabled = false;
+                btnCancelCompare.Enabled = true;
+                btnCancelCompare.Visible = true;
+
+                // Retorna os dados consultados
+                System.Data.DataTable records = await _business.ConsultDB(txtSQLQuery.Text, connectionString);
+
+                // Carregar registros existentes no CSV, se o checkbox estiver marcado
+                HashSet<string> existingCsvRecords = new HashSet<string>();
+                string filePathTripException = Path.Combine(directoryPathTripExceptionCSV, "WM_Trip_Exception.csv");
+                if (chkTripException.Checked && File.Exists(filePathTripException))
+                {
+                    existingCsvRecords = LoadCsvRecords(filePathTripException);
+                }
+
+                // Filtrar registros se chkTripException estiver marcado
+                if (chkTripException.Checked)
+                {
+                    var filteredRecords = from DataRow row in records.Rows
+                                          where !existingCsvRecords.Contains(row["cIDTrip"]?.ToString())
+                                          select row;
+
+                    // Atualizar DataTable após filtragem
+                    try
+                    {
+                        records = filteredRecords.Any() ? filteredRecords.CopyToDataTable() : new System.Data.DataTable();
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        throw new InvalidOperationException("A Origem não contem DataRows");
+                    }
+                }
+
+                // Atualizar totalCount com a quantidade de registros após a filtragem
+                totalCount = records.Rows.Count;
+                lblTotalVerified.Text = $"{verifiedCount} / {totalCount}";
+
+                // Validação caso não retornar nenhum registro habilita os botões novamente e mostra a mensagem.
+                if (totalCount == 0)
+                {
+                    throw new InvalidOperationException("Nenhum registro encontrado.");
+                }
+
+                // Inserir o valor máximo da barra de progresso com a quantidade retornada dos registros e colocar seu valor inicial igual a 0 
+                progressBarCEC.Maximum = totalCount;
+                progressBarCEC.Value = 0;
+
+                try
+                {
+                    List<DataRow> recordsWithPathCec = new List<DataRow>();
+
+                    // Primeiro, adicione todas as linhas com cPathCec ou dExportCECDanf nulo ou em branco
+                    foreach (DataRow record in records.Rows)
+                    {
+                        // Verifica se o botão de cancelar foi acionado, se sim ele cai no catch e para a verificação
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        string cPathCec = record["cPathCec"]?.ToString();
+                        string dExportCECDanf = record["dExportCECDanf"]?.ToString();
+
+                        if (string.IsNullOrEmpty(cPathCec) || string.IsNullOrEmpty(dExportCECDanf))
+                        {
+                            dgvInvoicesWithoutCEC.Rows.Add(
+                                record["cIDCompany"],
+                                record["cIDInvoice"],
+                                record["cSerie"],
+                                record["cIDBranchInvoice"],
+                                record["cPathCec"],
+                                record["dEmission"],
+                                record["cIDCustomer"],
+                                record["cIDTrip"]
+                            );
+
+                            totalInvoiceWithoutCEC++;
+                            verifiedCount++;
+                        }
+                        else
+                        {
+                            recordsWithPathCec.Add(record);
+                        }
+
+                        progressBarCEC.Value = verifiedCount;
+                        lblTotalVerified.Text = $"{verifiedCount} / {totalCount}";
+                        lblTotalInvoiceWithoutCEC.Text = $"{totalInvoiceWithoutCEC}";
+                    }
+
+                    // Agora, verifique os registros com cPathCec e dExportCECDanf preenchido
+                    foreach (DataRow record in recordsWithPathCec)
+                    {
+                        // Verifica se o botão de cancelar foi acionado, se sim ele cai no catch e para a verificação
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        string cIDTrip = record["cIDTrip"]?.ToString();
+
+                        if (chkTripException.Checked && existingCsvRecords.Contains(cIDTrip))
+                        {
+                            // Pula a verificação, pois já existe no CSV e o chkTripException está marcado
+                            continue;
+                        }
+
+                        string cPathCec = record["cPathCec"]?.ToString();
+                        string fileName = "FiscalDoc/" + cPathCec.Replace("FiscalDoc: ", "").ToLower();
+
+                        // Se não existir no bucket, insere a linha no DataGridView
+                        bool exists = await FileExistsInBucketAsync(fileName);
+                        if (!exists)
+                        {
+                            dgvInvoicesWithoutCEC.Rows.Add(
+                                record["cIDCompany"],
+                                record["cIDInvoice"],
+                                record["cSerie"],
+                                record["cIDBranchInvoice"],
+                                record["cPathCec"],
+                                record["dEmission"],
+                                record["cIDCustomer"],
+                                record["cIDTrip"]
+                            );
+
+                            totalInvoiceWithoutCEC++;
+                        }
+
+                        verifiedCount++;
+                        progressBarCEC.Value = verifiedCount;
+                        lblTotalVerified.Text = $"{verifiedCount} / {totalCount}";
+                        lblTotalInvoiceWithoutCEC.Text = $"{totalInvoiceWithoutCEC}";
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    // Mensagem que aparece caso o botão de cancelar for clicado
+                    MessageBox.Show("Operação cancelada pelo usuário.", "WMTool", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                }
+                finally
+                {
+                    if (totalInvoiceWithoutCEC > 0)
+                    {
+                        btnExcel.Enabled = true;
+                        btnInsertDataCECTableTemporary.Enabled = true;
+                    }
+                    txtSQLQuery.Enabled = true;
+                    btnCompareCEC.Enabled = true;
+                    btnCancelCompare.Enabled = false;
+                    btnCancelCompare.Visible = false;
+                    chkTripException.Enabled = true;
+                }
+
+                // Pergunta ao usuário se deseja salvar os dados em um arquivo CSV
+                DialogResult result = MessageBox.Show("Deseja salvar as viagens verificadas na planilha de exceção?", "WMTool", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
+                {
+                    AppendRecordsToCsv(records, dgvInvoicesWithoutCEC);
+                }
+
+                MessageBox.Show("Comparação concluída.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(ex.Message);
+                MessageBox.Show("Comparação concluída.");
+                FinallyBlock();
+            }
+            catch (ArgumentException ex)
+            {
+                MessageBox.Show(ex.Message);
+                FinallyBlock();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                FinallyBlock();
+            }
+        }
+
+        private void FinallyBlock()
+        {
+            if (totalInvoiceWithoutCEC > 0)
+            {
+                btnExcel.Enabled = true;
+                btnInsertDataCECTableTemporary.Enabled = true;
+            }
+            txtSQLQuery.Enabled = true;
+            btnCompareCEC.Enabled = true;
+            btnCancelCompare.Enabled = false;
+            btnCancelCompare.Visible = false;
+            chkTripException.Enabled = true;
+        }
+
+        private void AppendRecordsToCsv(System.Data.DataTable records, DataGridView dgvInvoicesWithoutCEC)
+        {
+            // Caminho onde o CSV será salvo
+            string filePathTripException = Path.Combine(directoryPathTripExceptionCSV, "WM_Trip_Exception.csv");
+            string filePath = filePathTripException;
+            var csv = new StringBuilder();
+
+            HashSet<string> existingCsvRecords = new HashSet<string>();
+            HashSet<string> excludedRecords = new HashSet<string>();
+
+            // Carregar registros existentes no CSV
+            if (File.Exists(filePath))
+            {
+                existingCsvRecords = LoadCsvRecords(filePath);
+            }
+            else
+            {
+                // Adicionar cabeçalho apenas se o arquivo não existe
+                csv.AppendLine("cIDTrip;Data");
+            }
+
+            // Obter os cIDTrips do dgvInvoicesWithoutCEC
+            foreach (DataGridViewRow row in dgvInvoicesWithoutCEC.Rows)
+            {
+                // Verificar se a célula não é nula e se possui um valor
+                if (row.Cells["cIDTrip"] != null && row.Cells["cIDTrip"].Value != null)
+                {
+                    string cIDTrip = row.Cells["cIDTrip"].Value.ToString();
+                    excludedRecords.Add(cIDTrip);
+                }
+            }
+
+            // Percorrer o DataTable e obter os valores cIDTrip e a data atual
+            foreach (DataRow row in records.Rows)
+            {
+                if (row["cIDTrip"] != null)
+                {
+                    string cIDTrip = row["cIDTrip"].ToString();
+
+                    // Verificar se o cIDTrip já existe no conjunto ou se está no excludedRecords
+                    if (!existingCsvRecords.Contains(cIDTrip) && !excludedRecords.Contains(cIDTrip))
+                    {
+                        string data = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+                        csv.AppendLine($"{cIDTrip};{data}");
+                        existingCsvRecords.Add(cIDTrip); // Adicionar ao conjunto para evitar duplicadas no futuro
+                    }
+                }
+            }
+
+            // Append o CSV ao arquivo
+            File.AppendAllText(filePath, csv.ToString());
+        }
+
+
+
+        private HashSet<string> LoadCsvRecords(string filePath)
+        {
+            var existingRecords = new HashSet<string>();
+
+            var lines = File.ReadAllLines(filePath);
+            foreach (var line in lines.Skip(1)) // Pular o cabeçalho
+            {
+                var parts = line.Split(';');
+                if (parts.Length > 0)
+                {
+                    existingRecords.Add(parts[0]);
+                }
+            }
+
+            return existingRecords;
+        }
+
+
+        private void btnExcel_Click(object sender, EventArgs e)
+        {
+            DateTime now = DateTime.Now;
+
+            // Formatar a data e hora conforme desejado (aaaaMMdd_HHmmss)
+            string formattedDateTime = now.ToString("yyyyMMdd_HHmmss");
+
+            // Inicializar datas mínima e máxima
+            DateTime minDate = DateTime.MaxValue;
+            DateTime maxDate = DateTime.MinValue;
+
+            // Iterar pelas linhas para encontrar as datas mínima e máxima na coluna dEmission
+            foreach (DataGridViewRow row in dgvInvoicesWithoutCEC.Rows)
+            {
+                if (!row.IsNewRow)
+                {
+                    DateTime emissionDate;
+                    if (DateTime.TryParse(row.Cells["dEmission"].Value.ToString(), out emissionDate))
+                    {
+                        if (emissionDate < minDate) minDate = emissionDate;
+                        if (emissionDate > maxDate) maxDate = emissionDate;
+                    }
+                }
+            }
+
+            // Verificar se minDate e maxDate foram atualizadas
+            if (minDate == DateTime.MaxValue || maxDate == DateTime.MinValue)
+            {
+                MessageBox.Show("Erro: Nenhuma data válida encontrada na coluna dEmission.");
+                return;
+            }
+
+            // Formatar as datas mínima e máxima
+            string minDateString = minDate.ToString("dd-MM-yy");
+            string maxDateString = maxDate.ToString("dd-MM-yy");
+
+            // Concatenar a string inicial com as datas formatadas
+            string fileName = $"WM_NF_WITHOUT_CEC_{minDateString}_a_{maxDateString}_{formattedDateTime}.csv";
+
+            string destinationPath = Path.Combine(directoryPathCSV, fileName);
+
+            try
+            {
+                if (!Directory.Exists(directoryPathCSV))
+                {
+                    Directory.CreateDirectory(directoryPathCSV);
+                }
+
+                StringBuilder sb = new StringBuilder();
+
+                string[] colunas = new string[dgvInvoicesWithoutCEC.Columns.Count];
+                for (int i = 0; i < dgvInvoicesWithoutCEC.Columns.Count; i++)
+                {
+                    colunas[i] = dgvInvoicesWithoutCEC.Columns[i].HeaderText;
+                }
+                sb.AppendLine(string.Join(";", colunas));
+
+                foreach (DataGridViewRow row in dgvInvoicesWithoutCEC.Rows)
+                {
+                    if (!row.IsNewRow)
+                    {
+                        string[] cells = new string[dgvInvoicesWithoutCEC.Columns.Count];
+                        for (int i = 0; i < dgvInvoicesWithoutCEC.Columns.Count; i++)
+                        {
+                            var cellValue = row.Cells[i].Value;
+                            cells[i] = cellValue != null ? cellValue.ToString() : string.Empty;
+                        }
+                        sb.AppendLine(string.Join(";", cells));
+                    }
+                }
+
+                File.WriteAllText(destinationPath, sb.ToString(), Encoding.UTF8);
+
+                MessageBox.Show("Dados exportados com sucesso para " + destinationPath);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao exportar dados: " + ex.Message);
+            }
+        }
+
+        #endregion
+
+        #region |Control events (Settings)|
+        private void btnSetDirectory_Click(object sender, EventArgs e)
+        {
+            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
+            {
+                DialogResult result = folderBrowserDialog.ShowDialog();
+
+                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderBrowserDialog.SelectedPath))
+                {
+                    directoryPathCECs = folderBrowserDialog.SelectedPath;
+
+                    WMTool.Properties.Settings.Default.configSaveImageFolder = directoryPathCECs;
+                    WMTool.Properties.Settings.Default.Save();
+
+                    MessageBox.Show("Diretório salvo com sucesso!");
+
+                    //lblDirectory.Text = directoryPath;
+                }
+            }
+        }
+
+        private void btnSetDirectoryCSV_Click(object sender, EventArgs e)
+        {
+            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
+            {
+                DialogResult result = folderBrowserDialog.ShowDialog();
+
+                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderBrowserDialog.SelectedPath))
+                {
+                    directoryPathCSV = folderBrowserDialog.SelectedPath;
+
+                    WMTool.Properties.Settings.Default.configSaveCSVFolder = directoryPathCSV;
+                    WMTool.Properties.Settings.Default.Save();
+
+                    MessageBox.Show("Diretório salvo com sucesso!");
+
+                    lblDirectoryCSV.Text = directoryPathCSV;
+                }
+            }
+        }
+
+        private void btnSaveSettings_Click(object sender, EventArgs e)
+        {
+            WMTool.Properties.Settings.Default.configBucketName = txtBucketName.Text;
+            WMTool.Properties.Settings.Default.configAccessKey = txtAccessKey.Text;
+            WMTool.Properties.Settings.Default.configSecretKey = txtSecretAccessKey.Text;
+
+            awsAccessKeyId = txtAccessKey.Text;
+            awsSecretAccessKey = txtSecretAccessKey.Text;
+            bucketName = txtBucketName.Text;
+
+            WMTool.Properties.Settings.Default.Save();
+        }
+
+        private void chkPreProd_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+        #endregion
+
+        #endregion
+       
+        
+        private void btnCancelCompare_Click(object sender, EventArgs e)
+        {
+            _cancellationTokenSource.Cancel();
+        }
+
+        private void btnSetDirectoryTripExceptionCSV_Click(object sender, EventArgs e)
+        {
+            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
+            {
+                DialogResult result = folderBrowserDialog.ShowDialog();
+
+                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderBrowserDialog.SelectedPath))
+                {
+                    directoryPathTripExceptionCSV = folderBrowserDialog.SelectedPath;
+
+                    WMTool.Properties.Settings.Default.configSaveTripExceptionCSVFolder = directoryPathTripExceptionCSV;
+                    WMTool.Properties.Settings.Default.Save();
+
+                    MessageBox.Show("Diretório salvo com sucesso!");
+
+                    lblDirectoryTripExceptionCSV.Text = directoryPathTripExceptionCSV;
+                }
+            }
+        }
+
+       
+        private async void btnPesquisarCECs_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                WMTool.Properties.Settings.Default.configQuerySearchCEC = txtQueryCECs.Text;
+                WMTool.Properties.Settings.Default.Save();
+
+                connectionString = $"Server={server};Database={database};Integrated Security=true;";
+
+                Business.WMBusiness business = new Business.WMBusiness();
+
+                dataTableCECs = await business.ConsultDB(txtQueryCECs.Text, connectionString);
+
+                dgvCECs.DataSource = dataTableCECs;
+           }
+           catch (Exception ex)
+           {
+               MessageBox.Show("Erro ao consultar CECs: " + ex.Message);
+           }
+        }
+
+
+        private async void btnDownloadCECs_Click(object sender, EventArgs e)
+        {
+            string savePath = string.Empty;
+
+            foreach (DataGridViewRow row in dgvCECs.Rows)
+            {
+                bool isChecked = row.Cells["CheckCEC"].Value != null && Convert.ToBoolean(row.Cells["CheckCEC"].Value);
+                if (!isChecked) continue;
+
+                var key = row.Cells["cPathCECCC"].Value?.ToString();
+                if (string.IsNullOrWhiteSpace(key)) continue;
+
+                var fileName = GenerateFileNameFromRow(row);
+                if (fileName == null) continue;
+
+                savePath = Path.Combine(directoryPathCECs, fileName);
+
+                await DownloadFileFromS3Async(key, savePath);
+            }
+
+            MessageBox.Show($"Arquivo salvo em: " + savePath);
+        }
+
+        private async void dgvCECs_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dgvCECs.SelectedRows.Count > 0)
+            {
+                var selectedRow = dgvCECs.SelectedRows[0];
+                var key = selectedRow.Cells["cPathCECCC"].Value?.ToString();
+                if (!string.IsNullOrWhiteSpace(key))
+                    await LoadImageFromS3Async(key, imgCECs);
+            }
+        }
+
+        private void SetCheckStateForAllRows(bool state)
+        {
+            foreach (DataGridViewRow row in dgvCECs.Rows)
+            {
+                row.Cells["CheckCEC"].Value = state;
+            }
+        }
+
+        private void btnSelecionarTodasCECs_Click(object sender, EventArgs e) => SetCheckStateForAllRows(true);
+
+        private void btnDesmarcarTodasCECs_Click(object sender, EventArgs e) => SetCheckStateForAllRows(false);
+
+        private async void dgvCECs_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == 1 && e.RowIndex >= 0)
+            {
+                var row = dgvCECs.Rows[e.RowIndex];
+
+                var key = row.Cells["cPathCECCC"].Value?.ToString();
+                if (string.IsNullOrWhiteSpace(key)) return;
+
+                var fileName = GenerateFileNameFromRow(row);
+                if (fileName == null) return;
+
+                string savePath = Path.Combine(directoryPathCECs, fileName);
+
+                bool success = await DownloadFileFromS3Async(key, savePath);
+
+                if (success)
+                    MessageBox.Show($"Arquivo salvo em: {savePath}");
+            }
+        }
+
+        private void btnSetDirectoryCECs_Click(object sender, EventArgs e)
+        {
+            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
+            {
+                DialogResult result = folderBrowserDialog.ShowDialog();
+
+                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderBrowserDialog.SelectedPath))
+                {
+                    directoryPathCECs = folderBrowserDialog.SelectedPath;
+
+                    WMTool.Properties.Settings.Default.configSaveCECFolder = directoryPathCECs;
+                    WMTool.Properties.Settings.Default.Save();
+
+                    MessageBox.Show("Diretório salvo com sucesso!");
+
+                    lblDirectoryCECs.Text = directoryPathCECs;
+                }
+            }
+        }
+
+        private void btnSaveSettingsDB_Click(object sender, EventArgs e)
+        {
+            WMTool.Properties.Settings.Default.configServer = txtServerDB.Text;
+            WMTool.Properties.Settings.Default.configDatabase = txtNameDB.Text;
+
+            server = txtServerDB.Text;
+            database = txtNameDB.Text;
+
+            WMTool.Properties.Settings.Default.Save();
+        }
+
+        private void btn_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(tempImagePath) && File.Exists(tempImagePath))
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = tempImagePath,
+                    UseShellExecute = true
+                });
+            }
+            else
+            {
+                MessageBox.Show("A imagem não está disponível.");
+            }
+        }
+
+        private void btnCECOpenFolder_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(directoryPathCECs) && Directory.Exists(directoryPathCECs))
+            {
+                Process.Start("explorer.exe", directoryPathCECs);
+            }
+            else
+            {
+                MessageBox.Show("O diretório não está configurado ou não existe.");
+            }
+        }
+
+        private void btnCECSaveImage_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(tempImagePath) && File.Exists(tempImagePath))
+            {
+                string fileName = "image.png";
+                string destinationPath = Path.Combine(directoryPathCECs, fileName);
+
+                try
+                {
+                    if (!Directory.Exists(directoryPathCECs))
+                    {
+                        Directory.CreateDirectory(directoryPathCECs);
+                    }
+
+                    File.Copy(tempImagePath, destinationPath, true);
+                    MessageBox.Show($"Arquivo salvo em: {destinationPath}");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Erro ao salvar a imagem: {ex.Message}");
+                }
+            }
+            else
+            {
+                MessageBox.Show("A imagem não está disponível.");
+            }
+        }
+    }
+}
