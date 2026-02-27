@@ -927,5 +927,17 @@ namespace WMTool
         {
             await CheckForUpdates();
         }
+
+        public class GitHubRelease
+        {
+            public string tag_name { get; set; }
+            public string body { get; set; }
+            public List<GitHubAsset> assets { get; set; }
+        }
+
+        public class GitHubAsset
+        {
+            public string browser_download_url { get; set; }
+        }
     }
 }
