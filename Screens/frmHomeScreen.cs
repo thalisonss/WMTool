@@ -1,24 +1,28 @@
-﻿using Amazon.S3;
+﻿using Amazon;
+using Amazon.S3;
 using Amazon.S3.Model;
-using Amazon;
-using System;
-using System.Drawing;
-using System.IO;
-using System.Windows.Forms;
-using System.Diagnostics;
-using WMTool.Databases;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Text;
-using System.Data;
-using System.Globalization;
-using System.Threading;
-using WMTool.Business;
-using System.Windows.Controls;
 using Microsoft.Office.Interop.Excel;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
+using System.Drawing;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Xml.Linq;
+using WMTool.Business;
+using WMTool.Databases;
+using WMTool.Utils;
+using Application = System.Windows.Forms.Application;
 
 namespace WMTool
 {
@@ -876,6 +880,52 @@ namespace WMTool
             {
                 MessageBox.Show("A imagem não está disponível.");
             }
+        }
+        private async Task CheckForUpdates()
+        {
+            try
+            {
+                using (HttpClient client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Add("User-Agent", "WMTool");
+
+                    string url = "https://api.github.com/repos/thalisonss/WMTool/releases/latest";
+
+                    var response = await client.GetStringAsync(url);
+
+                    var release = JsonConvert.DeserializeObject<GitHubRelease>(response);
+
+                    string latestVersionTag = release.tag_name.Replace("v", "");
+
+                    Version currentVersion = new Version(Application.ProductVersion);
+                    Version latestVersion = new Version(latestVersionTag);
+
+                    if (latestVersion > currentVersion)
+                    {
+                        var result = MessageBox.Show(
+                            $"Nova versão disponível: {latestVersion}\n\n{release.body}\n\nDeseja atualizar?",
+                            "Atualização disponível",
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Information);
+
+                        if (result == DialogResult.Yes)
+                        {
+                            string downloadUrl = release.assets[0].browser_download_url;
+                            Process.Start(downloadUrl);
+                            Application.Exit();
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                
+            }
+        }
+
+        private async void frmHomeScreen_Load(object sender, EventArgs e)
+        {
+            await CheckForUpdates();
         }
     }
 }
