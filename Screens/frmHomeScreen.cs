@@ -757,6 +757,8 @@ namespace WMTool
         #region |Control events (Request)|
         private async void btnRequest_Click(object sender, EventArgs e)
         {
+            lblRequestLastUpdate.Text = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+
             try
             {
                 WMTool.Properties.Settings.Default.configURLSync = txtRequestURLSync.Text;
@@ -799,7 +801,7 @@ namespace WMTool
 
                     if (string.IsNullOrEmpty(token))
                     {
-                        MessageBox.Show("Token não retornado.");
+                        lblRequestStatus.Text = "Token não retornado.";
                         return;
                     }
 
@@ -813,11 +815,13 @@ namespace WMTool
                     var syncResponse = await httpClient.PostAsync(urlSync, syncContent);
                     syncResponse.EnsureSuccessStatusCode();
 
-                    MessageBox.Show("Refresh realizado com sucesso.");
+                    lblRequestStatus.Text = "Refresh para o usuario " + login + " realizado com sucesso.";
                 }
             }
             catch (Exception ex)
             {
+                lblRequestStatus.Text = "Erro na requisição do usaurio " + login;
+
                 MessageBox.Show("Erro na requisição: " + ex.Message);
             }
         }
