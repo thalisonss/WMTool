@@ -11,7 +11,8 @@ namespace WMTool.Business
 {
     class WMBusiness 
     {
-        WMDatabase wmDataBase = new WMDatabase();
+        private static readonly string[] DangerousKeywords = { "DROP", "DELETE", "--", "INSERT" };
+        private readonly WMDatabase wmDataBase = new WMDatabase();
 
         public async Task<System.Data.DataTable> ConsultDB(string sqlQuery, string connectionString)
         {
@@ -20,8 +21,7 @@ namespace WMTool.Business
                 throw new ArgumentNullException("Campo de query vazia!");
             }
 
-            List<string> dangerousKeywords = new List<string> { "DROP", "DELETE", "--", "INSERT"};
-            foreach (string keyword in dangerousKeywords)
+            foreach (string keyword in DangerousKeywords)
             {
                 if (sqlQuery.ToUpper().Contains(keyword))
                 {
@@ -34,10 +34,8 @@ namespace WMTool.Business
                 throw new ArgumentException("A query deve começar com uma cláusula SELECT.");
             }
 
-            {
-                DataTable dataTable = await wmDataBase.ConsultDB(sqlQuery, connectionString);
-                return dataTable;
-            }
+            DataTable dataTable = await wmDataBase.ConsultDB(sqlQuery, connectionString);
+            return dataTable;
         }
 
     }
