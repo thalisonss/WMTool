@@ -982,9 +982,24 @@ namespace WMTool
 
                         if (result == DialogResult.Yes)
                         {
-                            string downloadUrl = release.assets[0].browser_download_url;
-                            Process.Start(downloadUrl);
-                            Application.Exit();
+                            string downloadUrl = release.assets?
+                                .FirstOrDefault(a => !string.IsNullOrWhiteSpace(a.browser_download_url))?
+                                .browser_download_url;
+
+                            if (string.IsNullOrWhiteSpace(downloadUrl))
+                            {
+                                downloadUrl = release.html_url;
+                            }
+
+                            if (!string.IsNullOrWhiteSpace(downloadUrl))
+                            {
+                                Process.Start(downloadUrl);
+                                Application.Exit();
+                            }
+                            else
+                            {
+                                MessageBox.Show("Não foi possível encontrar o link de download da atualização.", "Atualização", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            }
                         }
                     }
                 }
@@ -999,6 +1014,7 @@ namespace WMTool
         {
             public string tag_name { get; set; }
             public string body { get; set; }
+            public string html_url { get; set; }
             public List<GitHubAsset> assets { get; set; }
         }
 
