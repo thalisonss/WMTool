@@ -30,6 +30,18 @@
         {
             this.label10 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
+            this.txtRequestURLSync = new System.Windows.Forms.TextBox();
+            this.txtRequestURLToken = new System.Windows.Forms.TextBox();
+            this.txtRequestEnvironment = new System.Windows.Forms.TextBox();
+            this.txtRequestDomain = new System.Windows.Forms.TextBox();
+            this.txtRequestPassword = new System.Windows.Forms.TextBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.btnSaveSettingsDB = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
@@ -96,25 +108,14 @@
             this.txtQueryCECs = new System.Windows.Forms.TextBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPageRequest = new System.Windows.Forms.TabPage();
+            this.lblRequestLastUpdate = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
             this.lblRequestStatus = new System.Windows.Forms.Label();
             this.btnRequest = new System.Windows.Forms.Button();
             this.txtRequestUser = new System.Windows.Forms.TextBox();
             this.printDocument1 = new System.Drawing.Printing.PrintDocument();
-            this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.txtRequestURLSync = new System.Windows.Forms.TextBox();
-            this.txtRequestURLToken = new System.Windows.Forms.TextBox();
-            this.txtRequestEnvironment = new System.Windows.Forms.TextBox();
-            this.txtRequestDomain = new System.Windows.Forms.TextBox();
-            this.txtRequestPassword = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
-            this.label7 = new System.Windows.Forms.Label();
-            this.label8 = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
-            this.label13 = new System.Windows.Forms.Label();
-            this.label14 = new System.Windows.Forms.Label();
-            this.lblRequestLastUpdate = new System.Windows.Forms.Label();
             this.tabPage2.SuspendLayout();
+            this.groupBox5.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -126,7 +127,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvCECs)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPageRequest.SuspendLayout();
-            this.groupBox5.SuspendLayout();
             this.SuspendLayout();
             // 
             // label10
@@ -134,9 +134,10 @@
             this.label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label10.AutoSize = true;
             this.label10.Font = new System.Drawing.Font("Segoe UI", 7.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label10.Location = new System.Drawing.Point(1233, 754);
+            this.label10.Location = new System.Drawing.Point(925, 613);
+            this.label10.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(101, 15);
+            this.label10.Size = new System.Drawing.Size(85, 12);
             this.label10.TabIndex = 1;
             this.label10.Text = "github/thalisonss";
             // 
@@ -147,14 +148,131 @@
             this.tabPage2.Controls.Add(this.groupBox3);
             this.tabPage2.Controls.Add(this.groupBox2);
             this.tabPage2.Controls.Add(this.groupBox1);
-            this.tabPage2.Location = new System.Drawing.Point(4, 25);
-            this.tabPage2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage2.Size = new System.Drawing.Size(1341, 718);
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPage2.Size = new System.Drawing.Size(1004, 581);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Settings";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.label13);
+            this.groupBox5.Controls.Add(this.label12);
+            this.groupBox5.Controls.Add(this.label9);
+            this.groupBox5.Controls.Add(this.label8);
+            this.groupBox5.Controls.Add(this.label7);
+            this.groupBox5.Controls.Add(this.button1);
+            this.groupBox5.Controls.Add(this.txtRequestURLSync);
+            this.groupBox5.Controls.Add(this.txtRequestURLToken);
+            this.groupBox5.Controls.Add(this.txtRequestEnvironment);
+            this.groupBox5.Controls.Add(this.txtRequestDomain);
+            this.groupBox5.Controls.Add(this.txtRequestPassword);
+            this.groupBox5.Location = new System.Drawing.Point(710, 13);
+            this.groupBox5.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox5.Size = new System.Drawing.Size(292, 298);
+            this.groupBox5.TabIndex = 13;
+            this.groupBox5.TabStop = false;
+            this.groupBox5.Text = "Request";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(4, 187);
+            this.label13.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(59, 13);
+            this.label13.TabIndex = 53;
+            this.label13.Text = "URL Sync:";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(4, 147);
+            this.label12.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(66, 13);
+            this.label12.TabIndex = 52;
+            this.label12.Text = "URL Token:";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(4, 107);
+            this.label9.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(63, 13);
+            this.label9.TabIndex = 51;
+            this.label9.Text = "Enviroment:";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(4, 65);
+            this.label8.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(48, 13);
+            this.label8.TabIndex = 50;
+            this.label8.Text = "Dominio:";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(4, 23);
+            this.label7.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(41, 13);
+            this.label7.TabIndex = 26;
+            this.label7.Text = "Senha:";
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(7, 262);
+            this.button1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(85, 19);
+            this.button1.TabIndex = 49;
+            this.button1.Text = "Salvar";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
+            // txtRequestURLSync
+            // 
+            this.txtRequestURLSync.Location = new System.Drawing.Point(5, 203);
+            this.txtRequestURLSync.Name = "txtRequestURLSync";
+            this.txtRequestURLSync.Size = new System.Drawing.Size(230, 20);
+            this.txtRequestURLSync.TabIndex = 48;
+            // 
+            // txtRequestURLToken
+            // 
+            this.txtRequestURLToken.Location = new System.Drawing.Point(5, 163);
+            this.txtRequestURLToken.Name = "txtRequestURLToken";
+            this.txtRequestURLToken.Size = new System.Drawing.Size(230, 20);
+            this.txtRequestURLToken.TabIndex = 47;
+            // 
+            // txtRequestEnvironment
+            // 
+            this.txtRequestEnvironment.Location = new System.Drawing.Point(5, 122);
+            this.txtRequestEnvironment.Name = "txtRequestEnvironment";
+            this.txtRequestEnvironment.Size = new System.Drawing.Size(230, 20);
+            this.txtRequestEnvironment.TabIndex = 46;
+            // 
+            // txtRequestDomain
+            // 
+            this.txtRequestDomain.Location = new System.Drawing.Point(5, 81);
+            this.txtRequestDomain.Name = "txtRequestDomain";
+            this.txtRequestDomain.Size = new System.Drawing.Size(230, 20);
+            this.txtRequestDomain.TabIndex = 45;
+            // 
+            // txtRequestPassword
+            // 
+            this.txtRequestPassword.Location = new System.Drawing.Point(5, 39);
+            this.txtRequestPassword.Name = "txtRequestPassword";
+            this.txtRequestPassword.Size = new System.Drawing.Size(230, 20);
+            this.txtRequestPassword.TabIndex = 44;
             // 
             // groupBox4
             // 
@@ -163,21 +281,19 @@
             this.groupBox4.Controls.Add(this.label6);
             this.groupBox4.Controls.Add(this.txtServerDB);
             this.groupBox4.Controls.Add(this.txtNameDB);
-            this.groupBox4.Location = new System.Drawing.Point(16, 16);
-            this.groupBox4.Margin = new System.Windows.Forms.Padding(4);
+            this.groupBox4.Location = new System.Drawing.Point(12, 13);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox4.Size = new System.Drawing.Size(463, 224);
+            this.groupBox4.Size = new System.Drawing.Size(347, 182);
             this.groupBox4.TabIndex = 12;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Banco de dados";
             // 
             // btnSaveSettingsDB
             // 
-            this.btnSaveSettingsDB.Location = new System.Drawing.Point(13, 189);
-            this.btnSaveSettingsDB.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnSaveSettingsDB.Location = new System.Drawing.Point(10, 154);
+            this.btnSaveSettingsDB.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnSaveSettingsDB.Name = "btnSaveSettingsDB";
-            this.btnSaveSettingsDB.Size = new System.Drawing.Size(113, 23);
+            this.btnSaveSettingsDB.Size = new System.Drawing.Size(85, 19);
             this.btnSaveSettingsDB.TabIndex = 34;
             this.btnSaveSettingsDB.Text = "Salvar";
             this.btnSaveSettingsDB.UseVisualStyleBackColor = true;
@@ -186,35 +302,35 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(7, 90);
+            this.label5.Location = new System.Drawing.Point(5, 73);
+            this.label5.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(168, 16);
+            this.label5.Size = new System.Drawing.Size(133, 13);
             this.label5.TabIndex = 37;
             this.label5.Text = "Nome do banco de dados:";
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(7, 28);
+            this.label6.Location = new System.Drawing.Point(5, 23);
+            this.label6.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(120, 16);
+            this.label6.Size = new System.Drawing.Size(95, 13);
             this.label6.TabIndex = 34;
             this.label6.Text = "Nome do Servidor:";
             // 
             // txtServerDB
             // 
-            this.txtServerDB.Location = new System.Drawing.Point(10, 51);
-            this.txtServerDB.Margin = new System.Windows.Forms.Padding(4);
+            this.txtServerDB.Location = new System.Drawing.Point(8, 41);
             this.txtServerDB.Name = "txtServerDB";
-            this.txtServerDB.Size = new System.Drawing.Size(427, 22);
+            this.txtServerDB.Size = new System.Drawing.Size(321, 20);
             this.txtServerDB.TabIndex = 35;
             // 
             // txtNameDB
             // 
-            this.txtNameDB.Location = new System.Drawing.Point(10, 110);
-            this.txtNameDB.Margin = new System.Windows.Forms.Padding(4);
+            this.txtNameDB.Location = new System.Drawing.Point(8, 89);
             this.txtNameDB.Name = "txtNameDB";
-            this.txtNameDB.Size = new System.Drawing.Size(427, 22);
+            this.txtNameDB.Size = new System.Drawing.Size(321, 20);
             this.txtNameDB.TabIndex = 36;
             // 
             // groupBox3
@@ -222,11 +338,9 @@
             this.groupBox3.Controls.Add(this.label16);
             this.groupBox3.Controls.Add(this.btnSetDirectoryCECs);
             this.groupBox3.Controls.Add(this.lblDirectoryCECs);
-            this.groupBox3.Location = new System.Drawing.Point(487, 319);
-            this.groupBox3.Margin = new System.Windows.Forms.Padding(4);
+            this.groupBox3.Location = new System.Drawing.Point(365, 259);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox3.Size = new System.Drawing.Size(452, 250);
+            this.groupBox3.Size = new System.Drawing.Size(339, 203);
             this.groupBox3.TabIndex = 11;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Search CEC";
@@ -234,18 +348,19 @@
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(12, 166);
+            this.label16.Location = new System.Drawing.Point(9, 135);
+            this.label16.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(111, 16);
+            this.label16.Size = new System.Drawing.Size(88, 13);
             this.label16.TabIndex = 28;
             this.label16.Text = "Salvar CEC\'s em:";
             // 
             // btnSetDirectoryCECs
             // 
-            this.btnSetDirectoryCECs.Location = new System.Drawing.Point(15, 210);
-            this.btnSetDirectoryCECs.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnSetDirectoryCECs.Location = new System.Drawing.Point(11, 171);
+            this.btnSetDirectoryCECs.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnSetDirectoryCECs.Name = "btnSetDirectoryCECs";
-            this.btnSetDirectoryCECs.Size = new System.Drawing.Size(64, 23);
+            this.btnSetDirectoryCECs.Size = new System.Drawing.Size(48, 19);
             this.btnSetDirectoryCECs.TabIndex = 26;
             this.btnSetDirectoryCECs.Text = "Alterar";
             this.btnSetDirectoryCECs.UseVisualStyleBackColor = true;
@@ -253,9 +368,10 @@
             // 
             // lblDirectoryCECs
             // 
-            this.lblDirectoryCECs.Location = new System.Drawing.Point(17, 185);
+            this.lblDirectoryCECs.Location = new System.Drawing.Point(13, 150);
+            this.lblDirectoryCECs.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblDirectoryCECs.Name = "lblDirectoryCECs";
-            this.lblDirectoryCECs.Size = new System.Drawing.Size(405, 23);
+            this.lblDirectoryCECs.Size = new System.Drawing.Size(304, 19);
             this.lblDirectoryCECs.TabIndex = 27;
             this.lblDirectoryCECs.Text = "-";
             this.lblDirectoryCECs.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -268,11 +384,9 @@
             this.groupBox2.Controls.Add(this.label11);
             this.groupBox2.Controls.Add(this.btnSetDirectoryTripExceptionCSV);
             this.groupBox2.Controls.Add(this.lblDirectoryTripExceptionCSV);
-            this.groupBox2.Location = new System.Drawing.Point(487, 16);
-            this.groupBox2.Margin = new System.Windows.Forms.Padding(4);
+            this.groupBox2.Location = new System.Drawing.Point(365, 13);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox2.Size = new System.Drawing.Size(452, 295);
+            this.groupBox2.Size = new System.Drawing.Size(339, 240);
             this.groupBox2.TabIndex = 10;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "CEC not exists in the bucket";
@@ -280,18 +394,19 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(7, 212);
+            this.label2.Location = new System.Drawing.Point(5, 172);
+            this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(121, 16);
+            this.label2.Size = new System.Drawing.Size(96, 13);
             this.label2.TabIndex = 22;
             this.label2.Text = "Salvar planilha em:";
             // 
             // btnSetDirectoryCSV
             // 
-            this.btnSetDirectoryCSV.Location = new System.Drawing.Point(9, 256);
-            this.btnSetDirectoryCSV.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnSetDirectoryCSV.Location = new System.Drawing.Point(7, 208);
+            this.btnSetDirectoryCSV.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnSetDirectoryCSV.Name = "btnSetDirectoryCSV";
-            this.btnSetDirectoryCSV.Size = new System.Drawing.Size(64, 23);
+            this.btnSetDirectoryCSV.Size = new System.Drawing.Size(48, 19);
             this.btnSetDirectoryCSV.TabIndex = 20;
             this.btnSetDirectoryCSV.Text = "Alterar";
             this.btnSetDirectoryCSV.UseVisualStyleBackColor = true;
@@ -299,9 +414,10 @@
             // 
             // lblDirectoryCSV
             // 
-            this.lblDirectoryCSV.Location = new System.Drawing.Point(12, 230);
+            this.lblDirectoryCSV.Location = new System.Drawing.Point(9, 187);
+            this.lblDirectoryCSV.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblDirectoryCSV.Name = "lblDirectoryCSV";
-            this.lblDirectoryCSV.Size = new System.Drawing.Size(410, 23);
+            this.lblDirectoryCSV.Size = new System.Drawing.Size(308, 19);
             this.lblDirectoryCSV.TabIndex = 21;
             this.lblDirectoryCSV.Text = "-";
             this.lblDirectoryCSV.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -309,18 +425,19 @@
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(7, 134);
+            this.label11.Location = new System.Drawing.Point(5, 109);
+            this.label11.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(202, 16);
+            this.label11.Size = new System.Drawing.Size(161, 13);
             this.label11.TabIndex = 25;
             this.label11.Text = "Planilha de exceção de viagens:";
             // 
             // btnSetDirectoryTripExceptionCSV
             // 
-            this.btnSetDirectoryTripExceptionCSV.Location = new System.Drawing.Point(11, 178);
-            this.btnSetDirectoryTripExceptionCSV.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnSetDirectoryTripExceptionCSV.Location = new System.Drawing.Point(8, 145);
+            this.btnSetDirectoryTripExceptionCSV.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnSetDirectoryTripExceptionCSV.Name = "btnSetDirectoryTripExceptionCSV";
-            this.btnSetDirectoryTripExceptionCSV.Size = new System.Drawing.Size(64, 23);
+            this.btnSetDirectoryTripExceptionCSV.Size = new System.Drawing.Size(48, 19);
             this.btnSetDirectoryTripExceptionCSV.TabIndex = 23;
             this.btnSetDirectoryTripExceptionCSV.Text = "Alterar";
             this.btnSetDirectoryTripExceptionCSV.UseVisualStyleBackColor = true;
@@ -328,9 +445,10 @@
             // 
             // lblDirectoryTripExceptionCSV
             // 
-            this.lblDirectoryTripExceptionCSV.Location = new System.Drawing.Point(12, 153);
+            this.lblDirectoryTripExceptionCSV.Location = new System.Drawing.Point(9, 124);
+            this.lblDirectoryTripExceptionCSV.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblDirectoryTripExceptionCSV.Name = "lblDirectoryTripExceptionCSV";
-            this.lblDirectoryTripExceptionCSV.Size = new System.Drawing.Size(410, 23);
+            this.lblDirectoryTripExceptionCSV.Size = new System.Drawing.Size(308, 19);
             this.lblDirectoryTripExceptionCSV.TabIndex = 24;
             this.lblDirectoryTripExceptionCSV.Text = "-";
             this.lblDirectoryTripExceptionCSV.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -344,11 +462,11 @@
             this.groupBox1.Controls.Add(this.txtSecretAccessKey);
             this.groupBox1.Controls.Add(this.txtAccessKey);
             this.groupBox1.Controls.Add(this.btnSaveSettings);
-            this.groupBox1.Location = new System.Drawing.Point(16, 246);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.groupBox1.Location = new System.Drawing.Point(12, 200);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.groupBox1.Size = new System.Drawing.Size(464, 322);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox1.Size = new System.Drawing.Size(348, 262);
             this.groupBox1.TabIndex = 9;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Acesso ao Bucket";
@@ -356,60 +474,60 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(15, 153);
+            this.label4.Location = new System.Drawing.Point(11, 124);
+            this.label4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(91, 16);
+            this.label4.Size = new System.Drawing.Size(75, 13);
             this.label4.TabIndex = 33;
             this.label4.Text = "Bucket Name:";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(15, 95);
+            this.label3.Location = new System.Drawing.Point(11, 77);
+            this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(123, 16);
+            this.label3.Size = new System.Drawing.Size(100, 13);
             this.label3.TabIndex = 32;
             this.label3.Text = "Secret Access Key:";
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(15, 33);
+            this.label1.Location = new System.Drawing.Point(11, 27);
+            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(81, 16);
+            this.label1.Size = new System.Drawing.Size(66, 13);
             this.label1.TabIndex = 26;
             this.label1.Text = "Access Key:";
             // 
             // txtBucketName
             // 
-            this.txtBucketName.Location = new System.Drawing.Point(18, 175);
-            this.txtBucketName.Margin = new System.Windows.Forms.Padding(4);
+            this.txtBucketName.Location = new System.Drawing.Point(14, 142);
             this.txtBucketName.Name = "txtBucketName";
-            this.txtBucketName.Size = new System.Drawing.Size(427, 22);
+            this.txtBucketName.Size = new System.Drawing.Size(321, 20);
             this.txtBucketName.TabIndex = 31;
             // 
             // txtSecretAccessKey
             // 
-            this.txtSecretAccessKey.Location = new System.Drawing.Point(18, 115);
-            this.txtSecretAccessKey.Margin = new System.Windows.Forms.Padding(4);
+            this.txtSecretAccessKey.Location = new System.Drawing.Point(14, 93);
             this.txtSecretAccessKey.Name = "txtSecretAccessKey";
-            this.txtSecretAccessKey.Size = new System.Drawing.Size(427, 22);
+            this.txtSecretAccessKey.Size = new System.Drawing.Size(321, 20);
             this.txtSecretAccessKey.TabIndex = 30;
             // 
             // txtAccessKey
             // 
-            this.txtAccessKey.Location = new System.Drawing.Point(18, 56);
-            this.txtAccessKey.Margin = new System.Windows.Forms.Padding(4);
+            this.txtAccessKey.Location = new System.Drawing.Point(14, 46);
             this.txtAccessKey.Name = "txtAccessKey";
-            this.txtAccessKey.Size = new System.Drawing.Size(427, 22);
+            this.txtAccessKey.Size = new System.Drawing.Size(321, 20);
             this.txtAccessKey.TabIndex = 29;
             // 
             // btnSaveSettings
             // 
-            this.btnSaveSettings.Location = new System.Drawing.Point(23, 283);
-            this.btnSaveSettings.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnSaveSettings.Location = new System.Drawing.Point(17, 230);
+            this.btnSaveSettings.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnSaveSettings.Name = "btnSaveSettings";
-            this.btnSaveSettings.Size = new System.Drawing.Size(113, 23);
+            this.btnSaveSettings.Size = new System.Drawing.Size(85, 19);
             this.btnSaveSettings.TabIndex = 17;
             this.btnSaveSettings.Text = "Salvar";
             this.btnSaveSettings.UseVisualStyleBackColor = true;
@@ -427,50 +545,51 @@
             this.tabPage3.Controls.Add(this.progressBarCEC);
             this.tabPage3.Controls.Add(this.dgvInvoicesWithoutCEC);
             this.tabPage3.Controls.Add(this.btnCompareCEC);
-            this.tabPage3.Location = new System.Drawing.Point(4, 25);
-            this.tabPage3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(1341, 718);
+            this.tabPage3.Size = new System.Drawing.Size(1004, 581);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "CEC not exists in the bucket";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
             // chkTripException
             // 
-            this.chkTripException.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.chkTripException.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.chkTripException.AutoSize = true;
-            this.chkTripException.Location = new System.Drawing.Point(950, 356);
-            this.chkTripException.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.chkTripException.Location = new System.Drawing.Point(704, 289);
+            this.chkTripException.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.chkTripException.Name = "chkTripException";
-            this.chkTripException.Size = new System.Drawing.Size(154, 20);
+            this.chkTripException.Size = new System.Drawing.Size(124, 17);
             this.chkTripException.TabIndex = 25;
             this.chkTripException.Text = "Exceção de Viagens";
             this.chkTripException.UseVisualStyleBackColor = true;
             // 
             // btnInsertDataCECTableTemporary
             // 
+            this.btnInsertDataCECTableTemporary.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnInsertDataCECTableTemporary.Enabled = false;
             this.btnInsertDataCECTableTemporary.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnInsertDataCECTableTemporary.Location = new System.Drawing.Point(172, 354);
-            this.btnInsertDataCECTableTemporary.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnInsertDataCECTableTemporary.Location = new System.Drawing.Point(129, 288);
+            this.btnInsertDataCECTableTemporary.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnInsertDataCECTableTemporary.Name = "btnInsertDataCECTableTemporary";
-            this.btnInsertDataCECTableTemporary.Size = new System.Drawing.Size(221, 28);
+            this.btnInsertDataCECTableTemporary.Size = new System.Drawing.Size(166, 23);
             this.btnInsertDataCECTableTemporary.TabIndex = 3;
             this.btnInsertDataCECTableTemporary.Text = "Inserir na Tabela Temporaria";
             this.btnInsertDataCECTableTemporary.UseVisualStyleBackColor = true;
             // 
             // btnCancelCompare
             // 
-            this.btnCancelCompare.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCancelCompare.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancelCompare.BackColor = System.Drawing.Color.Transparent;
             this.btnCancelCompare.Enabled = false;
             this.btnCancelCompare.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnCancelCompare.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnCancelCompare.ForeColor = System.Drawing.Color.Red;
-            this.btnCancelCompare.Location = new System.Drawing.Point(1117, 350);
-            this.btnCancelCompare.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnCancelCompare.Location = new System.Drawing.Point(838, 284);
+            this.btnCancelCompare.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnCancelCompare.Name = "btnCancelCompare";
-            this.btnCancelCompare.Size = new System.Drawing.Size(93, 28);
+            this.btnCancelCompare.Size = new System.Drawing.Size(70, 23);
             this.btnCancelCompare.TabIndex = 11;
             this.btnCancelCompare.Text = "Cancelar";
             this.btnCancelCompare.UseVisualStyleBackColor = false;
@@ -482,21 +601,22 @@
             this.txtSQLQuery.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtSQLQuery.Location = new System.Drawing.Point(29, 25);
-            this.txtSQLQuery.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.txtSQLQuery.Location = new System.Drawing.Point(22, 20);
+            this.txtSQLQuery.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.txtSQLQuery.Multiline = true;
             this.txtSQLQuery.Name = "txtSQLQuery";
-            this.txtSQLQuery.Size = new System.Drawing.Size(1281, 293);
+            this.txtSQLQuery.Size = new System.Drawing.Size(962, 239);
             this.txtSQLQuery.TabIndex = 0;
             // 
             // btnExcel
             // 
+            this.btnExcel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnExcel.Enabled = false;
             this.btnExcel.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnExcel.Location = new System.Drawing.Point(29, 354);
-            this.btnExcel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnExcel.Location = new System.Drawing.Point(22, 288);
+            this.btnExcel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnExcel.Name = "btnExcel";
-            this.btnExcel.Size = new System.Drawing.Size(136, 27);
+            this.btnExcel.Size = new System.Drawing.Size(102, 22);
             this.btnExcel.TabIndex = 2;
             this.btnExcel.Text = "Extrair para Excel";
             this.btnExcel.UseVisualStyleBackColor = true;
@@ -506,9 +626,10 @@
             // 
             this.lblTotalInvoiceWithoutCEC.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lblTotalInvoiceWithoutCEC.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTotalInvoiceWithoutCEC.Location = new System.Drawing.Point(1109, 649);
+            this.lblTotalInvoiceWithoutCEC.Location = new System.Drawing.Point(832, 527);
+            this.lblTotalInvoiceWithoutCEC.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblTotalInvoiceWithoutCEC.Name = "lblTotalInvoiceWithoutCEC";
-            this.lblTotalInvoiceWithoutCEC.Size = new System.Drawing.Size(203, 14);
+            this.lblTotalInvoiceWithoutCEC.Size = new System.Drawing.Size(152, 11);
             this.lblTotalInvoiceWithoutCEC.TabIndex = 24;
             this.lblTotalInvoiceWithoutCEC.Text = "0";
             this.lblTotalInvoiceWithoutCEC.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -518,9 +639,10 @@
             this.lblTotalVerified.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lblTotalVerified.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTotalVerified.Location = new System.Drawing.Point(575, 660);
+            this.lblTotalVerified.Location = new System.Drawing.Point(431, 536);
+            this.lblTotalVerified.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblTotalVerified.Name = "lblTotalVerified";
-            this.lblTotalVerified.Size = new System.Drawing.Size(203, 28);
+            this.lblTotalVerified.Size = new System.Drawing.Size(152, 23);
             this.lblTotalVerified.TabIndex = 23;
             this.lblTotalVerified.Text = "0/0";
             this.lblTotalVerified.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -529,10 +651,10 @@
             // 
             this.progressBarCEC.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBarCEC.Location = new System.Drawing.Point(29, 697);
-            this.progressBarCEC.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.progressBarCEC.Location = new System.Drawing.Point(22, 566);
+            this.progressBarCEC.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.progressBarCEC.Name = "progressBarCEC";
-            this.progressBarCEC.Size = new System.Drawing.Size(1281, 17);
+            this.progressBarCEC.Size = new System.Drawing.Size(961, 14);
             this.progressBarCEC.TabIndex = 3;
             // 
             // dgvInvoicesWithoutCEC
@@ -550,12 +672,12 @@
             this.cIDCustomer,
             this.cIDTrip,
             this.dExportCECDanf});
-            this.dgvInvoicesWithoutCEC.Location = new System.Drawing.Point(29, 388);
-            this.dgvInvoicesWithoutCEC.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.dgvInvoicesWithoutCEC.Location = new System.Drawing.Point(22, 315);
+            this.dgvInvoicesWithoutCEC.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.dgvInvoicesWithoutCEC.Name = "dgvInvoicesWithoutCEC";
             this.dgvInvoicesWithoutCEC.RowHeadersWidth = 51;
             this.dgvInvoicesWithoutCEC.RowTemplate.Height = 24;
-            this.dgvInvoicesWithoutCEC.Size = new System.Drawing.Size(1281, 258);
+            this.dgvInvoicesWithoutCEC.Size = new System.Drawing.Size(961, 210);
             this.dgvInvoicesWithoutCEC.TabIndex = 2;
             this.dgvInvoicesWithoutCEC.TabStop = false;
             // 
@@ -624,12 +746,12 @@
             // 
             // btnCompareCEC
             // 
-            this.btnCompareCEC.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCompareCEC.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCompareCEC.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCompareCEC.Location = new System.Drawing.Point(1217, 345);
-            this.btnCompareCEC.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnCompareCEC.Location = new System.Drawing.Point(913, 280);
+            this.btnCompareCEC.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnCompareCEC.Name = "btnCompareCEC";
-            this.btnCompareCEC.Size = new System.Drawing.Size(93, 38);
+            this.btnCompareCEC.Size = new System.Drawing.Size(70, 31);
             this.btnCompareCEC.TabIndex = 1;
             this.btnCompareCEC.Text = "Comparar";
             this.btnCompareCEC.UseVisualStyleBackColor = true;
@@ -646,11 +768,11 @@
             this.tabPage6.Controls.Add(this.btnPesquisarCECs);
             this.tabPage6.Controls.Add(this.dgvCECs);
             this.tabPage6.Controls.Add(this.txtQueryCECs);
-            this.tabPage6.Location = new System.Drawing.Point(4, 25);
-            this.tabPage6.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPage6.Location = new System.Drawing.Point(4, 22);
+            this.tabPage6.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.tabPage6.Name = "tabPage6";
-            this.tabPage6.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage6.Size = new System.Drawing.Size(1341, 718);
+            this.tabPage6.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPage6.Size = new System.Drawing.Size(1004, 581);
             this.tabPage6.TabIndex = 6;
             this.tabPage6.Text = "Search CEC";
             this.tabPage6.UseVisualStyleBackColor = true;
@@ -659,10 +781,10 @@
             // 
             this.btnCECSaveImage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCECSaveImage.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCECSaveImage.Location = new System.Drawing.Point(974, 10);
-            this.btnCECSaveImage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnCECSaveImage.Location = new System.Drawing.Point(730, 8);
+            this.btnCECSaveImage.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnCECSaveImage.Name = "btnCECSaveImage";
-            this.btnCECSaveImage.Size = new System.Drawing.Size(125, 26);
+            this.btnCECSaveImage.Size = new System.Drawing.Size(94, 21);
             this.btnCECSaveImage.TabIndex = 12;
             this.btnCECSaveImage.Text = "Salvar Imagem";
             this.btnCECSaveImage.UseVisualStyleBackColor = true;
@@ -672,10 +794,10 @@
             // 
             this.btnCECOpenFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCECOpenFolder.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCECOpenFolder.Location = new System.Drawing.Point(840, 10);
-            this.btnCECOpenFolder.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnCECOpenFolder.Location = new System.Drawing.Point(630, 8);
+            this.btnCECOpenFolder.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnCECOpenFolder.Name = "btnCECOpenFolder";
-            this.btnCECOpenFolder.Size = new System.Drawing.Size(128, 26);
+            this.btnCECOpenFolder.Size = new System.Drawing.Size(96, 21);
             this.btnCECOpenFolder.TabIndex = 11;
             this.btnCECOpenFolder.Text = "Abrir Pasta";
             this.btnCECOpenFolder.UseVisualStyleBackColor = true;
@@ -685,10 +807,10 @@
             // 
             this.btnCECOpenImage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCECOpenImage.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCECOpenImage.Location = new System.Drawing.Point(712, 10);
-            this.btnCECOpenImage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnCECOpenImage.Location = new System.Drawing.Point(534, 8);
+            this.btnCECOpenImage.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnCECOpenImage.Name = "btnCECOpenImage";
-            this.btnCECOpenImage.Size = new System.Drawing.Size(122, 26);
+            this.btnCECOpenImage.Size = new System.Drawing.Size(92, 21);
             this.btnCECOpenImage.TabIndex = 10;
             this.btnCECOpenImage.Text = "Abrir Imagem";
             this.btnCECOpenImage.UseVisualStyleBackColor = true;
@@ -699,10 +821,10 @@
             this.imgCECs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.imgCECs.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.imgCECs.Location = new System.Drawing.Point(712, 40);
-            this.imgCECs.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.imgCECs.Location = new System.Drawing.Point(534, 32);
+            this.imgCECs.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.imgCECs.Name = "imgCECs";
-            this.imgCECs.Size = new System.Drawing.Size(614, 682);
+            this.imgCECs.Size = new System.Drawing.Size(461, 554);
             this.imgCECs.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.imgCECs.TabIndex = 7;
             this.imgCECs.TabStop = false;
@@ -710,10 +832,10 @@
             // btnDesmarcarTodasCECs
             // 
             this.btnDesmarcarTodasCECs.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnDesmarcarTodasCECs.Location = new System.Drawing.Point(164, 337);
-            this.btnDesmarcarTodasCECs.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnDesmarcarTodasCECs.Location = new System.Drawing.Point(123, 274);
+            this.btnDesmarcarTodasCECs.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnDesmarcarTodasCECs.Name = "btnDesmarcarTodasCECs";
-            this.btnDesmarcarTodasCECs.Size = new System.Drawing.Size(139, 26);
+            this.btnDesmarcarTodasCECs.Size = new System.Drawing.Size(104, 21);
             this.btnDesmarcarTodasCECs.TabIndex = 9;
             this.btnDesmarcarTodasCECs.Text = "Desmarcar Todos";
             this.btnDesmarcarTodasCECs.UseVisualStyleBackColor = true;
@@ -722,10 +844,10 @@
             // btnSelecionarTodasCECs
             // 
             this.btnSelecionarTodasCECs.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnSelecionarTodasCECs.Location = new System.Drawing.Point(17, 337);
-            this.btnSelecionarTodasCECs.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnSelecionarTodasCECs.Location = new System.Drawing.Point(13, 274);
+            this.btnSelecionarTodasCECs.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnSelecionarTodasCECs.Name = "btnSelecionarTodasCECs";
-            this.btnSelecionarTodasCECs.Size = new System.Drawing.Size(141, 26);
+            this.btnSelecionarTodasCECs.Size = new System.Drawing.Size(106, 21);
             this.btnSelecionarTodasCECs.TabIndex = 8;
             this.btnSelecionarTodasCECs.Text = "Selecionar Todos";
             this.btnSelecionarTodasCECs.UseVisualStyleBackColor = true;
@@ -735,10 +857,10 @@
             // 
             this.btnDownloadCECs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnDownloadCECs.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnDownloadCECs.Location = new System.Drawing.Point(532, 337);
-            this.btnDownloadCECs.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnDownloadCECs.Location = new System.Drawing.Point(399, 274);
+            this.btnDownloadCECs.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnDownloadCECs.Name = "btnDownloadCECs";
-            this.btnDownloadCECs.Size = new System.Drawing.Size(159, 26);
+            this.btnDownloadCECs.Size = new System.Drawing.Size(119, 21);
             this.btnDownloadCECs.TabIndex = 6;
             this.btnDownloadCECs.Text = "Salvar Selecionados";
             this.btnDownloadCECs.UseVisualStyleBackColor = true;
@@ -748,10 +870,10 @@
             // 
             this.btnPesquisarCECs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnPesquisarCECs.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnPesquisarCECs.Location = new System.Drawing.Point(419, 337);
-            this.btnPesquisarCECs.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnPesquisarCECs.Location = new System.Drawing.Point(314, 274);
+            this.btnPesquisarCECs.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnPesquisarCECs.Name = "btnPesquisarCECs";
-            this.btnPesquisarCECs.Size = new System.Drawing.Size(107, 26);
+            this.btnPesquisarCECs.Size = new System.Drawing.Size(80, 21);
             this.btnPesquisarCECs.TabIndex = 5;
             this.btnPesquisarCECs.Text = "Pesquisar";
             this.btnPesquisarCECs.UseVisualStyleBackColor = true;
@@ -775,13 +897,13 @@
             this.CECcIDBranchInvoice,
             this.cPathCECCC,
             this.Joker});
-            this.dgvCECs.Location = new System.Drawing.Point(17, 369);
-            this.dgvCECs.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.dgvCECs.Location = new System.Drawing.Point(13, 300);
+            this.dgvCECs.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.dgvCECs.Name = "dgvCECs";
             this.dgvCECs.RowHeadersWidth = 51;
             this.dgvCECs.RowTemplate.Height = 24;
             this.dgvCECs.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvCECs.Size = new System.Drawing.Size(675, 350);
+            this.dgvCECs.Size = new System.Drawing.Size(506, 284);
             this.dgvCECs.TabIndex = 4;
             this.dgvCECs.TabStop = false;
             this.dgvCECs.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvCECs_CellContentClick);
@@ -793,7 +915,7 @@
             this.CheckCEC.MinimumWidth = 6;
             this.CheckCEC.Name = "CheckCEC";
             this.CheckCEC.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.CheckCEC.Width = 23;
+            this.CheckCEC.Width = 19;
             // 
             // downloadCEC
             // 
@@ -804,7 +926,7 @@
             this.downloadCEC.Name = "downloadCEC";
             this.downloadCEC.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.downloadCEC.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.downloadCEC.Width = 23;
+            this.downloadCEC.Width = 19;
             // 
             // CECcIDCompany
             // 
@@ -813,7 +935,7 @@
             this.CECcIDCompany.HeaderText = "cIDCompany";
             this.CECcIDCompany.MinimumWidth = 6;
             this.CECcIDCompany.Name = "CECcIDCompany";
-            this.CECcIDCompany.Width = 114;
+            this.CECcIDCompany.Width = 93;
             // 
             // CECcIDInvoice
             // 
@@ -822,7 +944,7 @@
             this.CECcIDInvoice.HeaderText = "cIDInvoice";
             this.CECcIDInvoice.MinimumWidth = 6;
             this.CECcIDInvoice.Name = "CECcIDInvoice";
-            this.CECcIDInvoice.Width = 99;
+            this.CECcIDInvoice.Width = 84;
             // 
             // CECcSerie
             // 
@@ -832,7 +954,7 @@
             this.CECcSerie.MinimumWidth = 6;
             this.CECcSerie.Name = "CECcSerie";
             this.CECcSerie.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.CECcSerie.Width = 75;
+            this.CECcSerie.Width = 62;
             // 
             // CECcIDBranchInvoice
             // 
@@ -842,7 +964,7 @@
             this.CECcIDBranchInvoice.MinimumWidth = 6;
             this.CECcIDBranchInvoice.Name = "CECcIDBranchInvoice";
             this.CECcIDBranchInvoice.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.CECcIDBranchInvoice.Width = 141;
+            this.CECcIDBranchInvoice.Width = 118;
             // 
             // cPathCECCC
             // 
@@ -851,24 +973,24 @@
             this.cPathCECCC.HeaderText = "cPathCEC";
             this.cPathCECCC.MinimumWidth = 6;
             this.cPathCECCC.Name = "cPathCECCC";
-            this.cPathCECCC.Width = 97;
+            this.cPathCECCC.Width = 81;
             // 
             // Joker
             // 
             this.Joker.HeaderText = "";
             this.Joker.MinimumWidth = 6;
             this.Joker.Name = "Joker";
-            this.Joker.Width = 23;
+            this.Joker.Width = 19;
             // 
             // txtQueryCECs
             // 
             this.txtQueryCECs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtQueryCECs.Location = new System.Drawing.Point(17, 18);
-            this.txtQueryCECs.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.txtQueryCECs.Location = new System.Drawing.Point(13, 15);
+            this.txtQueryCECs.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.txtQueryCECs.Multiline = true;
             this.txtQueryCECs.Name = "txtQueryCECs";
-            this.txtQueryCECs.Size = new System.Drawing.Size(673, 293);
+            this.txtQueryCECs.Size = new System.Drawing.Size(506, 239);
             this.txtQueryCECs.TabIndex = 1;
             // 
             // tabControl1
@@ -880,11 +1002,11 @@
             this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Controls.Add(this.tabPageRequest);
             this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Location = new System.Drawing.Point(4, 5);
-            this.tabControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabControl1.Location = new System.Drawing.Point(3, 4);
+            this.tabControl1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1349, 747);
+            this.tabControl1.Size = new System.Drawing.Size(1012, 607);
             this.tabControl1.TabIndex = 0;
             this.tabControl1.TabStop = false;
             // 
@@ -895,27 +1017,47 @@
             this.tabPageRequest.Controls.Add(this.lblRequestStatus);
             this.tabPageRequest.Controls.Add(this.btnRequest);
             this.tabPageRequest.Controls.Add(this.txtRequestUser);
-            this.tabPageRequest.Location = new System.Drawing.Point(4, 25);
+            this.tabPageRequest.Location = new System.Drawing.Point(4, 22);
+            this.tabPageRequest.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.tabPageRequest.Name = "tabPageRequest";
-            this.tabPageRequest.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageRequest.Size = new System.Drawing.Size(1341, 718);
+            this.tabPageRequest.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPageRequest.Size = new System.Drawing.Size(1004, 581);
             this.tabPageRequest.TabIndex = 7;
             this.tabPageRequest.Text = "Request";
             this.tabPageRequest.UseVisualStyleBackColor = true;
             // 
+            // lblRequestLastUpdate
+            // 
+            this.lblRequestLastUpdate.Location = new System.Drawing.Point(106, 124);
+            this.lblRequestLastUpdate.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.lblRequestLastUpdate.Name = "lblRequestLastUpdate";
+            this.lblRequestLastUpdate.Size = new System.Drawing.Size(119, 13);
+            this.lblRequestLastUpdate.TabIndex = 40;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(15, 19);
+            this.label14.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(46, 13);
+            this.label14.TabIndex = 39;
+            this.label14.Text = "Usuario:";
+            // 
             // lblRequestStatus
             // 
-            this.lblRequestStatus.Location = new System.Drawing.Point(20, 119);
+            this.lblRequestStatus.Location = new System.Drawing.Point(15, 97);
+            this.lblRequestStatus.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblRequestStatus.Name = "lblRequestStatus";
-            this.lblRequestStatus.Size = new System.Drawing.Size(430, 16);
+            this.lblRequestStatus.Size = new System.Drawing.Size(322, 13);
             this.lblRequestStatus.TabIndex = 38;
             // 
             // btnRequest
             // 
-            this.btnRequest.Location = new System.Drawing.Point(23, 149);
-            this.btnRequest.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnRequest.Location = new System.Drawing.Point(17, 121);
+            this.btnRequest.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnRequest.Name = "btnRequest";
-            this.btnRequest.Size = new System.Drawing.Size(113, 23);
+            this.btnRequest.Size = new System.Drawing.Size(85, 19);
             this.btnRequest.TabIndex = 37;
             this.btnRequest.Text = "Request";
             this.btnRequest.UseVisualStyleBackColor = true;
@@ -923,156 +1065,26 @@
             // 
             // txtRequestUser
             // 
-            this.txtRequestUser.Location = new System.Drawing.Point(23, 43);
-            this.txtRequestUser.Margin = new System.Windows.Forms.Padding(4);
+            this.txtRequestUser.Location = new System.Drawing.Point(17, 35);
             this.txtRequestUser.Name = "txtRequestUser";
-            this.txtRequestUser.Size = new System.Drawing.Size(354, 22);
+            this.txtRequestUser.Size = new System.Drawing.Size(266, 20);
             this.txtRequestUser.TabIndex = 36;
-            // 
-            // groupBox5
-            // 
-            this.groupBox5.Controls.Add(this.label13);
-            this.groupBox5.Controls.Add(this.label12);
-            this.groupBox5.Controls.Add(this.label9);
-            this.groupBox5.Controls.Add(this.label8);
-            this.groupBox5.Controls.Add(this.label7);
-            this.groupBox5.Controls.Add(this.button1);
-            this.groupBox5.Controls.Add(this.txtRequestURLSync);
-            this.groupBox5.Controls.Add(this.txtRequestURLToken);
-            this.groupBox5.Controls.Add(this.txtRequestEnvironment);
-            this.groupBox5.Controls.Add(this.txtRequestDomain);
-            this.groupBox5.Controls.Add(this.txtRequestPassword);
-            this.groupBox5.Location = new System.Drawing.Point(946, 16);
-            this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(389, 367);
-            this.groupBox5.TabIndex = 13;
-            this.groupBox5.TabStop = false;
-            this.groupBox5.Text = "Request";
-            // 
-            // txtRequestURLSync
-            // 
-            this.txtRequestURLSync.Location = new System.Drawing.Point(7, 250);
-            this.txtRequestURLSync.Margin = new System.Windows.Forms.Padding(4);
-            this.txtRequestURLSync.Name = "txtRequestURLSync";
-            this.txtRequestURLSync.Size = new System.Drawing.Size(306, 22);
-            this.txtRequestURLSync.TabIndex = 48;
-            // 
-            // txtRequestURLToken
-            // 
-            this.txtRequestURLToken.Location = new System.Drawing.Point(7, 201);
-            this.txtRequestURLToken.Margin = new System.Windows.Forms.Padding(4);
-            this.txtRequestURLToken.Name = "txtRequestURLToken";
-            this.txtRequestURLToken.Size = new System.Drawing.Size(306, 22);
-            this.txtRequestURLToken.TabIndex = 47;
-            // 
-            // txtRequestEnvironment
-            // 
-            this.txtRequestEnvironment.Location = new System.Drawing.Point(7, 150);
-            this.txtRequestEnvironment.Margin = new System.Windows.Forms.Padding(4);
-            this.txtRequestEnvironment.Name = "txtRequestEnvironment";
-            this.txtRequestEnvironment.Size = new System.Drawing.Size(306, 22);
-            this.txtRequestEnvironment.TabIndex = 46;
-            // 
-            // txtRequestDomain
-            // 
-            this.txtRequestDomain.Location = new System.Drawing.Point(7, 100);
-            this.txtRequestDomain.Margin = new System.Windows.Forms.Padding(4);
-            this.txtRequestDomain.Name = "txtRequestDomain";
-            this.txtRequestDomain.Size = new System.Drawing.Size(306, 22);
-            this.txtRequestDomain.TabIndex = 45;
-            // 
-            // txtRequestPassword
-            // 
-            this.txtRequestPassword.Location = new System.Drawing.Point(7, 48);
-            this.txtRequestPassword.Margin = new System.Windows.Forms.Padding(4);
-            this.txtRequestPassword.Name = "txtRequestPassword";
-            this.txtRequestPassword.Size = new System.Drawing.Size(306, 22);
-            this.txtRequestPassword.TabIndex = 44;
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(9, 322);
-            this.button1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(113, 23);
-            this.button1.TabIndex = 49;
-            this.button1.Text = "Salvar";
-            this.button1.UseVisualStyleBackColor = true;
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(6, 28);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(49, 16);
-            this.label7.TabIndex = 26;
-            this.label7.Text = "Senha:";
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(6, 80);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(60, 16);
-            this.label8.TabIndex = 50;
-            this.label8.Text = "Dominio:";
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(6, 132);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(77, 16);
-            this.label9.TabIndex = 51;
-            this.label9.Text = "Enviroment:";
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(6, 181);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(79, 16);
-            this.label12.TabIndex = 52;
-            this.label12.Text = "URL Token:";
-            // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(6, 230);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(70, 16);
-            this.label13.TabIndex = 53;
-            this.label13.Text = "URL Sync:";
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(20, 23);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(57, 16);
-            this.label14.TabIndex = 39;
-            this.label14.Text = "Usuario:";
-            // 
-            // lblRequestLastUpdate
-            // 
-            this.lblRequestLastUpdate.Location = new System.Drawing.Point(142, 152);
-            this.lblRequestLastUpdate.Name = "lblRequestLastUpdate";
-            this.lblRequestLastUpdate.Size = new System.Drawing.Size(159, 16);
-            this.lblRequestLastUpdate.TabIndex = 40;
             // 
             // frmHomeScreen
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1365, 773);
+            this.ClientSize = new System.Drawing.Size(1024, 628);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.tabControl1);
-            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "frmHomeScreen";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "WMTool";
             this.Load += new System.EventHandler(this.frmHomeScreen_Load);
             this.tabPage2.ResumeLayout(false);
+            this.groupBox5.ResumeLayout(false);
+            this.groupBox5.PerformLayout();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             this.groupBox3.ResumeLayout(false);
@@ -1091,8 +1103,6 @@
             this.tabControl1.ResumeLayout(false);
             this.tabPageRequest.ResumeLayout(false);
             this.tabPageRequest.PerformLayout();
-            this.groupBox5.ResumeLayout(false);
-            this.groupBox5.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
