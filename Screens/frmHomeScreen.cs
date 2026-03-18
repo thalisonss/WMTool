@@ -266,198 +266,7 @@ namespace WMTool
 
         private async void btn_businessCEC_Click(object sender, EventArgs e)
         {
-            try
-            {
-                _business = new WMBusiness();
-                _cancellationTokenSource = new CancellationTokenSource();
-                var cancellationToken = _cancellationTokenSource.Token;
-
-                // Salvar a query nas configurações da aplicação
-                WMTool.Properties.Settings.Default.configQuerySQL = txtSQLQuery.Text;
-                WMTool.Properties.Settings.Default.Save();
-
-                // Limpar e resetar a dgvInvoicesWithoutCEC e variáveis de contagem
-                dgvInvoicesWithoutCEC.Rows.Clear();
-                totalCount = 0;
-                verifiedCount = 0;
-                totalInvoiceWithoutCEC = 0;
-
-                // Desabilitar os controles para impedir bugs no momento da execução
-                btnCompareCEC.Enabled = false;
-                btnExcel.Enabled = false;
-                txtSQLQuery.Enabled = false;
-                btnInsertDataCECTableTemporary.Enabled = false;
-                chkTripException.Enabled = false;
-                btnCancelCompare.Enabled = true;
-                btnCancelCompare.Visible = true;
-
-                // Retorna os dados consultados
-                System.Data.DataTable records = await _business.ConsultDB(txtSQLQuery.Text, connectionString);
-
-                // Carregar registros existentes no CSV, se o checkbox estiver marcado
-                HashSet<string> existingCsvRecords = new HashSet<string>();
-                string filePathTripException = Path.Combine(directoryPathTripExceptionCSV, "WM_Trip_Exception.csv");
-                if (chkTripException.Checked && File.Exists(filePathTripException))
-                {
-                    existingCsvRecords = LoadCsvRecords(filePathTripException);
-                }
-
-                // Filtrar registros se chkTripException estiver marcado
-                if (chkTripException.Checked)
-                {
-                    var filteredRecords = from DataRow row in records.Rows
-                                          where !existingCsvRecords.Contains(row["cIDTrip"]?.ToString())
-                                          select row;
-
-                    // Atualizar DataTable após filtragem
-                    try
-                    {
-                        records = filteredRecords.Any() ? filteredRecords.CopyToDataTable() : new System.Data.DataTable();
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        throw new InvalidOperationException("A Origem não contem DataRows");
-                    }
-                }
-
-                // Atualizar totalCount com a quantidade de registros após a filtragem
-                totalCount = records.Rows.Count;
-                lblTotalVerified.Text = $"{verifiedCount} / {totalCount}";
-
-                // Validação caso não retornar nenhum registro habilita os botões novamente e mostra a mensagem.
-                if (totalCount == 0)
-                {
-                    throw new InvalidOperationException("Nenhum registro encontrado.");
-                }
-
-                // Inserir o valor máximo da barra de progresso com a quantidade retornada dos registros e colocar seu valor inicial igual a 0 
-                progressBarCEC.Maximum = totalCount;
-                progressBarCEC.Value = 0;
-
-                try
-                {
-                    List<DataRow> recordsWithPathCec = new List<DataRow>();
-
-                    // Primeiro, adicione todas as linhas com cPathCec ou dExportCECDanf nulo ou em branco
-                    foreach (DataRow record in records.Rows)
-                    {
-                        // Verifica se o botão de cancelar foi acionado, se sim ele cai no catch e para a verificação
-                        cancellationToken.ThrowIfCancellationRequested();
-
-                        string cPathCec = record["cPathCec"]?.ToString();
-                        string dExportCECDanf = record["dExportCECDanf"]?.ToString();
-
-                        if (string.IsNullOrEmpty(cPathCec) || string.IsNullOrEmpty(dExportCECDanf))
-                        {
-                            dgvInvoicesWithoutCEC.Rows.Add(
-                                record["cIDCompany"],
-                                record["cIDInvoice"],
-                                record["cSerie"],
-                                record["cIDBranchInvoice"],
-                                record["cPathCec"],
-                                record["dEmission"],
-                                record["cIDCustomer"],
-                                record["cIDTrip"]
-                            );
-
-                            totalInvoiceWithoutCEC++;
-                            verifiedCount++;
-                        }
-                        else
-                        {
-                            recordsWithPathCec.Add(record);
-                        }
-
-                        progressBarCEC.Value = verifiedCount;
-                        lblTotalVerified.Text = $"{verifiedCount} / {totalCount}";
-                        lblTotalInvoiceWithoutCEC.Text = $"{totalInvoiceWithoutCEC}";
-                    }
-
-                    // Agora, verifique os registros com cPathCec e dExportCECDanf preenchido
-                    foreach (DataRow record in recordsWithPathCec)
-                    {
-                        // Verifica se o botão de cancelar foi acionado, se sim ele cai no catch e para a verificação
-                        cancellationToken.ThrowIfCancellationRequested();
-
-                        string cIDTrip = record["cIDTrip"]?.ToString();
-
-                        if (chkTripException.Checked && existingCsvRecords.Contains(cIDTrip))
-                        {
-                            // Pula a verificação, pois já existe no CSV e o chkTripException está marcado
-                            continue;
-                        }
-
-                        string cPathCec = record["cPathCec"]?.ToString();
-                        string fileName = "FiscalDoc/" + cPathCec.Replace("FiscalDoc: ", "").ToLower();
-
-                        // Se não existir no bucket, insere a linha no DataGridView
-                        bool exists = await FileExistsInBucketAsync(fileName);
-                        if (!exists)
-                        {
-                            dgvInvoicesWithoutCEC.Rows.Add(
-                                record["cIDCompany"],
-                                record["cIDInvoice"],
-                                record["cSerie"],
-                                record["cIDBranchInvoice"],
-                                record["cPathCec"],
-                                record["dEmission"],
-                                record["cIDCustomer"],
-                                record["cIDTrip"]
-                            );
-
-                            totalInvoiceWithoutCEC++;
-                        }
-
-                        verifiedCount++;
-                        progressBarCEC.Value = verifiedCount;
-                        lblTotalVerified.Text = $"{verifiedCount} / {totalCount}";
-                        lblTotalInvoiceWithoutCEC.Text = $"{totalInvoiceWithoutCEC}";
-                    }
-                }
-                catch (OperationCanceledException)
-                {
-                    // Mensagem que aparece caso o botão de cancelar for clicado
-                    MessageBox.Show("Operação cancelada pelo usuário.", "WMTool", MessageBoxButtons.OK, MessageBoxIcon.Stop);
-                }
-                finally
-                {
-                    if (totalInvoiceWithoutCEC > 0)
-                    {
-                        btnExcel.Enabled = true;
-                        btnInsertDataCECTableTemporary.Enabled = true;
-                    }
-                    txtSQLQuery.Enabled = true;
-                    btnCompareCEC.Enabled = true;
-                    btnCancelCompare.Enabled = false;
-                    btnCancelCompare.Visible = false;
-                    chkTripException.Enabled = true;
-                }
-
-                // Pergunta ao usuário se deseja salvar os dados em um arquivo CSV
-                DialogResult result = MessageBox.Show("Deseja salvar as viagens verificadas na planilha de exceção?", "WMTool", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (result == DialogResult.Yes)
-                {
-                    AppendRecordsToCsv(records, dgvInvoicesWithoutCEC);
-                }
-
-                MessageBox.Show("Comparação concluída.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageBox.Show(ex.Message);
-                MessageBox.Show("Comparação concluída.");
-                FinallyBlock();
-            }
-            catch (ArgumentException ex)
-            {
-                MessageBox.Show(ex.Message);
-                FinallyBlock();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-                FinallyBlock();
-            }
+           
         }
 
         private void FinallyBlock()
@@ -468,7 +277,7 @@ namespace WMTool
                 btnInsertDataCECTableTemporary.Enabled = true;
             }
             txtSQLQuery.Enabled = true;
-            btnCompareCEC.Enabled = true;
+            btnbusinessCEC.Enabled = true;
             btnCancelCompare.Enabled = false;
             btnCancelCompare.Visible = false;
             chkTripException.Enabled = true;
@@ -1022,6 +831,201 @@ namespace WMTool
         {
             public string browser_download_url { get; set; }
         }
-     
+
+        private async void btnbusinessCEC_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                _business = new WMBusiness();
+                _cancellationTokenSource = new CancellationTokenSource();
+                var cancellationToken = _cancellationTokenSource.Token;
+
+                // Salvar a query nas configurações da aplicação
+                WMTool.Properties.Settings.Default.configQuerySQL = txtSQLQuery.Text;
+                WMTool.Properties.Settings.Default.Save();
+
+                // Limpar e resetar a dgvInvoicesWithoutCEC e variáveis de contagem
+                dgvInvoicesWithoutCEC.Rows.Clear();
+                totalCount = 0;
+                verifiedCount = 0;
+                totalInvoiceWithoutCEC = 0;
+
+                // Desabilitar os controles para impedir bugs no momento da execução
+                btnbusinessCEC.Enabled = false;
+                btnExcel.Enabled = false;
+                txtSQLQuery.Enabled = false;
+                btnInsertDataCECTableTemporary.Enabled = false;
+                chkTripException.Enabled = false;
+                btnCancelCompare.Enabled = true;
+                btnCancelCompare.Visible = true;
+
+                // Retorna os dados consultados
+                System.Data.DataTable records = await _business.ConsultDB(txtSQLQuery.Text, connectionString);
+
+                // Carregar registros existentes no CSV, se o checkbox estiver marcado
+                HashSet<string> existingCsvRecords = new HashSet<string>();
+                string filePathTripException = Path.Combine(directoryPathTripExceptionCSV, "WM_Trip_Exception.csv");
+                if (chkTripException.Checked && File.Exists(filePathTripException))
+                {
+                    existingCsvRecords = LoadCsvRecords(filePathTripException);
+                }
+
+                // Filtrar registros se chkTripException estiver marcado
+                if (chkTripException.Checked)
+                {
+                    var filteredRecords = from DataRow row in records.Rows
+                                          where !existingCsvRecords.Contains(row["cIDTrip"]?.ToString())
+                                          select row;
+
+                    // Atualizar DataTable após filtragem
+                    try
+                    {
+                        records = filteredRecords.Any() ? filteredRecords.CopyToDataTable() : new System.Data.DataTable();
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        throw new InvalidOperationException("A Origem não contem DataRows");
+                    }
+                }
+
+                // Atualizar totalCount com a quantidade de registros após a filtragem
+                totalCount = records.Rows.Count;
+                lblTotalVerified.Text = $"{verifiedCount} / {totalCount}";
+
+                // Validação caso não retornar nenhum registro habilita os botões novamente e mostra a mensagem.
+                if (totalCount == 0)
+                {
+                    throw new InvalidOperationException("Nenhum registro encontrado.");
+                }
+
+                // Inserir o valor máximo da barra de progresso com a quantidade retornada dos registros e colocar seu valor inicial igual a 0 
+                progressBarCEC.Maximum = totalCount;
+                progressBarCEC.Value = 0;
+
+                try
+                {
+                    List<DataRow> recordsWithPathCec = new List<DataRow>();
+
+                    // Primeiro, adicione todas as linhas com cPathCec ou dExportCECDanf nulo ou em branco
+                    foreach (DataRow record in records.Rows)
+                    {
+                        // Verifica se o botão de cancelar foi acionado, se sim ele cai no catch e para a verificação
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        string cPathCec = record["cPathCec"]?.ToString();
+                        string dExportCECDanf = record["dExportCECDanf"]?.ToString();
+
+                        if (string.IsNullOrEmpty(cPathCec) || string.IsNullOrEmpty(dExportCECDanf))
+                        {
+                            dgvInvoicesWithoutCEC.Rows.Add(
+                                record["cIDCompany"],
+                                record["cIDInvoice"],
+                                record["cSerie"],
+                                record["cIDBranchInvoice"],
+                                record["cPathCec"],
+                                record["dEmission"],
+                                record["cIDCustomer"],
+                                record["cIDTrip"]
+                            );
+
+                            totalInvoiceWithoutCEC++;
+                            verifiedCount++;
+                        }
+                        else
+                        {
+                            recordsWithPathCec.Add(record);
+                        }
+
+                        progressBarCEC.Value = verifiedCount;
+                        lblTotalVerified.Text = $"{verifiedCount} / {totalCount}";
+                        lblTotalInvoiceWithoutCEC.Text = $"{totalInvoiceWithoutCEC}";
+                    }
+
+                    // Agora, verifique os registros com cPathCec e dExportCECDanf preenchido
+                    foreach (DataRow record in recordsWithPathCec)
+                    {
+                        // Verifica se o botão de cancelar foi acionado, se sim ele cai no catch e para a verificação
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        string cIDTrip = record["cIDTrip"]?.ToString();
+
+                        if (chkTripException.Checked && existingCsvRecords.Contains(cIDTrip))
+                        {
+                            // Pula a verificação, pois já existe no CSV e o chkTripException está marcado
+                            continue;
+                        }
+
+                        string cPathCec = record["cPathCec"]?.ToString();
+                        string fileName = "FiscalDoc/" + cPathCec.Replace("FiscalDoc: ", "").ToLower();
+
+                        // Se não existir no bucket, insere a linha no DataGridView
+                        bool exists = await FileExistsInBucketAsync(fileName);
+                        if (!exists)
+                        {
+                            dgvInvoicesWithoutCEC.Rows.Add(
+                                record["cIDCompany"],
+                                record["cIDInvoice"],
+                                record["cSerie"],
+                                record["cIDBranchInvoice"],
+                                record["cPathCec"],
+                                record["dEmission"],
+                                record["cIDCustomer"],
+                                record["cIDTrip"]
+                            );
+
+                            totalInvoiceWithoutCEC++;
+                        }
+
+                        verifiedCount++;
+                        progressBarCEC.Value = verifiedCount;
+                        lblTotalVerified.Text = $"{verifiedCount} / {totalCount}";
+                        lblTotalInvoiceWithoutCEC.Text = $"{totalInvoiceWithoutCEC}";
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    // Mensagem que aparece caso o botão de cancelar for clicado
+                    MessageBox.Show("Operação cancelada pelo usuário.", "WMTool", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                }
+                finally
+                {
+                    if (totalInvoiceWithoutCEC > 0)
+                    {
+                        btnExcel.Enabled = true;
+                        btnInsertDataCECTableTemporary.Enabled = true;
+                    }
+                    txtSQLQuery.Enabled = true;
+                    btnbusinessCEC.Enabled = true;
+                    btnCancelCompare.Enabled = false;
+                    btnCancelCompare.Visible = false;
+                    chkTripException.Enabled = true;
+                }
+
+                // Pergunta ao usuário se deseja salvar os dados em um arquivo CSV
+                DialogResult result = MessageBox.Show("Deseja salvar as viagens verificadas na planilha de exceção?", "WMTool", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
+                {
+                    AppendRecordsToCsv(records, dgvInvoicesWithoutCEC);
+                }
+
+                MessageBox.Show("Comparação concluída.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(ex.Message);
+                MessageBox.Show("Comparação concluída.");
+                FinallyBlock();
+            }
+            catch (ArgumentException ex)
+            {
+                MessageBox.Show(ex.Message);
+                FinallyBlock();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                FinallyBlock();
+            }
+        }
     }
 }
