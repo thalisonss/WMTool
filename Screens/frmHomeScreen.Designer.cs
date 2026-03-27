@@ -1044,7 +1044,7 @@
             // 
             this.lblRequestStatus.Location = new System.Drawing.Point(20, 119);
             this.lblRequestStatus.Name = "lblRequestStatus";
-            this.lblRequestStatus.Size = new System.Drawing.Size(429, 16);
+            this.lblRequestStatus.Size = new System.Drawing.Size(802, 16);
             this.lblRequestStatus.TabIndex = 38;
             // 
             // btnRequest

@@ -611,7 +611,7 @@ namespace WMTool
                     var syncResponse = await httpClient.PostAsync(urlSync, syncContent);
                     syncResponse.EnsureSuccessStatusCode();
 
-                    lblRequestStatus.Text = "Refresh para o usuario " + login + " realizado com sucesso.";
+                    lblRequestStatus.Text = "Refresh para o usuario " + login + " realizado com sucesso. - " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
                 }
             }
             catch (Exception ex)
