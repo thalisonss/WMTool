@@ -111,6 +111,12 @@
     <Compile Include="Screens\frmHomeScreen.Designer.cs">
       <DependentUpon>frmHomeScreen.cs</DependentUpon>
     </Compile>
+    <Compile Include="Screens\ucValidation.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Screens\ucValidation.Designer.cs">
+      <DependentUpon>ucValidation.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Integrations\WMApiClient.cs" />
@@ -118,11 +124,22 @@
     <Compile Include="Integrations\Models\TokenResponse.cs" />
     <Compile Include="Utils\GitHubRelease.cs" />
     <Compile Include="Utils\LogError.cs" />
+    <Compile Include="Validation\Models\ComparisonType.cs" />
+    <Compile Include="Validation\Models\RuleParameterSource.cs" />
+    <Compile Include="Validation\Models\RuleParameter.cs" />
+    <Compile Include="Validation\Models\ValidationRule.cs" />
+    <Compile Include="Validation\Models\ValidationRuleResult.cs" />
+    <Compile Include="Validation\Models\FileValidationResult.cs" />
+    <Compile Include="Validation\RuleParameterParser.cs" />
+    <Compile Include="Validation\ValidationEngine.cs" />
     <EmbeddedResource Include="Screens\FormLogin.resx">
       <DependentUpon>FormLogin.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Screens\frmHomeScreen.resx">
       <DependentUpon>frmHomeScreen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Screens\ucValidation.resx">
+      <DependentUpon>ucValidation.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -143,6 +160,9 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="validation_rules.example.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

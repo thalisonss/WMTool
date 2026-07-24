@@ -114,6 +114,8 @@
             this.btnRequest = new System.Windows.Forms.Button();
             this.txtRequestUser = new System.Windows.Forms.TextBox();
             this.printDocument1 = new System.Drawing.Printing.PrintDocument();
+            this.tabPageValidation = new System.Windows.Forms.TabPage();
+            this.ucValidation1 = new WMTool.Screens.ucValidation();
             this.tabPage2.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -127,6 +129,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvCECs)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPageRequest.SuspendLayout();
+            this.tabPageValidation.SuspendLayout();
             this.SuspendLayout();
             // 
             // label10
@@ -1000,6 +1003,7 @@
             this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Controls.Add(this.tabPageRequest);
             this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.tabPageValidation);
             this.tabControl1.Location = new System.Drawing.Point(4, 5);
             this.tabControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabControl1.Name = "tabControl1";
@@ -1065,7 +1069,27 @@
             this.txtRequestUser.Name = "txtRequestUser";
             this.txtRequestUser.Size = new System.Drawing.Size(353, 22);
             this.txtRequestUser.TabIndex = 36;
-            // 
+            //
+            // tabPageValidation
+            //
+            this.tabPageValidation.Controls.Add(this.ucValidation1);
+            this.tabPageValidation.Location = new System.Drawing.Point(4, 25);
+            this.tabPageValidation.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPageValidation.Name = "tabPageValidation";
+            this.tabPageValidation.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPageValidation.Size = new System.Drawing.Size(1341, 718);
+            this.tabPageValidation.TabIndex = 8;
+            this.tabPageValidation.Text = "Validação JSON x Banco";
+            this.tabPageValidation.UseVisualStyleBackColor = true;
+            //
+            // ucValidation1
+            //
+            this.ucValidation1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ucValidation1.Location = new System.Drawing.Point(3, 2);
+            this.ucValidation1.Name = "ucValidation1";
+            this.ucValidation1.Size = new System.Drawing.Size(1335, 714);
+            this.ucValidation1.TabIndex = 0;
+            //
             // frmHomeScreen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -1099,6 +1123,7 @@
             this.tabControl1.ResumeLayout(false);
             this.tabPageRequest.ResumeLayout(false);
             this.tabPageRequest.PerformLayout();
+            this.tabPageValidation.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1193,6 +1218,8 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label lblRequestLastUpdate;
         private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.TabPage tabPageValidation;
+        private WMTool.Screens.ucValidation ucValidation1;
     }
 }
 

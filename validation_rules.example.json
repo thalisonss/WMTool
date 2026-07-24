@@ -1,0 +1,26 @@
+[
+  {
+    "Name": "nNF x MC1_Invoice.cIDInvoice",
+    "JsonPath": "nfe_batch.nfe_batch.Nota[0].ide.nNF",
+    "SqlTemplate": "SELECT cIDInvoice FROM MC1_Invoice WHERE cIDInvoice = {varCIDInvoice} AND cSerie = {varCSerie} AND cIDBranchInvoice = {varCIDBranch}",
+    "ResultColumn": "cIDInvoice",
+    "Comparison": "EqualsTrimmed",
+    "Parameters": [
+      {
+        "Name": "varCIDInvoice",
+        "SourceType": "JsonPath",
+        "Value": "mc1_params.CIDInvoice"
+      },
+      {
+        "Name": "varCSerie",
+        "SourceType": "JsonPath",
+        "Value": "mc1_params.CSerie"
+      },
+      {
+        "Name": "varCIDBranch",
+        "SourceType": "JsonPath",
+        "Value": "mc1_params.CIDBranchInvoice"
+      }
+    ]
+  }
+]

@@ -38,5 +38,23 @@ namespace WMTool.Business
             return dataTable;
         }
 
+        public async Task<System.Data.DataTable> ConsultDB(string sqlQuery, string connectionString, IDictionary<string, object> parameters)
+        {
+            if (String.IsNullOrEmpty(sqlQuery))
+            {
+                throw new ArgumentNullException("Campo de query vazia!");
+            }
+
+            foreach (string keyword in DangerousKeywords)
+            {
+                if (sqlQuery.ToUpper().Contains(keyword))
+                {
+                    throw new ArgumentException($"A query contém uma palavra-chave perigosa: {keyword}");
+                }
+            }
+
+            return await wmDataBase.ConsultDB(sqlQuery, connectionString, parameters);
+        }
+
     }
 }
