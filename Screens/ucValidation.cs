@@ -43,7 +43,7 @@ namespace WMTool.Screens
             dgvRules.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "colParameters",
-                HeaderText = "Parâmetros (nome=json:$.caminho;nome2=fixo:valor)",
+                HeaderText = "Parâmetros (nome=json:caminho;nome2=fixo:valor)",
                 Width = 320
             });
         }
