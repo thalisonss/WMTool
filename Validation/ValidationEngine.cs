@@ -86,6 +86,17 @@ namespace WMTool.Validation
                 parameters["@" + parameter.Name] = value;
             }
 
+            List<string> undeclared = RuleParameterParser.ExtractPlaceholderNames(rule.SqlTemplate)
+                .Where(name => !parameters.ContainsKey("@" + name))
+                .ToList();
+
+            if (undeclared.Count > 0)
+            {
+                result.Passed = false;
+                result.Message = $"SQL usa {{{string.Join("}}, {{", undeclared)}}} mas não há parâmetro correspondente na coluna Parâmetros.";
+                return result;
+            }
+
             string sql = RuleParameterParser.ToParameterizedSql(rule.SqlTemplate);
 
             DataTable dataTable;

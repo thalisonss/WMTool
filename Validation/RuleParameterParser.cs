@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using WMTool.Validation.Models;
@@ -11,6 +13,15 @@ namespace WMTool.Validation
         public static string ToParameterizedSql(string sqlTemplate)
         {
             return PlaceholderPattern.Replace(sqlTemplate, "@$1");
+        }
+
+        public static List<string> ExtractPlaceholderNames(string sqlTemplate)
+        {
+            return PlaceholderPattern.Matches(sqlTemplate)
+                .Cast<Match>()
+                .Select(m => m.Groups[1].Value)
+                .Distinct()
+                .ToList();
         }
 
         public static bool TryResolve(RuleParameter parameter, JObject json, out string value, out string error)
