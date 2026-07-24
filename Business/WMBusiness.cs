@@ -29,10 +29,10 @@ namespace WMTool.Business
                 }
             }
 
-            if (!Regex.IsMatch(sqlQuery, @"^\s*SELECT\s+", RegexOptions.IgnoreCase))
-            {
-                throw new ArgumentException("A query deve começar com uma cláusula SELECT.");
-            }
+            //if (!Regex.IsMatch(sqlQuery, @"^\s*SELECT\s+", RegexOptions.IgnoreCase))
+            //{
+            //    throw new ArgumentException("A query deve começar com uma cláusula SELECT.");
+            //}
 
             DataTable dataTable = await wmDataBase.ConsultDB(sqlQuery, connectionString);
             return dataTable;

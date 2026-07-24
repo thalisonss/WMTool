@@ -2,58 +2,64 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="WMTool.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="configSaveImageFolder" Type="System.String" Scope="User">
+    <Setting Name="configLoginUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="configServer" Type="System.String" Scope="User">
+    <Setting Name="configLoginSuccessUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="configDatabase" Type="System.String" Scope="User">
+    <Setting Name="configSaveImageFolder" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="configPreProd" Type="System.Boolean" Scope="User">
+    <Setting Name="configServer" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="configDatabase" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="configPreProd" Type="System.Boolean" Scope="Application">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="configQuerySQL" Type="System.String" Scope="User">
+    <Setting Name="configQuerySQL" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="configSaveCSVFolder" Type="System.String" Scope="User">
+    <Setting Name="configSaveCSVFolder" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="configSaveTripExceptionCSVFolder" Type="System.String" Scope="User">
+    <Setting Name="configSaveTripExceptionCSVFolder" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="configSaveCECFolder" Type="System.String" Scope="User">
+    <Setting Name="configSaveCECFolder" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="configAccessKey" Type="System.String" Scope="User">
+    <Setting Name="configAccessKey" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="configSecretKey" Type="System.String" Scope="User">
+    <Setting Name="configSecretKey" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="configBucketName" Type="System.String" Scope="User">
+    <Setting Name="configBucketName" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="configQuerySearchCEC" Type="System.String" Scope="User">
+    <Setting Name="configQuerySearchCEC" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="configURLToken" Type="System.String" Scope="User">
+    <Setting Name="configURLToken" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="configURLSync" Type="System.String" Scope="User">
+    <Setting Name="configURLSync" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="configLogin" Type="System.String" Scope="User">
+    <Setting Name="configLogin" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="configPassword" Type="System.String" Scope="User">
+    <Setting Name="configPassword" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="configDomain" Type="System.String" Scope="User">
+    <Setting Name="configDomain" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="configEnvironment" Type="System.String" Scope="User">
+    <Setting Name="configEnvironment" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>
