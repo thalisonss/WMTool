@@ -125,7 +125,7 @@ namespace WMTool.Screens
             //
             // dgvRules
             //
-            this.dgvRules.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            this.dgvRules.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.dgvRules.AllowUserToAddRows = false;
@@ -137,7 +137,7 @@ namespace WMTool.Screens
             //
             // btnAddRule
             //
-            this.btnAddRule.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnAddRule.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
             this.btnAddRule.Location = new System.Drawing.Point(10, 374);
             this.btnAddRule.Name = "btnAddRule";
             this.btnAddRule.Size = new System.Drawing.Size(110, 26);
@@ -148,7 +148,7 @@ namespace WMTool.Screens
             //
             // btnRemoveRule
             //
-            this.btnRemoveRule.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnRemoveRule.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
             this.btnRemoveRule.Location = new System.Drawing.Point(130, 374);
             this.btnRemoveRule.Name = "btnRemoveRule";
             this.btnRemoveRule.Size = new System.Drawing.Size(110, 26);
@@ -159,7 +159,7 @@ namespace WMTool.Screens
             //
             // btnLoadRules
             //
-            this.btnLoadRules.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnLoadRules.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
             this.btnLoadRules.Location = new System.Drawing.Point(250, 374);
             this.btnLoadRules.Name = "btnLoadRules";
             this.btnLoadRules.Size = new System.Drawing.Size(140, 26);
@@ -170,7 +170,7 @@ namespace WMTool.Screens
             //
             // btnSaveRules
             //
-            this.btnSaveRules.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnSaveRules.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
             this.btnSaveRules.Location = new System.Drawing.Point(400, 374);
             this.btnSaveRules.Name = "btnSaveRules";
             this.btnSaveRules.Size = new System.Drawing.Size(140, 26);
@@ -181,7 +181,7 @@ namespace WMTool.Screens
             //
             // btnExecute
             //
-            this.btnExecute.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnExecute.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
             this.btnExecute.Location = new System.Drawing.Point(10, 410);
             this.btnExecute.Name = "btnExecute";
             this.btnExecute.Size = new System.Drawing.Size(200, 30);
@@ -192,8 +192,8 @@ namespace WMTool.Screens
             //
             // progressBarValidation
             //
-            this.progressBarValidation.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right))));
+            this.progressBarValidation.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.progressBarValidation.Location = new System.Drawing.Point(220, 415);
             this.progressBarValidation.Name = "progressBarValidation";
             this.progressBarValidation.Size = new System.Drawing.Size(1110, 20);
@@ -201,7 +201,7 @@ namespace WMTool.Screens
             //
             // lblResults
             //
-            this.lblResults.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblResults.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
             this.lblResults.Location = new System.Drawing.Point(10, 452);
             this.lblResults.Name = "lblResults";
             this.lblResults.Size = new System.Drawing.Size(300, 20);
