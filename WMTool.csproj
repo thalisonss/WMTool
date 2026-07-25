@@ -117,6 +117,18 @@
     <Compile Include="Screens\ucValidation.Designer.cs">
       <DependentUpon>ucValidation.cs</DependentUpon>
     </Compile>
+    <Compile Include="Screens\ucJsonReprocessor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Screens\ucJsonReprocessor.Designer.cs">
+      <DependentUpon>ucJsonReprocessor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\frmCustomViewSqlEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Screens\frmCustomViewSqlEditor.Designer.cs">
+      <DependentUpon>frmCustomViewSqlEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Integrations\WMApiClient.cs" />
@@ -132,6 +144,52 @@
     <Compile Include="Validation\Models\FileValidationResult.cs" />
     <Compile Include="Validation\RuleParameterParser.cs" />
     <Compile Include="Validation\ValidationEngine.cs" />
+    <Compile Include="Reprocessing\JsonReprocessingEngine.cs" />
+    <Compile Include="Reprocessing\Models\DataSourceReference.cs" />
+    <Compile Include="Reprocessing\Models\DocumentTemplateDefinition.cs" />
+    <Compile Include="Reprocessing\Models\DataSourceResult.cs" />
+    <Compile Include="Reprocessing\Models\MasterParameterInputs.cs" />
+    <Compile Include="Reprocessing\Models\MasterParameterSet.cs" />
+    <Compile Include="Reprocessing\Models\RequiredParameterInfo.cs" />
+    <Compile Include="Reprocessing\Models\DerivedInvoiceData.cs" />
+    <Compile Include="Reprocessing\Parsing\DocumentTemplateJsonParser.cs" />
+    <Compile Include="Reprocessing\ViewDsl\Models\ViewParameterDefinition.cs" />
+    <Compile Include="Reprocessing\ViewDsl\Models\ViewJoinDefinition.cs" />
+    <Compile Include="Reprocessing\ViewDsl\Models\ViewFromDefinition.cs" />
+    <Compile Include="Reprocessing\ViewDsl\Models\ViewFilterDefinition.cs" />
+    <Compile Include="Reprocessing\ViewDsl\Models\ViewColumnDefinition.cs" />
+    <Compile Include="Reprocessing\ViewDsl\Models\ViewSelectDefinition.cs" />
+    <Compile Include="Reprocessing\ViewDsl\Models\ViewDefinition.cs" />
+    <Compile Include="Reprocessing\ViewDsl\Models\ViewParameterMapping.cs" />
+    <Compile Include="Reprocessing\ViewDsl\IViewDefinitionProvider.cs" />
+    <Compile Include="Reprocessing\ViewDsl\ViewDslXmlParser.cs" />
+    <Compile Include="Reprocessing\ViewDsl\BindParameterScanner.cs" />
+    <Compile Include="Reprocessing\ViewDsl\TranslatedSqlQuery.cs" />
+    <Compile Include="Reprocessing\ViewDsl\ViewSqlBuilder.cs" />
+    <Compile Include="Reprocessing\ViewDsl\EntityExtensionResolver.cs" />
+    <Compile Include="Reprocessing\ViewDsl\DslFunctionRegistry.cs" />
+    <Compile Include="Reprocessing\ViewDsl\DslExpressionTranslator.cs" />
+    <Compile Include="Reprocessing\ViewDsl\SqlTextScanner.cs" />
+    <Compile Include="Reprocessing\ViewDsl\AggregateColumnDetector.cs" />
+    <Compile Include="Reprocessing\Repositories\DocumentTemplateRepository.cs" />
+    <Compile Include="Reprocessing\Repositories\ViewRepository.cs" />
+    <Compile Include="Reprocessing\Repositories\InvoiceDerivedDataRepository.cs" />
+    <Compile Include="Reprocessing\Repositories\TripVehicleCodeRepository.cs" />
+    <Compile Include="Reprocessing\CustomSql\CustomViewSqlOverride.cs" />
+    <Compile Include="Reprocessing\CustomSql\CustomViewSqlOverrideStore.cs" />
+    <Compile Include="Reprocessing\Execution\DataSourceExecutor.cs" />
+    <Compile Include="Reprocessing\ParameterResolution\MasterParameterResolver.cs" />
+    <Compile Include="Reprocessing\Templating\PlaceholderRegex.cs" />
+    <Compile Include="Reprocessing\Templating\PlaceholderValueResolver.cs" />
+    <Compile Include="Reprocessing\Templating\TemplateEngine.cs" />
+    <Compile Include="Reprocessing\Templating\McParamsBuilder.cs" />
+    <Compile Include="Reprocessing\Exceptions\ReprocessingException.cs" />
+    <Compile Include="Reprocessing\Exceptions\TemplateNotFoundException.cs" />
+    <Compile Include="Reprocessing\Exceptions\ViewNotFoundException.cs" />
+    <Compile Include="Reprocessing\Exceptions\UnresolvedParameterException.cs" />
+    <Compile Include="Reprocessing\Exceptions\UnknownDslFunctionException.cs" />
+    <Compile Include="Reprocessing\Exceptions\PlaceholderFieldNotFoundException.cs" />
+    <Compile Include="Reprocessing\Exceptions\MissingColumnAliasException.cs" />
     <EmbeddedResource Include="Screens\FormLogin.resx">
       <DependentUpon>FormLogin.cs</DependentUpon>
     </EmbeddedResource>
@@ -140,6 +198,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Screens\ucValidation.resx">
       <DependentUpon>ucValidation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Screens\ucJsonReprocessor.resx">
+      <DependentUpon>ucJsonReprocessor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Screens\frmCustomViewSqlEditor.resx">
+      <DependentUpon>frmCustomViewSqlEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

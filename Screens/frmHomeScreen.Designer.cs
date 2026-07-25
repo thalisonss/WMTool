@@ -116,6 +116,8 @@
             this.printDocument1 = new System.Drawing.Printing.PrintDocument();
             this.tabPageValidation = new System.Windows.Forms.TabPage();
             this.ucValidation1 = new WMTool.Screens.ucValidation();
+            this.tabPageJsonReprocessor = new System.Windows.Forms.TabPage();
+            this.ucJsonReprocessor1 = new WMTool.Screens.ucJsonReprocessor();
             this.tabPage2.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -130,6 +132,7 @@
             this.tabControl1.SuspendLayout();
             this.tabPageRequest.SuspendLayout();
             this.tabPageValidation.SuspendLayout();
+            this.tabPageJsonReprocessor.SuspendLayout();
             this.SuspendLayout();
             // 
             // label10
@@ -1004,6 +1007,7 @@
             this.tabControl1.Controls.Add(this.tabPageRequest);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Controls.Add(this.tabPageValidation);
+            this.tabControl1.Controls.Add(this.tabPageJsonReprocessor);
             this.tabControl1.Location = new System.Drawing.Point(4, 5);
             this.tabControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabControl1.Name = "tabControl1";
@@ -1090,6 +1094,26 @@
             this.ucValidation1.Size = new System.Drawing.Size(1335, 714);
             this.ucValidation1.TabIndex = 0;
             //
+            // tabPageJsonReprocessor
+            //
+            this.tabPageJsonReprocessor.Controls.Add(this.ucJsonReprocessor1);
+            this.tabPageJsonReprocessor.Location = new System.Drawing.Point(4, 25);
+            this.tabPageJsonReprocessor.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPageJsonReprocessor.Name = "tabPageJsonReprocessor";
+            this.tabPageJsonReprocessor.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPageJsonReprocessor.Size = new System.Drawing.Size(1341, 718);
+            this.tabPageJsonReprocessor.TabIndex = 9;
+            this.tabPageJsonReprocessor.Text = "Reprocessar JSON";
+            this.tabPageJsonReprocessor.UseVisualStyleBackColor = true;
+            //
+            // ucJsonReprocessor1
+            //
+            this.ucJsonReprocessor1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ucJsonReprocessor1.Location = new System.Drawing.Point(3, 2);
+            this.ucJsonReprocessor1.Name = "ucJsonReprocessor1";
+            this.ucJsonReprocessor1.Size = new System.Drawing.Size(1335, 714);
+            this.ucJsonReprocessor1.TabIndex = 0;
+            //
             // frmHomeScreen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -1124,6 +1148,7 @@
             this.tabPageRequest.ResumeLayout(false);
             this.tabPageRequest.PerformLayout();
             this.tabPageValidation.ResumeLayout(false);
+            this.tabPageJsonReprocessor.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1220,6 +1245,8 @@
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.TabPage tabPageValidation;
         private WMTool.Screens.ucValidation ucValidation1;
+        private System.Windows.Forms.TabPage tabPageJsonReprocessor;
+        private WMTool.Screens.ucJsonReprocessor ucJsonReprocessor1;
     }
 }
 
