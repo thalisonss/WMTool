@@ -61,9 +61,12 @@ namespace WMTool.Business
                 throw new ArgumentException("A query contém uma palavra-chave perigosa: --");
             }
 
-            if (!Regex.IsMatch(sqlQuery, @"^\s*SELECT\s+", RegexOptions.IgnoreCase))
+            // Além de "SELECT", uma query somente-leitura pode legitimamente começar com um CTE
+            // ("WITH ...", ou ";WITH ..." — necessário, por exemplo, pra declarar XMLNAMESPACES antes
+            // de ler colunas XML com prefixo de namespace).
+            if (!Regex.IsMatch(sqlQuery, @"^\s*;?\s*(SELECT|WITH)\s+", RegexOptions.IgnoreCase))
             {
-                throw new ArgumentException("A query deve começar com uma cláusula SELECT.");
+                throw new ArgumentException("A query deve começar com uma cláusula SELECT (ou WITH, para CTEs).");
             }
         }
 

@@ -19,6 +19,14 @@ namespace WMTool.Screens
         {
             this.rbSingleFile = new System.Windows.Forms.RadioButton();
             this.rbBatchFolder = new System.Windows.Forms.RadioButton();
+            this.lblCIDInvoice = new System.Windows.Forms.Label();
+            this.txtCIDInvoice = new System.Windows.Forms.TextBox();
+            this.lblCSerie = new System.Windows.Forms.Label();
+            this.txtCSerie = new System.Windows.Forms.TextBox();
+            this.lblCIDBranchInvoice = new System.Windows.Forms.Label();
+            this.txtCIDBranchInvoice = new System.Windows.Forms.TextBox();
+            this.lblCIDCompany = new System.Windows.Forms.Label();
+            this.txtCIDCompany = new System.Windows.Forms.TextBox();
             this.lblJson = new System.Windows.Forms.Label();
             this.btnLoadJsonFile = new System.Windows.Forms.Button();
             this.txtJson = new System.Windows.Forms.TextBox();
@@ -31,6 +39,8 @@ namespace WMTool.Screens
             this.btnRemoveRule = new System.Windows.Forms.Button();
             this.btnLoadRules = new System.Windows.Forms.Button();
             this.btnSaveRules = new System.Windows.Forms.Button();
+            this.btnConfigureGeneralSql = new System.Windows.Forms.Button();
+            this.lblGeneralSqlPreview = new System.Windows.Forms.Label();
             this.btnExecute = new System.Windows.Forms.Button();
             this.progressBarValidation = new System.Windows.Forms.ProgressBar();
             this.lblResults = new System.Windows.Forms.Label();
@@ -56,6 +66,70 @@ namespace WMTool.Screens
             this.rbBatchFolder.Size = new System.Drawing.Size(150, 20);
             this.rbBatchFolder.TabIndex = 1;
             this.rbBatchFolder.Text = "Lote (pasta)";
+            //
+            // lblCIDInvoice
+            //
+            this.lblCIDInvoice.AutoSize = true;
+            this.lblCIDInvoice.Location = new System.Drawing.Point(340, 12);
+            this.lblCIDInvoice.Name = "lblCIDInvoice";
+            this.lblCIDInvoice.Size = new System.Drawing.Size(63, 13);
+            this.lblCIDInvoice.TabIndex = 18;
+            this.lblCIDInvoice.Text = "cIDInvoice:";
+            //
+            // txtCIDInvoice
+            //
+            this.txtCIDInvoice.Location = new System.Drawing.Point(410, 9);
+            this.txtCIDInvoice.Name = "txtCIDInvoice";
+            this.txtCIDInvoice.Size = new System.Drawing.Size(100, 20);
+            this.txtCIDInvoice.TabIndex = 19;
+            //
+            // lblCSerie
+            //
+            this.lblCSerie.AutoSize = true;
+            this.lblCSerie.Location = new System.Drawing.Point(520, 12);
+            this.lblCSerie.Name = "lblCSerie";
+            this.lblCSerie.Size = new System.Drawing.Size(41, 13);
+            this.lblCSerie.TabIndex = 20;
+            this.lblCSerie.Text = "cSerie:";
+            //
+            // txtCSerie
+            //
+            this.txtCSerie.Location = new System.Drawing.Point(570, 9);
+            this.txtCSerie.Name = "txtCSerie";
+            this.txtCSerie.Size = new System.Drawing.Size(80, 20);
+            this.txtCSerie.TabIndex = 21;
+            //
+            // lblCIDBranchInvoice
+            //
+            this.lblCIDBranchInvoice.AutoSize = true;
+            this.lblCIDBranchInvoice.Location = new System.Drawing.Point(660, 12);
+            this.lblCIDBranchInvoice.Name = "lblCIDBranchInvoice";
+            this.lblCIDBranchInvoice.Size = new System.Drawing.Size(93, 13);
+            this.lblCIDBranchInvoice.TabIndex = 22;
+            this.lblCIDBranchInvoice.Text = "cIDBranchInvoice:";
+            //
+            // txtCIDBranchInvoice
+            //
+            this.txtCIDBranchInvoice.Location = new System.Drawing.Point(760, 9);
+            this.txtCIDBranchInvoice.Name = "txtCIDBranchInvoice";
+            this.txtCIDBranchInvoice.Size = new System.Drawing.Size(100, 20);
+            this.txtCIDBranchInvoice.TabIndex = 23;
+            //
+            // lblCIDCompany
+            //
+            this.lblCIDCompany.AutoSize = true;
+            this.lblCIDCompany.Location = new System.Drawing.Point(870, 12);
+            this.lblCIDCompany.Name = "lblCIDCompany";
+            this.lblCIDCompany.Size = new System.Drawing.Size(69, 13);
+            this.lblCIDCompany.TabIndex = 24;
+            this.lblCIDCompany.Text = "cIDCompany:";
+            //
+            // txtCIDCompany
+            //
+            this.txtCIDCompany.Location = new System.Drawing.Point(950, 9);
+            this.txtCIDCompany.Name = "txtCIDCompany";
+            this.txtCIDCompany.Size = new System.Drawing.Size(100, 20);
+            this.txtCIDCompany.TabIndex = 25;
             //
             // lblJson
             //
@@ -179,6 +253,28 @@ namespace WMTool.Screens
             this.btnSaveRules.UseVisualStyleBackColor = true;
             this.btnSaveRules.Click += new System.EventHandler(this.btnSaveRules_Click);
             //
+            // btnConfigureGeneralSql
+            //
+            this.btnConfigureGeneralSql.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnConfigureGeneralSql.Location = new System.Drawing.Point(560, 374);
+            this.btnConfigureGeneralSql.Name = "btnConfigureGeneralSql";
+            this.btnConfigureGeneralSql.Size = new System.Drawing.Size(180, 26);
+            this.btnConfigureGeneralSql.TabIndex = 26;
+            this.btnConfigureGeneralSql.Text = "Configurar Query Geral...";
+            this.btnConfigureGeneralSql.UseVisualStyleBackColor = true;
+            this.btnConfigureGeneralSql.Click += new System.EventHandler(this.btnConfigureGeneralSql_Click);
+            //
+            // lblGeneralSqlPreview
+            //
+            this.lblGeneralSqlPreview.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblGeneralSqlPreview.AutoEllipsis = true;
+            this.lblGeneralSqlPreview.Location = new System.Drawing.Point(750, 378);
+            this.lblGeneralSqlPreview.Name = "lblGeneralSqlPreview";
+            this.lblGeneralSqlPreview.Size = new System.Drawing.Size(580, 18);
+            this.lblGeneralSqlPreview.TabIndex = 27;
+            this.lblGeneralSqlPreview.Text = "Query Geral: não configurada";
+            //
             // btnExecute
             //
             this.btnExecute.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
@@ -227,6 +323,8 @@ namespace WMTool.Screens
             this.Controls.Add(this.lblResults);
             this.Controls.Add(this.progressBarValidation);
             this.Controls.Add(this.btnExecute);
+            this.Controls.Add(this.lblGeneralSqlPreview);
+            this.Controls.Add(this.btnConfigureGeneralSql);
             this.Controls.Add(this.btnSaveRules);
             this.Controls.Add(this.btnLoadRules);
             this.Controls.Add(this.btnRemoveRule);
@@ -239,6 +337,14 @@ namespace WMTool.Screens
             this.Controls.Add(this.txtJson);
             this.Controls.Add(this.btnLoadJsonFile);
             this.Controls.Add(this.lblJson);
+            this.Controls.Add(this.txtCIDCompany);
+            this.Controls.Add(this.lblCIDCompany);
+            this.Controls.Add(this.txtCIDBranchInvoice);
+            this.Controls.Add(this.lblCIDBranchInvoice);
+            this.Controls.Add(this.txtCSerie);
+            this.Controls.Add(this.lblCSerie);
+            this.Controls.Add(this.txtCIDInvoice);
+            this.Controls.Add(this.lblCIDInvoice);
             this.Controls.Add(this.rbBatchFolder);
             this.Controls.Add(this.rbSingleFile);
             this.Name = "ucValidation";
@@ -254,6 +360,14 @@ namespace WMTool.Screens
 
         private System.Windows.Forms.RadioButton rbSingleFile;
         private System.Windows.Forms.RadioButton rbBatchFolder;
+        private System.Windows.Forms.Label lblCIDInvoice;
+        private System.Windows.Forms.TextBox txtCIDInvoice;
+        private System.Windows.Forms.Label lblCSerie;
+        private System.Windows.Forms.TextBox txtCSerie;
+        private System.Windows.Forms.Label lblCIDBranchInvoice;
+        private System.Windows.Forms.TextBox txtCIDBranchInvoice;
+        private System.Windows.Forms.Label lblCIDCompany;
+        private System.Windows.Forms.TextBox txtCIDCompany;
         private System.Windows.Forms.Label lblJson;
         private System.Windows.Forms.Button btnLoadJsonFile;
         private System.Windows.Forms.TextBox txtJson;
@@ -266,6 +380,8 @@ namespace WMTool.Screens
         private System.Windows.Forms.Button btnRemoveRule;
         private System.Windows.Forms.Button btnLoadRules;
         private System.Windows.Forms.Button btnSaveRules;
+        private System.Windows.Forms.Button btnConfigureGeneralSql;
+        private System.Windows.Forms.Label lblGeneralSqlPreview;
         private System.Windows.Forms.Button btnExecute;
         private System.Windows.Forms.ProgressBar progressBarValidation;
         private System.Windows.Forms.Label lblResults;

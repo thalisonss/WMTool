@@ -35,16 +35,25 @@ namespace WMTool.Reprocessing.ViewDsl
 
         public Task<TranslatedSqlQuery> BuildAsync(ViewDefinition view, string viewName, string connectionString)
         {
-            return BuildAsync(view, viewName, connectionString, 0);
+            return BuildAsync(view, viewName, connectionString, 0, ignoreOverrides: false);
         }
 
-        private async Task<TranslatedSqlQuery> BuildAsync(ViewDefinition view, string viewName, string connectionString, int depth)
+        // Usado só pelo refresh de data sources (botão "Atualizar DataSources"): ignora qualquer SQL
+        // customizado já cadastrado e força a tradução a partir da DSL da MC1_View ao vivo no banco — é
+        // assim que o refresh consegue reconstruir o SQL customizado de cada view com a definição mais
+        // atual, em vez de devolver o cache antigo que ele mesmo está tentando renovar.
+        public Task<TranslatedSqlQuery> BuildFromLiveDslAsync(ViewDefinition view, string viewName, string connectionString)
+        {
+            return BuildAsync(view, viewName, connectionString, 0, ignoreOverrides: true);
+        }
+
+        private async Task<TranslatedSqlQuery> BuildAsync(ViewDefinition view, string viewName, string connectionString, int depth, bool ignoreOverrides)
         {
             // Uma query customizada cadastrada pelo usuário para essa view (normalmente por performance)
             // substitui totalmente a tradução da DSL — precisa devolver as mesmas colunas de saída. Vale
             // tanto quando a view é um data source de topo quanto quando é referenciada como view aninhada
             // dentro de outra (o mesmo método é usado nos dois casos).
-            string customSql = _overrideStore.GetSql(viewName);
+            string customSql = ignoreOverrides ? null : _overrideStore.GetSql(viewName);
             if (customSql != null)
             {
                 return new TranslatedSqlQuery
@@ -72,7 +81,7 @@ namespace WMTool.Reprocessing.ViewDsl
 
             foreach (ViewJoinDefinition join in view.From.Joins)
             {
-                (string text, bool isNestedView) = await BuildJoinTextAsync(join, viewName, connectionString, depth);
+                (string text, bool isNestedView) = await BuildJoinTextAsync(join, viewName, connectionString, depth, view.Filter.CompanyFilter, ignoreOverrides);
                 joinTexts.Add(text);
 
                 if (isNestedView)
@@ -140,7 +149,8 @@ namespace WMTool.Reprocessing.ViewDsl
         // faz JOIN direto com Custom_WM_NF_ProductOrder), com parâmetros da view aninhada remapeados via
         // <parameter name="X" value=":Y"/> dentro do próprio join. Tentamos resolver "Entity" como view
         // primeiro; se não existir (ViewNotFoundException), é uma tabela real e seguimos como sempre.
-        private async Task<(string Text, bool IsNestedView)> BuildJoinTextAsync(ViewJoinDefinition join, string viewName, string connectionString, int depth)
+        private async Task<(string Text, bool IsNestedView)> BuildJoinTextAsync(
+            ViewJoinDefinition join, string viewName, string connectionString, int depth, bool applyCompanyFilter, bool ignoreOverrides)
         {
             string joinKeyword = join.JoinType == "inner-join" ? "INNER JOIN" : "LEFT JOIN";
             string qualifier = join.Alias ?? join.Entity;
@@ -150,16 +160,48 @@ namespace WMTool.Reprocessing.ViewDsl
             if (nestedView == null)
             {
                 string alias = string.IsNullOrEmpty(join.Alias) ? string.Empty : " AS " + join.Alias;
-                string joinText = " " + joinKeyword + " " + join.Entity + alias + " ON " + _expressionTranslator.Translate(join.OnExpression, viewName);
+                string onClause = _expressionTranslator.Translate(join.OnExpression, viewName);
+                onClause = await AppendCompanyFilterAsync(onClause, join.Entity, qualifier, applyCompanyFilter, connectionString);
+                string joinText = " " + joinKeyword + " " + join.Entity + alias + " ON " + onClause;
                 return (joinText, false);
             }
 
-            TranslatedSqlQuery nestedQuery = await BuildAsync(nestedView, join.Entity, connectionString, depth + 1);
+            TranslatedSqlQuery nestedQuery = await BuildAsync(nestedView, join.Entity, connectionString, depth + 1, ignoreOverrides);
             string nestedSql = ApplyParameterMappings(nestedQuery.Sql, join.ParameterMappings, viewName);
 
             string nestedJoinText = " " + joinKeyword + " (" + nestedSql + ") AS " + qualifier +
                                      " ON " + _expressionTranslator.Translate(join.OnExpression, viewName);
             return (nestedJoinText, true);
+        }
+
+        // <filter company="true"/> é uma flag única pra view inteira: a plataforma MC1 espera que TODA
+        // entidade multi-tenant referenciada na query seja escopada por empresa, não só a entidade base do
+        // FROM. Sem isso, joins em tabelas cuja chave primária inclui cIDCompany (a imensa maioria) deixam
+        // de ser um lookup seletivo por índice composto — o otimizador não consegue estimar cardinalidade
+        // corretamente e monta planos catastróficos (nested loops/index spool em excesso), além do risco de
+        // casar linhas de OUTRA empresa que reaproveitou o mesmo código (cIDProduct, cIDCustomer etc. não
+        // são únicos entre empresas). Documentado depois de comparar o SQL gerado com uma query de
+        // referência que rodava em segundos justamente por ter esse filtro em cada join.
+        private async Task<string> AppendCompanyFilterAsync(
+            string onClause, string entity, string qualifier, bool applyCompanyFilter, string connectionString)
+        {
+            if (!applyCompanyFilter)
+            {
+                return onClause;
+            }
+
+            if (Regex.IsMatch(onClause, @"\b" + Regex.Escape(qualifier) + @"\.cIDCompany\b"))
+            {
+                return onClause;
+            }
+
+            HashSet<string> columns = await _extensionResolver.GetColumnsAsync(entity, connectionString);
+            if (!columns.Contains("cIDCompany"))
+            {
+                return onClause;
+            }
+
+            return onClause + " AND " + qualifier + ".cIDCompany = @cIDCompany";
         }
 
         private async Task<ViewDefinition> TryGetNestedViewAsync(ViewJoinDefinition join, string connectionString)

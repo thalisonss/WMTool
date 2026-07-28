@@ -41,7 +41,11 @@ namespace WMTool.Reprocessing.ViewDsl
             Register("string.length", args => $"LEN({args[0]})");
             Register("string.replace", args => $"REPLACE({args[0]}, {args[1]}, {args[2]})");
             Register("string.substring", TranslateSubstring);
-            Register("string.toInteger", args => $"CONVERT(int, {args[0]})");
+            // TRY_CONVERT (não CONVERT): o valor de origem é dado de negócio em texto — pode não ser um
+            // inteiro "limpo" (ex.: "0.00000", vindo de um campo numeric(18,5) convertido pra texto em
+            // outro ponto da expressão). Um erro de conversão aqui não pode derrubar o reprocessamento
+            // inteiro; a semântica correta de "toInteger" é virar NULL quando o valor não converte.
+            Register("string.toInteger", args => $"TRY_CONVERT(int, {args[0]})");
             Register("string.trim", args => $"LTRIM(RTRIM({args[0]}))");
             Register("string.trimend", args => $"RTRIM({args[0]})");
             Register("string.trimstart", args => $"LTRIM({args[0]})");

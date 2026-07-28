@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using WMTool.Business;
+using WMTool.Reprocessing.Caching;
 using WMTool.Reprocessing.CustomSql;
 using WMTool.Reprocessing.Execution;
 using WMTool.Reprocessing.Models;
@@ -27,6 +28,8 @@ namespace WMTool.Reprocessing
         private readonly MasterParameterResolver _parameterResolver;
         private readonly TemplateEngine _templateEngine;
         private readonly McParamsBuilder _mcParamsBuilder;
+        private readonly CustomViewSqlOverrideStore _overrideStore;
+        private readonly DataSourceCacheStore _dataSourceCacheStore;
 
         public JsonReprocessingEngine(WMBusiness business)
         {
@@ -36,7 +39,9 @@ namespace WMTool.Reprocessing
 
             _templateRepository = new DocumentTemplateRepository(business);
             _viewRepository = new ViewRepository(business, new ViewDslXmlParser());
-            _sqlBuilder = new ViewSqlBuilder(expressionTranslator, extensionResolver, _viewRepository, new CustomViewSqlOverrideStore());
+            _overrideStore = new CustomViewSqlOverrideStore();
+            _dataSourceCacheStore = new DataSourceCacheStore();
+            _sqlBuilder = new ViewSqlBuilder(expressionTranslator, extensionResolver, _viewRepository, _overrideStore);
             _dataSourceExecutor = new DataSourceExecutor(business);
             _parameterResolver = new MasterParameterResolver(new InvoiceDerivedDataRepository(business), new TripVehicleCodeRepository(business));
             _templateEngine = new TemplateEngine();
@@ -46,6 +51,28 @@ namespace WMTool.Reprocessing
         public async Task<IReadOnlyList<DataSourceReference>> ListDataSourcesAsync(string connectionString)
         {
             DocumentTemplateDefinition template = await _templateRepository.GetLatestEnabledAsync(TemplateName, connectionString);
+            return template.DataSources;
+        }
+
+        // Busca a definição atual do template + de cada view no banco, traduz cada uma a partir da DSL
+        // (ignorando qualquer SQL customizado já cadastrado — é isso que "atualizar" significa) e grava o
+        // resultado como o SQL customizado de cada data source. Dali em diante, rodar o reprocessamento
+        // usa esse SQL já pronto (sem re-traduzir a DSL, sem re-consultar MC1_View) até a próxima
+        // atualização. Também salva a lista de data sources num cache local pra tela abrir sem precisar
+        // consultar o banco.
+        public async Task<IReadOnlyList<DataSourceReference>> RefreshDataSourcesAsync(string connectionString)
+        {
+            DocumentTemplateDefinition template = await _templateRepository.GetLatestEnabledAsync(TemplateName, connectionString);
+
+            foreach (DataSourceReference reference in template.DataSources)
+            {
+                ViewDefinition view = await _viewRepository.GetLatestEnabledAsync(reference.Alias, reference.ViewName, connectionString);
+                TranslatedSqlQuery query = await _sqlBuilder.BuildFromLiveDslAsync(view, reference.ViewName, connectionString);
+                _overrideStore.Save(reference.ViewName, query.Sql);
+            }
+
+            _dataSourceCacheStore.Save(template.TemplateName, template.DataSources);
+
             return template.DataSources;
         }
 

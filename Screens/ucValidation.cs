@@ -16,19 +16,87 @@ namespace WMTool.Screens
     public partial class ucValidation : UserControl
     {
         private readonly List<ValidationRule> _rules = new List<ValidationRule>();
+        private string _generalSqlTemplate = string.Empty;
 
         public ucValidation()
         {
             InitializeComponent();
             SetupRulesGrid();
             SetupResultsGrid();
+            LoadDefaultRulesFromSettings();
+        }
+
+        // Carrega automaticamente as regras do caminho configurado na aba Settings, se houver um
+        // cadastrado — assim a tela já abre pronta pra validar. Se o caminho estiver configurado
+        // mas o carregamento falhar (arquivo ausente/inválido), avisa em vez de falhar em silêncio,
+        // já que isso é indistinguível de "não carregou nada" pra quem está usando a tela.
+        private void LoadDefaultRulesFromSettings()
+        {
+            string path = Properties.Settings.Default.configValidationRulesPath;
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return;
+            }
+
+            if (!File.Exists(path))
+            {
+                MessageBox.Show(
+                    "O arquivo de regras padrão configurado em Settings não foi encontrado:\n" + path,
+                    "Regras de validação (JSON x Banco)");
+                return;
+            }
+
+            try
+            {
+                LoadRulesFromFile(path);
+            }
+            catch (Exception ex)
+            {
+                LogError.Log(ex);
+                MessageBox.Show(
+                    "Erro ao carregar as regras padrão configuradas em Settings: " + ex.Message,
+                    "Regras de validação (JSON x Banco)");
+            }
+        }
+
+        // Usado pelo botão "Validar JSON" da aba Reprocessar JSON: recebe o JSON gerado + os 4
+        // identificadores já digitados lá, prepara a tela no modo "arquivo único" e roda a validação
+        // com as regras já carregadas.
+        public void LoadJson(string json, string cIDInvoice, string cSerie, string cIDBranchInvoice, string cIDCompany)
+        {
+            txtJson.Text = json;
+            rbSingleFile.Checked = true;
+            txtCIDInvoice.Text = cIDInvoice;
+            txtCSerie.Text = cSerie;
+            txtCIDBranchInvoice.Text = cIDBranchInvoice;
+            txtCIDCompany.Text = cIDCompany;
+        }
+
+        public Task RunValidationAsync()
+        {
+            return ExecuteValidationAsync();
         }
 
         private void SetupRulesGrid()
         {
             dgvRules.Columns.Add(new DataGridViewTextBoxColumn { Name = "colName", HeaderText = "Nome", Width = 150 });
             dgvRules.Columns.Add(new DataGridViewTextBoxColumn { Name = "colJsonPath", HeaderText = "JSON Path", Width = 220 });
-            dgvRules.Columns.Add(new DataGridViewTextBoxColumn { Name = "colSql", HeaderText = "SQL (use {varNome})", Width = 380 });
+            dgvRules.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "colSql",
+                HeaderText = "SQL (dois cliques para editar)",
+                Width = 380,
+                ReadOnly = true
+            });
+            var sourceTypeColumn = new DataGridViewComboBoxColumn
+            {
+                Name = "colSourceType",
+                HeaderText = "Fonte",
+                Width = 110,
+                DataSource = Enum.GetValues(typeof(ComparisonSourceType))
+            };
+            dgvRules.Columns.Add(sourceTypeColumn);
+
             dgvRules.Columns.Add(new DataGridViewTextBoxColumn { Name = "colResultColumn", HeaderText = "Coluna Resultado", Width = 130 });
 
             var comparisonColumn = new DataGridViewComboBoxColumn
@@ -40,12 +108,71 @@ namespace WMTool.Screens
             };
             dgvRules.Columns.Add(comparisonColumn);
 
-            dgvRules.Columns.Add(new DataGridViewTextBoxColumn
+            dgvRules.CellDoubleClick += DgvRules_CellDoubleClick;
+        }
+
+        // Igual ao "Configurar" da grid de data sources da aba Reprocessar JSON: a query de uma regra
+        // costuma ser grande demais pra editar dentro da célula, então dois cliques abrem um editor
+        // dedicado; a célula em si só mostra uma prévia truncada.
+        private void DgvRules_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0 || dgvRules.Columns[e.ColumnIndex].Name != "colSql")
             {
-                Name = "colParameters",
-                HeaderText = "Parâmetros (nome=json:caminho;nome2=fixo:valor)",
-                Width = 320
-            });
+                return;
+            }
+
+            SyncRulesFromGrid();
+
+            ValidationRule rule = _rules[e.RowIndex];
+
+            using (var editor = new frmRuleSqlEditor("Regra: " + rule.Name, rule.SqlTemplate))
+            {
+                if (editor.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+
+                rule.SqlTemplate = editor.ResultSql;
+                RefreshRulesGrid();
+            }
+        }
+
+        private void btnConfigureGeneralSql_Click(object sender, EventArgs e)
+        {
+            using (var editor = new frmRuleSqlEditor("Query Geral (compartilhada entre as regras)", _generalSqlTemplate))
+            {
+                if (editor.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+
+                _generalSqlTemplate = editor.ResultSql;
+                UpdateGeneralSqlPreviewLabel();
+            }
+        }
+
+        private void UpdateGeneralSqlPreviewLabel()
+        {
+            lblGeneralSqlPreview.Text = string.IsNullOrEmpty(_generalSqlTemplate)
+                ? "Query Geral: não configurada"
+                : "Query Geral: " + BuildSqlPreview(_generalSqlTemplate);
+        }
+
+        private static string BuildSqlPreview(string sql)
+        {
+            if (string.IsNullOrEmpty(sql))
+            {
+                return string.Empty;
+            }
+
+            string singleLine = sql.Replace("\r", " ").Replace("\n", " ");
+            while (singleLine.Contains("  "))
+            {
+                singleLine = singleLine.Replace("  ", " ");
+            }
+
+            const int maxLength = 120;
+            return singleLine.Length > maxLength ? singleLine.Substring(0, maxLength) + "..." : singleLine;
         }
 
         private void SetupResultsGrid()
@@ -130,10 +257,7 @@ namespace WMTool.Screens
 
                 try
                 {
-                    List<ValidationRule> loaded = ValidationEngine.LoadRules(dialog.FileName);
-                    _rules.Clear();
-                    _rules.AddRange(loaded);
-                    RefreshRulesGrid();
+                    LoadRulesFromFile(dialog.FileName);
                 }
                 catch (Exception ex)
                 {
@@ -141,6 +265,16 @@ namespace WMTool.Screens
                     MessageBox.Show("Erro ao carregar regras: " + ex.Message);
                 }
             }
+        }
+
+        private void LoadRulesFromFile(string path)
+        {
+            ValidationRuleSet loaded = ValidationEngine.LoadRules(path);
+            _rules.Clear();
+            _rules.AddRange(loaded.Rules);
+            _generalSqlTemplate = loaded.GeneralSqlTemplate ?? string.Empty;
+            RefreshRulesGrid();
+            UpdateGeneralSqlPreviewLabel();
         }
 
         private void btnSaveRules_Click(object sender, EventArgs e)
@@ -156,7 +290,8 @@ namespace WMTool.Screens
 
                 try
                 {
-                    ValidationEngine.SaveRules(dialog.FileName, _rules);
+                    var ruleSet = new ValidationRuleSet { GeneralSqlTemplate = _generalSqlTemplate, Rules = _rules };
+                    ValidationEngine.SaveRules(dialog.FileName, ruleSet);
                     MessageBox.Show("Regras salvas em: " + dialog.FileName);
                 }
                 catch (Exception ex)
@@ -169,6 +304,11 @@ namespace WMTool.Screens
 
         private async void btnExecute_Click(object sender, EventArgs e)
         {
+            await ExecuteValidationAsync();
+        }
+
+        private async Task ExecuteValidationAsync()
+        {
             SyncRulesFromGrid();
 
             if (_rules.Count == 0)
@@ -179,6 +319,13 @@ namespace WMTool.Screens
 
             string connectionString = $"Server={Properties.Settings.Default.configServer};Database={Properties.Settings.Default.configDatabase};Integrated Security=true;";
             var engine = new ValidationEngine(new WMBusiness());
+            var context = new ValidationContextInputs
+            {
+                CIDInvoice = txtCIDInvoice.Text.Trim(),
+                CSerie = txtCSerie.Text.Trim(),
+                CIDBranchInvoice = txtCIDBranchInvoice.Text.Trim(),
+                CIDCompany = txtCIDCompany.Text.Trim()
+            };
 
             btnExecute.Enabled = false;
             progressBarValidation.Style = ProgressBarStyle.Marquee;
@@ -194,13 +341,13 @@ namespace WMTool.Screens
                         return;
                     }
 
-                    List<FileValidationResult> batchResults = await engine.RunBatchAsync(txtFolderPath.Text, _rules, connectionString);
+                    List<FileValidationResult> batchResults = await engine.RunBatchAsync(txtFolderPath.Text, _rules, connectionString, context, _generalSqlTemplate);
                     PopulateBatchResults(batchResults);
                 }
                 else
                 {
                     JObject json = JObject.Parse(txtJson.Text);
-                    List<ValidationRuleResult> results = await engine.RunAsync(json, _rules, connectionString);
+                    List<ValidationRuleResult> results = await engine.RunAsync(json, _rules, connectionString, context, _generalSqlTemplate);
                     PopulateResults(results, null);
                 }
             }
@@ -248,10 +395,12 @@ namespace WMTool.Screens
 
             foreach (ValidationRule rule in _rules)
             {
-                dgvRules.Rows.Add(rule.Name, rule.JsonPath, rule.SqlTemplate, rule.ResultColumn, rule.Comparison, EncodeParameters(rule.Parameters));
+                dgvRules.Rows.Add(rule.Name, rule.JsonPath, BuildSqlPreview(rule.SqlTemplate), rule.SourceType, rule.ResultColumn, rule.Comparison);
             }
         }
 
+        // colSql só mostra uma prévia (somente leitura) — o SQL completo de cada regra fica em
+        // _rules[i].SqlTemplate, editado exclusivamente via o dois-cliques (DgvRules_CellDoubleClick).
         private void SyncRulesFromGrid()
         {
             for (int i = 0; i < dgvRules.Rows.Count && i < _rules.Count; i++)
@@ -261,10 +410,9 @@ namespace WMTool.Screens
 
                 rule.Name = row.Cells["colName"].Value?.ToString();
                 rule.JsonPath = row.Cells["colJsonPath"].Value?.ToString();
-                rule.SqlTemplate = row.Cells["colSql"].Value?.ToString();
+                rule.SourceType = ParseSourceType(row.Cells["colSourceType"].Value);
                 rule.ResultColumn = row.Cells["colResultColumn"].Value?.ToString();
                 rule.Comparison = ParseComparison(row.Cells["colComparison"].Value);
-                rule.Parameters = DecodeParameters(row.Cells["colParameters"].Value?.ToString());
             }
         }
 
@@ -283,62 +431,20 @@ namespace WMTool.Screens
             return ComparisonType.EqualsTrimmed;
         }
 
-        private static string EncodeParameters(List<RuleParameter> parameters)
+        private static ComparisonSourceType ParseSourceType(object cellValue)
         {
-            if (parameters == null || parameters.Count == 0)
+            if (cellValue is ComparisonSourceType sourceType)
             {
-                return string.Empty;
+                return sourceType;
             }
 
-            return string.Join(";", parameters.Select(p =>
-                $"{p.Name}={(p.SourceType == RuleParameterSource.JsonPath ? "json" : "fixo")}:{p.Value}"));
+            if (cellValue != null && Enum.TryParse(cellValue.ToString(), out ComparisonSourceType parsed))
+            {
+                return parsed;
+            }
+
+            return ComparisonSourceType.CustomSql;
         }
 
-        private static List<RuleParameter> DecodeParameters(string encoded)
-        {
-            var parameters = new List<RuleParameter>();
-
-            if (string.IsNullOrWhiteSpace(encoded))
-            {
-                return parameters;
-            }
-
-            foreach (string entry in encoded.Split(';'))
-            {
-                if (string.IsNullOrWhiteSpace(entry))
-                {
-                    continue;
-                }
-
-                int nameSeparator = entry.IndexOf('=');
-                if (nameSeparator < 0)
-                {
-                    continue;
-                }
-
-                string name = entry.Substring(0, nameSeparator).Trim();
-                string rest = entry.Substring(nameSeparator + 1);
-
-                int sourceSeparator = rest.IndexOf(':');
-                if (sourceSeparator < 0)
-                {
-                    continue;
-                }
-
-                string source = rest.Substring(0, sourceSeparator).Trim();
-                string value = rest.Substring(sourceSeparator + 1);
-
-                parameters.Add(new RuleParameter
-                {
-                    Name = name,
-                    SourceType = string.Equals(source, "fixo", StringComparison.OrdinalIgnoreCase)
-                        ? RuleParameterSource.FixedValue
-                        : RuleParameterSource.JsonPath,
-                    Value = value
-                });
-            }
-
-            return parameters;
-        }
     }
 }

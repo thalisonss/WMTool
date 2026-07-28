@@ -35,6 +35,18 @@ namespace WMTool
             InitializeComponent();
 
             LoadInitial();
+
+            ucJsonReprocessor1.ValidateJsonRequested += OnValidateJsonRequested;
+        }
+
+        // Botão "Validar JSON" da aba Reprocessar JSON: manda o JSON gerado (+ os 4 identificadores)
+        // direto para a aba de Validação JSON x Banco, troca de aba e já executa a validação com as
+        // regras carregadas.
+        private async void OnValidateJsonRequested(string json, string cIDInvoice, string cSerie, string cIDBranchInvoice, string cIDCompany)
+        {
+            tabControl1.SelectedTab = tabPageValidation;
+            ucValidation1.LoadJson(json, cIDInvoice, cSerie, cIDBranchInvoice, cIDCompany);
+            await ucValidation1.RunValidationAsync();
         }
 
         #region |Variables|
@@ -99,7 +111,9 @@ namespace WMTool
             txtRequestURLSync.Text = urlSync;
             txtRequestURLToken.Text = urlToken;
             txtRequestUser.Text = login;
-            txtRequestPassword.Text = password; 
+            txtRequestPassword.Text = password;
+            txtValidationRulesPath.Text = Properties.Settings.Default.configValidationRulesPath;
+            txtDbComparisonRulesPath.Text = Properties.Settings.Default.configDbComparisonRulesPath;
         }
 
       
@@ -471,6 +485,44 @@ namespace WMTool
             WMTool.Properties.Settings.Default.Save();
         }
 
+        private void btnBrowseValidationRulesPath_Click(object sender, EventArgs e)
+        {
+            using (var dialog = new OpenFileDialog { Filter = "Arquivos JSON (*.json)|*.json" })
+            {
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    txtValidationRulesPath.Text = dialog.FileName;
+                }
+            }
+        }
+
+        private void btnSaveValidationRulesPath_Click(object sender, EventArgs e)
+        {
+            WMTool.Properties.Settings.Default.configValidationRulesPath = txtValidationRulesPath.Text;
+            WMTool.Properties.Settings.Default.Save();
+
+            MessageBox.Show("Caminho das regras de validação salvo com sucesso!");
+        }
+
+        private void btnBrowseDbComparisonRulesPath_Click(object sender, EventArgs e)
+        {
+            using (var dialog = new OpenFileDialog { Filter = "Arquivos JSON (*.json)|*.json" })
+            {
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    txtDbComparisonRulesPath.Text = dialog.FileName;
+                }
+            }
+        }
+
+        private void btnSaveDbComparisonRulesPath_Click(object sender, EventArgs e)
+        {
+            WMTool.Properties.Settings.Default.configDbComparisonRulesPath = txtDbComparisonRulesPath.Text;
+            WMTool.Properties.Settings.Default.Save();
+
+            MessageBox.Show("Caminho das regras de comparação Banco x Banco salvo com sucesso!");
+        }
+
         private void btnSetDirectoryTripExceptionCSV_Click(object sender, EventArgs e)
         {
             using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
@@ -553,24 +605,28 @@ namespace WMTool
         #region |Control events (Request)|
         private async void btnRequest_Click(object sender, EventArgs e)
         {
-            lblRequestLastUpdate.Text = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+            lblRequestLastUpdate.Text = "Última execução: " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+
+            WMTool.Properties.Settings.Default.configURLSync = txtRequestURLSync.Text;
+            WMTool.Properties.Settings.Default.configURLToken = txtRequestURLToken.Text;
+            WMTool.Properties.Settings.Default.configDomain = txtRequestDomain.Text;
+            WMTool.Properties.Settings.Default.configEnvironment = txtRequestEnvironment.Text;
+            WMTool.Properties.Settings.Default.configLogin = txtRequestUser.Text;
+            WMTool.Properties.Settings.Default.configPassword = txtRequestPassword.Text;
+            WMTool.Properties.Settings.Default.Save();
+
+            string urlToken = txtRequestURLToken.Text;
+            string urlSync = txtRequestURLSync.Text;
+            string domain = txtRequestDomain.Text;
+            string requestLogin = txtRequestUser.Text;
+            string password = txtRequestPassword.Text;
+
+            btnRequest.Enabled = false;
+            AppendRequestLog($"Iniciando requisição para o usuário '{requestLogin}' (domínio '{domain}', ambiente '{txtRequestEnvironment.Text}').");
 
             try
             {
-                WMTool.Properties.Settings.Default.configURLSync = txtRequestURLSync.Text;
-                WMTool.Properties.Settings.Default.configURLToken = txtRequestURLToken.Text;
-                WMTool.Properties.Settings.Default.configDomain = txtRequestDomain.Text;
-                WMTool.Properties.Settings.Default.configEnvironment = txtRequestEnvironment.Text;
-                WMTool.Properties.Settings.Default.configLogin = txtRequestUser.Text;
-                WMTool.Properties.Settings.Default.configPassword = txtRequestPassword.Text;
-                WMTool.Properties.Settings.Default.Save();
-
-                var urlToken = txtRequestURLToken.Text;
-                var urlSync = txtRequestURLSync.Text;
-                var domain = txtRequestDomain.Text;
                 var environment = int.Parse(txtRequestEnvironment.Text);
-                var login = txtRequestUser.Text;
-                var password = txtRequestPassword.Text;
 
                 using (var httpClient = new HttpClient())
                 {
@@ -580,13 +636,14 @@ namespace WMTool
                     {
                         cProjectGUI = domain,
                         nEnvironment = environment,
-                        cLogin = login,
+                        cLogin = requestLogin,
                         cPassword = password
                     };
 
                     var tokenJson = JsonConvert.SerializeObject(tokenPayload);
                     var tokenContent = new StringContent(tokenJson, Encoding.UTF8, "application/json");
 
+                    AppendRequestLog("Solicitando token em " + urlToken + "...");
                     var tokenResponse = await httpClient.PostAsync(urlToken, tokenContent);
                     tokenResponse.EnsureSuccessStatusCode();
 
@@ -598,8 +655,11 @@ namespace WMTool
                     if (string.IsNullOrEmpty(token))
                     {
                         lblRequestStatus.Text = "Token não retornado.";
+                        AppendRequestLog("Falha: o endpoint de token não retornou um token.");
                         return;
                     }
+
+                    AppendRequestLog("Token obtido com sucesso.");
 
                     httpClient.DefaultRequestHeaders.Clear();
                     httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
@@ -608,18 +668,35 @@ namespace WMTool
                     var syncJson = JsonConvert.SerializeObject(syncPayload);
                     var syncContent = new StringContent(syncJson, Encoding.UTF8, "application/json");
 
+                    AppendRequestLog("Enviando sync em " + urlSync + "...");
                     var syncResponse = await httpClient.PostAsync(urlSync, syncContent);
                     syncResponse.EnsureSuccessStatusCode();
 
-                    lblRequestStatus.Text = "Refresh para o usuario " + login + " realizado com sucesso. - " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                    lblRequestStatus.Text = "Refresh para o usuario " + requestLogin + " realizado com sucesso. - " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                    AppendRequestLog("Sucesso: refresh concluído para o usuário '" + requestLogin + "'.");
                 }
             }
             catch (Exception ex)
             {
-                lblRequestStatus.Text = "Erro na requisição do usaurio " + login;
+                lblRequestStatus.Text = "Erro na requisição do usuario " + requestLogin;
+                AppendRequestLog("Erro: " + ex.Message);
 
                 MessageBox.Show("Erro na requisição: " + ex.Message);
             }
+            finally
+            {
+                btnRequest.Enabled = true;
+            }
+        }
+
+        private void btnClearRequestLog_Click(object sender, EventArgs e)
+        {
+            txtRequestLog.Clear();
+        }
+
+        private void AppendRequestLog(string message)
+        {
+            txtRequestLog.AppendText(DateTime.Now.ToString("HH:mm:ss") + " - " + message + Environment.NewLine);
         }
         #endregion
 

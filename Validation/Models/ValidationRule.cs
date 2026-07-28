@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace WMTool.Validation.Models
 {
     public class ValidationRule
@@ -9,6 +7,6 @@ namespace WMTool.Validation.Models
         public string SqlTemplate { get; set; }
         public string ResultColumn { get; set; }
         public ComparisonType Comparison { get; set; } = ComparisonType.EqualsTrimmed;
-        public List<RuleParameter> Parameters { get; set; } = new List<RuleParameter>();
+        public ComparisonSourceType SourceType { get; set; } = ComparisonSourceType.CustomSql;
     }
 }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,22 +21,23 @@ namespace WMTool.Validation
             _business = business;
         }
 
-        public async Task<List<ValidationRuleResult>> RunAsync(JObject json, IEnumerable<ValidationRule> rules, string connectionString)
+        public async Task<List<ValidationRuleResult>> RunAsync(
+            JObject json, IEnumerable<ValidationRule> rules, string connectionString, ValidationContextInputs context, string generalSqlTemplate)
         {
-            var results = new List<ValidationRuleResult>();
-
-            foreach (ValidationRule rule in rules)
-            {
-                results.Add(await RunRuleAsync(json, rule, connectionString));
-            }
-
-            return results;
+            (DataRow generalRow, string generalRowError) = await SqlRuleHelper.ResolveGeneralRowAsync(_business, generalSqlTemplate, connectionString, context);
+            return await RunRulesAsync(json, rules.ToList(), connectionString, context, generalRow, generalRowError);
         }
 
-        public async Task<List<FileValidationResult>> RunBatchAsync(string folderPath, IEnumerable<ValidationRule> rules, string connectionString)
+        public async Task<List<FileValidationResult>> RunBatchAsync(
+            string folderPath, IEnumerable<ValidationRule> rules, string connectionString, ValidationContextInputs context, string generalSqlTemplate)
         {
             var ruleList = rules.ToList();
             var fileResults = new List<FileValidationResult>();
+
+            // A Query Geral usa os mesmos 4 identificadores do topo da tela pra todo o lote — roda uma
+            // única vez aqui, não a cada arquivo, exatamente pelo mesmo motivo de não repetir a mesma
+            // consulta pra cada campo.
+            (DataRow generalRow, string generalRowError) = await SqlRuleHelper.ResolveGeneralRowAsync(_business, generalSqlTemplate, connectionString, context);
 
             foreach (string filePath in Directory.GetFiles(folderPath, "*.json"))
             {
@@ -46,7 +46,7 @@ namespace WMTool.Validation
                 try
                 {
                     JObject json = JObject.Parse(File.ReadAllText(filePath));
-                    fileResult.Results = await RunAsync(json, ruleList, connectionString);
+                    fileResult.Results = await RunRulesAsync(json, ruleList, connectionString, context, generalRow, generalRowError);
                 }
                 catch (JsonException ex)
                 {
@@ -59,7 +59,21 @@ namespace WMTool.Validation
             return fileResults;
         }
 
-        private async Task<ValidationRuleResult> RunRuleAsync(JObject json, ValidationRule rule, string connectionString)
+        private async Task<List<ValidationRuleResult>> RunRulesAsync(
+            JObject json, List<ValidationRule> rules, string connectionString, ValidationContextInputs context, DataRow generalRow, string generalRowError)
+        {
+            var results = new List<ValidationRuleResult>();
+
+            foreach (ValidationRule rule in rules)
+            {
+                results.Add(await RunRuleAsync(json, rule, connectionString, context, generalRow, generalRowError));
+            }
+
+            return results;
+        }
+
+        private async Task<ValidationRuleResult> RunRuleAsync(
+            JObject json, ValidationRule rule, string connectionString, ValidationContextInputs context, DataRow generalRow, string generalRowError)
         {
             var result = new ValidationRuleResult { RuleName = rule.Name };
 
@@ -73,86 +87,63 @@ namespace WMTool.Validation
 
             result.Expected = expectedToken.ToString();
 
-            var parameters = new Dictionary<string, object>();
-            foreach (RuleParameter parameter in rule.Parameters)
+            DataRow sourceRow;
+
+            if (rule.SourceType == ComparisonSourceType.GeneralResult)
             {
-                if (!RuleParameterParser.TryResolve(parameter, json, out string value, out string error))
+                if (generalRow == null)
                 {
                     result.Passed = false;
-                    result.Message = error;
+                    result.Message = generalRowError ?? "Resultado geral indisponível.";
                     return result;
                 }
 
-                parameters["@" + parameter.Name] = value;
+                sourceRow = generalRow;
+            }
+            else
+            {
+                if (!SqlRuleHelper.TryBuildParameterizedSql(rule.SqlTemplate, context, out string sql, out Dictionary<string, object> parameters, out string placeholderError))
+                {
+                    result.Passed = false;
+                    result.Message = placeholderError;
+                    return result;
+                }
+
+                DataTable dataTable;
+                try
+                {
+                    dataTable = await _business.ConsultDB(sql, connectionString, parameters);
+                }
+                catch (Exception ex)
+                {
+                    result.Passed = false;
+                    result.Message = $"Erro ao consultar o banco: {ex.Message}";
+                    return result;
+                }
+
+                if (dataTable.Rows.Count == 0)
+                {
+                    result.Passed = false;
+                    result.Message = "Nenhum registro encontrado no banco.";
+                    return result;
+                }
+
+                sourceRow = dataTable.Rows[0];
             }
 
-            List<string> undeclared = RuleParameterParser.ExtractPlaceholderNames(rule.SqlTemplate)
-                .Where(name => !parameters.ContainsKey("@" + name))
-                .ToList();
-
-            if (undeclared.Count > 0)
+            if (!sourceRow.Table.Columns.Contains(rule.ResultColumn))
             {
                 result.Passed = false;
-                result.Message = $"SQL usa {{{string.Join("}}, {{", undeclared)}}} mas não há parâmetro correspondente na coluna Parâmetros.";
+                string origin = rule.SourceType == ComparisonSourceType.GeneralResult ? "no resultado geral" : "no resultado da query";
+                result.Message = $"Coluna '{rule.ResultColumn}' não veio {origin}.";
                 return result;
             }
 
-            string sql = RuleParameterParser.ToParameterizedSql(rule.SqlTemplate);
-
-            DataTable dataTable;
-            try
-            {
-                dataTable = await _business.ConsultDB(sql, connectionString, parameters);
-            }
-            catch (Exception ex)
-            {
-                result.Passed = false;
-                result.Message = $"Erro ao consultar o banco: {ex.Message}";
-                return result;
-            }
-
-            if (dataTable.Rows.Count == 0)
-            {
-                result.Passed = false;
-                result.Message = "Nenhum registro encontrado no banco.";
-                return result;
-            }
-
-            if (!dataTable.Columns.Contains(rule.ResultColumn))
-            {
-                result.Passed = false;
-                result.Message = $"Coluna '{rule.ResultColumn}' não veio no resultado da query.";
-                return result;
-            }
-
-            object actualValue = dataTable.Rows[0][rule.ResultColumn];
-            result.Actual = actualValue == DBNull.Value ? null : actualValue.ToString();
-            result.Passed = Compare(result.Expected, result.Actual, rule.Comparison);
+            object actualValue = sourceRow[rule.ResultColumn];
+            result.Actual = SqlRuleHelper.ToInvariantString(actualValue);
+            result.Passed = SqlRuleHelper.Compare(result.Expected, result.Actual, rule.Comparison);
 
             return result;
-        }
-
-        private static bool Compare(string expected, string actual, ComparisonType comparison)
-        {
-            if (expected == null || actual == null)
-            {
-                return expected == actual;
-            }
-
-            switch (comparison)
-            {
-                case ComparisonType.NumericEquals:
-                    bool expectedIsNumber = decimal.TryParse(expected, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal expectedNumber);
-                    bool actualIsNumber = decimal.TryParse(actual, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal actualNumber);
-                    return expectedIsNumber && actualIsNumber && expectedNumber == actualNumber;
-
-                case ComparisonType.Contains:
-                    return actual.IndexOf(expected.Trim(), StringComparison.OrdinalIgnoreCase) >= 0;
-
-                case ComparisonType.EqualsTrimmed:
-                default:
-                    return string.Equals(expected.Trim(), actual.Trim(), StringComparison.OrdinalIgnoreCase);
-            }
         }
 
         private static readonly JsonSerializerSettings RuleFileSettings = new JsonSerializerSettings
@@ -160,15 +151,25 @@ namespace WMTool.Validation
             Converters = { new StringEnumConverter() }
         };
 
-        public static List<ValidationRule> LoadRules(string path)
+        // Retrocompatível com arquivos salvos antes da Query Geral existir (uma lista JSON "nua", sem
+        // GeneralSqlTemplate) — nesse caso vira um ValidationRuleSet com GeneralSqlTemplate vazio.
+        public static ValidationRuleSet LoadRules(string path)
         {
             string json = File.ReadAllText(path);
-            return JsonConvert.DeserializeObject<List<ValidationRule>>(json, RuleFileSettings) ?? new List<ValidationRule>();
+            JToken root = JToken.Parse(json);
+
+            if (root.Type == JTokenType.Array)
+            {
+                List<ValidationRule> legacyRules = root.ToObject<List<ValidationRule>>(JsonSerializer.Create(RuleFileSettings)) ?? new List<ValidationRule>();
+                return new ValidationRuleSet { Rules = legacyRules };
+            }
+
+            return root.ToObject<ValidationRuleSet>(JsonSerializer.Create(RuleFileSettings)) ?? new ValidationRuleSet();
         }
 
-        public static void SaveRules(string path, IEnumerable<ValidationRule> rules)
+        public static void SaveRules(string path, ValidationRuleSet ruleSet)
         {
-            string json = JsonConvert.SerializeObject(rules, Formatting.Indented, RuleFileSettings);
+            string json = JsonConvert.SerializeObject(ruleSet, Formatting.Indented, RuleFileSettings);
             File.WriteAllText(path, json);
         }
     }

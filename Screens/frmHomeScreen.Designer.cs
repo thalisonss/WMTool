@@ -30,18 +30,16 @@
         {
             this.label10 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.label13 = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
-            this.label8 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.txtRequestURLSync = new System.Windows.Forms.TextBox();
-            this.txtRequestURLToken = new System.Windows.Forms.TextBox();
-            this.txtRequestEnvironment = new System.Windows.Forms.TextBox();
-            this.txtRequestDomain = new System.Windows.Forms.TextBox();
-            this.txtRequestPassword = new System.Windows.Forms.TextBox();
+            this.groupBoxValidationRules = new System.Windows.Forms.GroupBox();
+            this.lblValidationRulesPath = new System.Windows.Forms.Label();
+            this.txtValidationRulesPath = new System.Windows.Forms.TextBox();
+            this.btnBrowseValidationRulesPath = new System.Windows.Forms.Button();
+            this.btnSaveValidationRulesPath = new System.Windows.Forms.Button();
+            this.groupBoxDbComparisonRules = new System.Windows.Forms.GroupBox();
+            this.lblDbComparisonRulesPath = new System.Windows.Forms.Label();
+            this.txtDbComparisonRulesPath = new System.Windows.Forms.TextBox();
+            this.btnBrowseDbComparisonRulesPath = new System.Windows.Forms.Button();
+            this.btnSaveDbComparisonRulesPath = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.btnSaveSettingsDB = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
@@ -88,6 +86,9 @@
             this.dExportCECDanf = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnbusinessCEC = new System.Windows.Forms.Button();
             this.tabPage6 = new System.Windows.Forms.TabPage();
+            this.label18 = new System.Windows.Forms.Label();
+            this.label17 = new System.Windows.Forms.Label();
+            this.label15 = new System.Windows.Forms.Label();
             this.btnCECSaveImage = new System.Windows.Forms.Button();
             this.btnCECOpenFolder = new System.Windows.Forms.Button();
             this.btnCECOpenImage = new System.Windows.Forms.Button();
@@ -108,18 +109,35 @@
             this.txtQueryCECs = new System.Windows.Forms.TextBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPageRequest = new System.Windows.Forms.TabPage();
-            this.lblRequestLastUpdate = new System.Windows.Forms.Label();
+            this.groupBoxRequestConfig = new System.Windows.Forms.GroupBox();
             this.label14 = new System.Windows.Forms.Label();
-            this.lblRequestStatus = new System.Windows.Forms.Label();
-            this.btnRequest = new System.Windows.Forms.Button();
             this.txtRequestUser = new System.Windows.Forms.TextBox();
-            this.printDocument1 = new System.Drawing.Printing.PrintDocument();
+            this.label7 = new System.Windows.Forms.Label();
+            this.txtRequestPassword = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.txtRequestDomain = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.txtRequestEnvironment = new System.Windows.Forms.TextBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.txtRequestURLToken = new System.Windows.Forms.TextBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.txtRequestURLSync = new System.Windows.Forms.TextBox();
+            this.btnRequest = new System.Windows.Forms.Button();
+            this.lblRequestLastUpdate = new System.Windows.Forms.Label();
+            this.lblRequestStatus = new System.Windows.Forms.Label();
+            this.lblRequestLogTitle = new System.Windows.Forms.Label();
+            this.btnClearRequestLog = new System.Windows.Forms.Button();
+            this.txtRequestLog = new System.Windows.Forms.TextBox();
             this.tabPageValidation = new System.Windows.Forms.TabPage();
             this.ucValidation1 = new WMTool.Screens.ucValidation();
             this.tabPageJsonReprocessor = new System.Windows.Forms.TabPage();
             this.ucJsonReprocessor1 = new WMTool.Screens.ucJsonReprocessor();
+            this.tabPageDatabaseComparison = new System.Windows.Forms.TabPage();
+            this.ucDatabaseComparison1 = new WMTool.Screens.ucDatabaseComparison();
+            this.printDocument1 = new System.Drawing.Printing.PrintDocument();
             this.tabPage2.SuspendLayout();
-            this.groupBox5.SuspendLayout();
+            this.groupBoxValidationRules.SuspendLayout();
+            this.groupBoxDbComparisonRules.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -131,8 +149,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvCECs)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPageRequest.SuspendLayout();
+            this.groupBoxRequestConfig.SuspendLayout();
             this.tabPageValidation.SuspendLayout();
             this.tabPageJsonReprocessor.SuspendLayout();
+            this.tabPageDatabaseComparison.SuspendLayout();
             this.SuspendLayout();
             // 
             // label10
@@ -148,7 +168,8 @@
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.groupBox5);
+            this.tabPage2.Controls.Add(this.groupBoxValidationRules);
+            this.tabPage2.Controls.Add(this.groupBoxDbComparisonRules);
             this.tabPage2.Controls.Add(this.groupBox4);
             this.tabPage2.Controls.Add(this.groupBox3);
             this.tabPage2.Controls.Add(this.groupBox2);
@@ -162,122 +183,111 @@
             this.tabPage2.Text = "Settings";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // groupBox5
+            // groupBoxValidationRules
             // 
-            this.groupBox5.Controls.Add(this.label13);
-            this.groupBox5.Controls.Add(this.label12);
-            this.groupBox5.Controls.Add(this.label9);
-            this.groupBox5.Controls.Add(this.label8);
-            this.groupBox5.Controls.Add(this.label7);
-            this.groupBox5.Controls.Add(this.button1);
-            this.groupBox5.Controls.Add(this.txtRequestURLSync);
-            this.groupBox5.Controls.Add(this.txtRequestURLToken);
-            this.groupBox5.Controls.Add(this.txtRequestEnvironment);
-            this.groupBox5.Controls.Add(this.txtRequestDomain);
-            this.groupBox5.Controls.Add(this.txtRequestPassword);
-            this.groupBox5.Location = new System.Drawing.Point(947, 16);
-            this.groupBox5.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.groupBox5.Size = new System.Drawing.Size(389, 367);
-            this.groupBox5.TabIndex = 13;
-            this.groupBox5.TabStop = false;
-            this.groupBox5.Text = "Request";
+            this.groupBoxValidationRules.Controls.Add(this.lblValidationRulesPath);
+            this.groupBoxValidationRules.Controls.Add(this.txtValidationRulesPath);
+            this.groupBoxValidationRules.Controls.Add(this.btnBrowseValidationRulesPath);
+            this.groupBoxValidationRules.Controls.Add(this.btnSaveValidationRulesPath);
+            this.groupBoxValidationRules.Location = new System.Drawing.Point(947, 16);
+            this.groupBoxValidationRules.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.groupBoxValidationRules.Name = "groupBoxValidationRules";
+            this.groupBoxValidationRules.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.groupBoxValidationRules.Size = new System.Drawing.Size(389, 130);
+            this.groupBoxValidationRules.TabIndex = 36;
+            this.groupBoxValidationRules.TabStop = false;
+            this.groupBoxValidationRules.Text = "Validação JSON x Banco — Regras";
             // 
-            // label13
+            // lblValidationRulesPath
             // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(5, 230);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(70, 16);
-            this.label13.TabIndex = 53;
-            this.label13.Text = "URL Sync:";
+            this.lblValidationRulesPath.AutoSize = true;
+            this.lblValidationRulesPath.Location = new System.Drawing.Point(9, 25);
+            this.lblValidationRulesPath.Name = "lblValidationRulesPath";
+            this.lblValidationRulesPath.Size = new System.Drawing.Size(277, 16);
+            this.lblValidationRulesPath.TabIndex = 0;
+            this.lblValidationRulesPath.Text = "Caminho do arquivo de regras padrão (.json):";
             // 
-            // label12
+            // txtValidationRulesPath
             // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(5, 181);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(79, 16);
-            this.label12.TabIndex = 52;
-            this.label12.Text = "URL Token:";
+            this.txtValidationRulesPath.Location = new System.Drawing.Point(11, 50);
+            this.txtValidationRulesPath.Margin = new System.Windows.Forms.Padding(4);
+            this.txtValidationRulesPath.Name = "txtValidationRulesPath";
+            this.txtValidationRulesPath.Size = new System.Drawing.Size(300, 22);
+            this.txtValidationRulesPath.TabIndex = 1;
             // 
-            // label9
+            // btnBrowseValidationRulesPath
             // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(5, 132);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(77, 16);
-            this.label9.TabIndex = 51;
-            this.label9.Text = "Enviroment:";
+            this.btnBrowseValidationRulesPath.Location = new System.Drawing.Point(317, 49);
+            this.btnBrowseValidationRulesPath.Name = "btnBrowseValidationRulesPath";
+            this.btnBrowseValidationRulesPath.Size = new System.Drawing.Size(60, 23);
+            this.btnBrowseValidationRulesPath.TabIndex = 2;
+            this.btnBrowseValidationRulesPath.Text = "...";
+            this.btnBrowseValidationRulesPath.UseVisualStyleBackColor = true;
+            this.btnBrowseValidationRulesPath.Click += new System.EventHandler(this.btnBrowseValidationRulesPath_Click);
             // 
-            // label8
+            // btnSaveValidationRulesPath
             // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(5, 80);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(60, 16);
-            this.label8.TabIndex = 50;
-            this.label8.Text = "Dominio:";
+            this.btnSaveValidationRulesPath.Location = new System.Drawing.Point(13, 90);
+            this.btnSaveValidationRulesPath.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnSaveValidationRulesPath.Name = "btnSaveValidationRulesPath";
+            this.btnSaveValidationRulesPath.Size = new System.Drawing.Size(113, 23);
+            this.btnSaveValidationRulesPath.TabIndex = 3;
+            this.btnSaveValidationRulesPath.Text = "Salvar";
+            this.btnSaveValidationRulesPath.UseVisualStyleBackColor = true;
+            this.btnSaveValidationRulesPath.Click += new System.EventHandler(this.btnSaveValidationRulesPath_Click);
             // 
-            // label7
+            // groupBoxDbComparisonRules
             // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(5, 28);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(49, 16);
-            this.label7.TabIndex = 26;
-            this.label7.Text = "Senha:";
+            this.groupBoxDbComparisonRules.Controls.Add(this.lblDbComparisonRulesPath);
+            this.groupBoxDbComparisonRules.Controls.Add(this.txtDbComparisonRulesPath);
+            this.groupBoxDbComparisonRules.Controls.Add(this.btnBrowseDbComparisonRulesPath);
+            this.groupBoxDbComparisonRules.Controls.Add(this.btnSaveDbComparisonRulesPath);
+            this.groupBoxDbComparisonRules.Location = new System.Drawing.Point(947, 154);
+            this.groupBoxDbComparisonRules.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.groupBoxDbComparisonRules.Name = "groupBoxDbComparisonRules";
+            this.groupBoxDbComparisonRules.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.groupBoxDbComparisonRules.Size = new System.Drawing.Size(389, 130);
+            this.groupBoxDbComparisonRules.TabIndex = 37;
+            this.groupBoxDbComparisonRules.TabStop = false;
+            this.groupBoxDbComparisonRules.Text = "Comparação Banco x Banco — Regras";
             // 
-            // button1
+            // lblDbComparisonRulesPath
             // 
-            this.button1.Location = new System.Drawing.Point(9, 322);
-            this.button1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(113, 23);
-            this.button1.TabIndex = 49;
-            this.button1.Text = "Salvar";
-            this.button1.UseVisualStyleBackColor = true;
+            this.lblDbComparisonRulesPath.AutoSize = true;
+            this.lblDbComparisonRulesPath.Location = new System.Drawing.Point(9, 25);
+            this.lblDbComparisonRulesPath.Name = "lblDbComparisonRulesPath";
+            this.lblDbComparisonRulesPath.Size = new System.Drawing.Size(277, 16);
+            this.lblDbComparisonRulesPath.TabIndex = 0;
+            this.lblDbComparisonRulesPath.Text = "Caminho do arquivo de regras padrão (.json):";
             // 
-            // txtRequestURLSync
+            // txtDbComparisonRulesPath
             // 
-            this.txtRequestURLSync.Location = new System.Drawing.Point(7, 250);
-            this.txtRequestURLSync.Margin = new System.Windows.Forms.Padding(4);
-            this.txtRequestURLSync.Name = "txtRequestURLSync";
-            this.txtRequestURLSync.Size = new System.Drawing.Size(305, 22);
-            this.txtRequestURLSync.TabIndex = 48;
+            this.txtDbComparisonRulesPath.Location = new System.Drawing.Point(11, 50);
+            this.txtDbComparisonRulesPath.Margin = new System.Windows.Forms.Padding(4);
+            this.txtDbComparisonRulesPath.Name = "txtDbComparisonRulesPath";
+            this.txtDbComparisonRulesPath.Size = new System.Drawing.Size(300, 22);
+            this.txtDbComparisonRulesPath.TabIndex = 1;
             // 
-            // txtRequestURLToken
+            // btnBrowseDbComparisonRulesPath
             // 
-            this.txtRequestURLToken.Location = new System.Drawing.Point(7, 201);
-            this.txtRequestURLToken.Margin = new System.Windows.Forms.Padding(4);
-            this.txtRequestURLToken.Name = "txtRequestURLToken";
-            this.txtRequestURLToken.Size = new System.Drawing.Size(305, 22);
-            this.txtRequestURLToken.TabIndex = 47;
+            this.btnBrowseDbComparisonRulesPath.Location = new System.Drawing.Point(317, 49);
+            this.btnBrowseDbComparisonRulesPath.Name = "btnBrowseDbComparisonRulesPath";
+            this.btnBrowseDbComparisonRulesPath.Size = new System.Drawing.Size(60, 23);
+            this.btnBrowseDbComparisonRulesPath.TabIndex = 2;
+            this.btnBrowseDbComparisonRulesPath.Text = "...";
+            this.btnBrowseDbComparisonRulesPath.UseVisualStyleBackColor = true;
+            this.btnBrowseDbComparisonRulesPath.Click += new System.EventHandler(this.btnBrowseDbComparisonRulesPath_Click);
             // 
-            // txtRequestEnvironment
+            // btnSaveDbComparisonRulesPath
             // 
-            this.txtRequestEnvironment.Location = new System.Drawing.Point(7, 150);
-            this.txtRequestEnvironment.Margin = new System.Windows.Forms.Padding(4);
-            this.txtRequestEnvironment.Name = "txtRequestEnvironment";
-            this.txtRequestEnvironment.Size = new System.Drawing.Size(305, 22);
-            this.txtRequestEnvironment.TabIndex = 46;
-            // 
-            // txtRequestDomain
-            // 
-            this.txtRequestDomain.Location = new System.Drawing.Point(7, 100);
-            this.txtRequestDomain.Margin = new System.Windows.Forms.Padding(4);
-            this.txtRequestDomain.Name = "txtRequestDomain";
-            this.txtRequestDomain.Size = new System.Drawing.Size(305, 22);
-            this.txtRequestDomain.TabIndex = 45;
-            // 
-            // txtRequestPassword
-            // 
-            this.txtRequestPassword.Location = new System.Drawing.Point(7, 48);
-            this.txtRequestPassword.Margin = new System.Windows.Forms.Padding(4);
-            this.txtRequestPassword.Name = "txtRequestPassword";
-            this.txtRequestPassword.Size = new System.Drawing.Size(305, 22);
-            this.txtRequestPassword.TabIndex = 44;
+            this.btnSaveDbComparisonRulesPath.Location = new System.Drawing.Point(13, 90);
+            this.btnSaveDbComparisonRulesPath.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnSaveDbComparisonRulesPath.Name = "btnSaveDbComparisonRulesPath";
+            this.btnSaveDbComparisonRulesPath.Size = new System.Drawing.Size(113, 23);
+            this.btnSaveDbComparisonRulesPath.TabIndex = 3;
+            this.btnSaveDbComparisonRulesPath.Text = "Salvar";
+            this.btnSaveDbComparisonRulesPath.UseVisualStyleBackColor = true;
+            this.btnSaveDbComparisonRulesPath.Click += new System.EventHandler(this.btnSaveDbComparisonRulesPath_Click);
             // 
             // groupBox4
             // 
@@ -762,6 +772,9 @@
             // 
             // tabPage6
             // 
+            this.tabPage6.Controls.Add(this.label18);
+            this.tabPage6.Controls.Add(this.label17);
+            this.tabPage6.Controls.Add(this.label15);
             this.tabPage6.Controls.Add(this.btnCECSaveImage);
             this.tabPage6.Controls.Add(this.btnCECOpenFolder);
             this.tabPage6.Controls.Add(this.btnCECOpenImage);
@@ -780,6 +793,35 @@
             this.tabPage6.TabIndex = 6;
             this.tabPage6.Text = "Search CEC";
             this.tabPage6.UseVisualStyleBackColor = true;
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(17, 59);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(639, 16);
+            this.label18.TabIndex = 15;
+            this.label18.Text = "> o WMTool usa a coluna cPathCEC para buscar os arquivos no bucket, é obrigatorio" +
+    " seu retorno na query";
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(17, 40);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(637, 16);
+            this.label17.TabIndex = 14;
+            this.label17.Text = "> Deve conter as colunas cIDCompany, cIDInvoice, cSerie, cIDBranchInvoice, cPathC" +
+    "EC em seu resultado";
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(17, 19);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(46, 16);
+            this.label15.TabIndex = 13;
+            this.label15.Text = "Query:";
             // 
             // btnCECSaveImage
             // 
@@ -924,7 +966,6 @@
             // downloadCEC
             // 
             this.downloadCEC.HeaderText = "";
-            this.downloadCEC.Image = global::WMTool.Properties.Resources.down_to_line;
             this.downloadCEC.ImageLayout = System.Windows.Forms.DataGridViewImageCellLayout.Zoom;
             this.downloadCEC.MinimumWidth = 6;
             this.downloadCEC.Name = "downloadCEC";
@@ -990,11 +1031,11 @@
             // 
             this.txtQueryCECs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtQueryCECs.Location = new System.Drawing.Point(17, 18);
+            this.txtQueryCECs.Location = new System.Drawing.Point(17, 77);
             this.txtQueryCECs.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtQueryCECs.Multiline = true;
             this.txtQueryCECs.Name = "txtQueryCECs";
-            this.txtQueryCECs.Size = new System.Drawing.Size(673, 293);
+            this.txtQueryCECs.Size = new System.Drawing.Size(673, 234);
             this.txtQueryCECs.TabIndex = 1;
             // 
             // tabControl1
@@ -1005,9 +1046,10 @@
             this.tabControl1.Controls.Add(this.tabPage6);
             this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Controls.Add(this.tabPageRequest);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Controls.Add(this.tabPageValidation);
             this.tabControl1.Controls.Add(this.tabPageJsonReprocessor);
+            this.tabControl1.Controls.Add(this.tabPageValidation);
+            this.tabControl1.Controls.Add(this.tabPageDatabaseComparison);
+            this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Location = new System.Drawing.Point(4, 5);
             this.tabControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabControl1.Name = "tabControl1";
@@ -1018,11 +1060,13 @@
             // 
             // tabPageRequest
             // 
-            this.tabPageRequest.Controls.Add(this.lblRequestLastUpdate);
-            this.tabPageRequest.Controls.Add(this.label14);
-            this.tabPageRequest.Controls.Add(this.lblRequestStatus);
+            this.tabPageRequest.Controls.Add(this.groupBoxRequestConfig);
             this.tabPageRequest.Controls.Add(this.btnRequest);
-            this.tabPageRequest.Controls.Add(this.txtRequestUser);
+            this.tabPageRequest.Controls.Add(this.lblRequestLastUpdate);
+            this.tabPageRequest.Controls.Add(this.lblRequestStatus);
+            this.tabPageRequest.Controls.Add(this.lblRequestLogTitle);
+            this.tabPageRequest.Controls.Add(this.btnClearRequestLog);
+            this.tabPageRequest.Controls.Add(this.txtRequestLog);
             this.tabPageRequest.Location = new System.Drawing.Point(4, 25);
             this.tabPageRequest.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPageRequest.Name = "tabPageRequest";
@@ -1032,50 +1076,195 @@
             this.tabPageRequest.Text = "Request";
             this.tabPageRequest.UseVisualStyleBackColor = true;
             // 
-            // lblRequestLastUpdate
+            // groupBoxRequestConfig
             // 
-            this.lblRequestLastUpdate.Location = new System.Drawing.Point(141, 153);
-            this.lblRequestLastUpdate.Name = "lblRequestLastUpdate";
-            this.lblRequestLastUpdate.Size = new System.Drawing.Size(159, 16);
-            this.lblRequestLastUpdate.TabIndex = 40;
+            this.groupBoxRequestConfig.Controls.Add(this.label14);
+            this.groupBoxRequestConfig.Controls.Add(this.txtRequestUser);
+            this.groupBoxRequestConfig.Controls.Add(this.label7);
+            this.groupBoxRequestConfig.Controls.Add(this.txtRequestPassword);
+            this.groupBoxRequestConfig.Controls.Add(this.label8);
+            this.groupBoxRequestConfig.Controls.Add(this.txtRequestDomain);
+            this.groupBoxRequestConfig.Controls.Add(this.label9);
+            this.groupBoxRequestConfig.Controls.Add(this.txtRequestEnvironment);
+            this.groupBoxRequestConfig.Controls.Add(this.label12);
+            this.groupBoxRequestConfig.Controls.Add(this.txtRequestURLToken);
+            this.groupBoxRequestConfig.Controls.Add(this.label13);
+            this.groupBoxRequestConfig.Controls.Add(this.txtRequestURLSync);
+            this.groupBoxRequestConfig.Location = new System.Drawing.Point(16, 16);
+            this.groupBoxRequestConfig.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.groupBoxRequestConfig.Name = "groupBoxRequestConfig";
+            this.groupBoxRequestConfig.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.groupBoxRequestConfig.Size = new System.Drawing.Size(390, 350);
+            this.groupBoxRequestConfig.TabIndex = 13;
+            this.groupBoxRequestConfig.TabStop = false;
+            this.groupBoxRequestConfig.Text = "Configuração da Requisição";
             // 
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(20, 23);
+            this.label14.Location = new System.Drawing.Point(5, 28);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(57, 16);
             this.label14.TabIndex = 39;
             this.label14.Text = "Usuario:";
             // 
-            // lblRequestStatus
+            // txtRequestUser
             // 
-            this.lblRequestStatus.Location = new System.Drawing.Point(20, 119);
-            this.lblRequestStatus.Name = "lblRequestStatus";
-            this.lblRequestStatus.Size = new System.Drawing.Size(802, 16);
-            this.lblRequestStatus.TabIndex = 38;
+            this.txtRequestUser.Location = new System.Drawing.Point(7, 48);
+            this.txtRequestUser.Margin = new System.Windows.Forms.Padding(4);
+            this.txtRequestUser.Name = "txtRequestUser";
+            this.txtRequestUser.Size = new System.Drawing.Size(360, 22);
+            this.txtRequestUser.TabIndex = 36;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(5, 80);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(49, 16);
+            this.label7.TabIndex = 26;
+            this.label7.Text = "Senha:";
+            // 
+            // txtRequestPassword
+            // 
+            this.txtRequestPassword.Location = new System.Drawing.Point(7, 100);
+            this.txtRequestPassword.Margin = new System.Windows.Forms.Padding(4);
+            this.txtRequestPassword.Name = "txtRequestPassword";
+            this.txtRequestPassword.Size = new System.Drawing.Size(360, 22);
+            this.txtRequestPassword.TabIndex = 44;
+            this.txtRequestPassword.UseSystemPasswordChar = true;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(5, 132);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(60, 16);
+            this.label8.TabIndex = 50;
+            this.label8.Text = "Dominio:";
+            // 
+            // txtRequestDomain
+            // 
+            this.txtRequestDomain.Location = new System.Drawing.Point(7, 152);
+            this.txtRequestDomain.Margin = new System.Windows.Forms.Padding(4);
+            this.txtRequestDomain.Name = "txtRequestDomain";
+            this.txtRequestDomain.Size = new System.Drawing.Size(360, 22);
+            this.txtRequestDomain.TabIndex = 45;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(5, 184);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(77, 16);
+            this.label9.TabIndex = 51;
+            this.label9.Text = "Enviroment:";
+            // 
+            // txtRequestEnvironment
+            // 
+            this.txtRequestEnvironment.Location = new System.Drawing.Point(7, 204);
+            this.txtRequestEnvironment.Margin = new System.Windows.Forms.Padding(4);
+            this.txtRequestEnvironment.Name = "txtRequestEnvironment";
+            this.txtRequestEnvironment.Size = new System.Drawing.Size(360, 22);
+            this.txtRequestEnvironment.TabIndex = 46;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(5, 236);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(79, 16);
+            this.label12.TabIndex = 52;
+            this.label12.Text = "URL Token:";
+            // 
+            // txtRequestURLToken
+            // 
+            this.txtRequestURLToken.Location = new System.Drawing.Point(7, 256);
+            this.txtRequestURLToken.Margin = new System.Windows.Forms.Padding(4);
+            this.txtRequestURLToken.Name = "txtRequestURLToken";
+            this.txtRequestURLToken.Size = new System.Drawing.Size(360, 22);
+            this.txtRequestURLToken.TabIndex = 47;
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(5, 288);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(70, 16);
+            this.label13.TabIndex = 53;
+            this.label13.Text = "URL Sync:";
+            // 
+            // txtRequestURLSync
+            // 
+            this.txtRequestURLSync.Location = new System.Drawing.Point(7, 308);
+            this.txtRequestURLSync.Margin = new System.Windows.Forms.Padding(4);
+            this.txtRequestURLSync.Name = "txtRequestURLSync";
+            this.txtRequestURLSync.Size = new System.Drawing.Size(360, 22);
+            this.txtRequestURLSync.TabIndex = 48;
             // 
             // btnRequest
             // 
-            this.btnRequest.Location = new System.Drawing.Point(23, 149);
+            this.btnRequest.Location = new System.Drawing.Point(16, 376);
             this.btnRequest.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnRequest.Name = "btnRequest";
-            this.btnRequest.Size = new System.Drawing.Size(113, 23);
+            this.btnRequest.Size = new System.Drawing.Size(160, 32);
             this.btnRequest.TabIndex = 37;
-            this.btnRequest.Text = "Request";
+            this.btnRequest.Text = "Executar Request";
             this.btnRequest.UseVisualStyleBackColor = true;
             this.btnRequest.Click += new System.EventHandler(this.btnRequest_Click);
             // 
-            // txtRequestUser
+            // lblRequestLastUpdate
             // 
-            this.txtRequestUser.Location = new System.Drawing.Point(23, 43);
-            this.txtRequestUser.Margin = new System.Windows.Forms.Padding(4);
-            this.txtRequestUser.Name = "txtRequestUser";
-            this.txtRequestUser.Size = new System.Drawing.Size(353, 22);
-            this.txtRequestUser.TabIndex = 36;
-            //
+            this.lblRequestLastUpdate.Location = new System.Drawing.Point(184, 384);
+            this.lblRequestLastUpdate.Name = "lblRequestLastUpdate";
+            this.lblRequestLastUpdate.Size = new System.Drawing.Size(220, 16);
+            this.lblRequestLastUpdate.TabIndex = 40;
+            // 
+            // lblRequestStatus
+            // 
+            this.lblRequestStatus.Location = new System.Drawing.Point(16, 418);
+            this.lblRequestStatus.Name = "lblRequestStatus";
+            this.lblRequestStatus.Size = new System.Drawing.Size(390, 60);
+            this.lblRequestStatus.TabIndex = 38;
+            // 
+            // lblRequestLogTitle
+            // 
+            this.lblRequestLogTitle.AutoSize = true;
+            this.lblRequestLogTitle.Location = new System.Drawing.Point(426, 16);
+            this.lblRequestLogTitle.Name = "lblRequestLogTitle";
+            this.lblRequestLogTitle.Size = new System.Drawing.Size(125, 16);
+            this.lblRequestLogTitle.TabIndex = 54;
+            this.lblRequestLogTitle.Text = "Log de requisições:";
+            // 
+            // btnClearRequestLog
+            // 
+            this.btnClearRequestLog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnClearRequestLog.Location = new System.Drawing.Point(1245, 11);
+            this.btnClearRequestLog.Name = "btnClearRequestLog";
+            this.btnClearRequestLog.Size = new System.Drawing.Size(80, 23);
+            this.btnClearRequestLog.TabIndex = 55;
+            this.btnClearRequestLog.Text = "Limpar";
+            this.btnClearRequestLog.UseVisualStyleBackColor = true;
+            this.btnClearRequestLog.Click += new System.EventHandler(this.btnClearRequestLog_Click);
+            // 
+            // txtRequestLog
+            // 
+            this.txtRequestLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtRequestLog.BackColor = System.Drawing.Color.Black;
+            this.txtRequestLog.Font = new System.Drawing.Font("Consolas", 9F);
+            this.txtRequestLog.ForeColor = System.Drawing.Color.Lime;
+            this.txtRequestLog.Location = new System.Drawing.Point(426, 40);
+            this.txtRequestLog.Multiline = true;
+            this.txtRequestLog.Name = "txtRequestLog";
+            this.txtRequestLog.ReadOnly = true;
+            this.txtRequestLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtRequestLog.Size = new System.Drawing.Size(899, 662);
+            this.txtRequestLog.TabIndex = 56;
+            // 
             // tabPageValidation
-            //
+            // 
             this.tabPageValidation.Controls.Add(this.ucValidation1);
             this.tabPageValidation.Location = new System.Drawing.Point(4, 25);
             this.tabPageValidation.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -1085,17 +1274,17 @@
             this.tabPageValidation.TabIndex = 8;
             this.tabPageValidation.Text = "Validação JSON x Banco";
             this.tabPageValidation.UseVisualStyleBackColor = true;
-            //
+            // 
             // ucValidation1
-            //
+            // 
             this.ucValidation1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ucValidation1.Location = new System.Drawing.Point(3, 2);
             this.ucValidation1.Name = "ucValidation1";
             this.ucValidation1.Size = new System.Drawing.Size(1335, 714);
             this.ucValidation1.TabIndex = 0;
-            //
+            // 
             // tabPageJsonReprocessor
-            //
+            // 
             this.tabPageJsonReprocessor.Controls.Add(this.ucJsonReprocessor1);
             this.tabPageJsonReprocessor.Location = new System.Drawing.Point(4, 25);
             this.tabPageJsonReprocessor.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -1105,15 +1294,36 @@
             this.tabPageJsonReprocessor.TabIndex = 9;
             this.tabPageJsonReprocessor.Text = "Reprocessar JSON";
             this.tabPageJsonReprocessor.UseVisualStyleBackColor = true;
-            //
+            // 
             // ucJsonReprocessor1
-            //
+            // 
             this.ucJsonReprocessor1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ucJsonReprocessor1.Location = new System.Drawing.Point(3, 2);
+            this.ucJsonReprocessor1.Margin = new System.Windows.Forms.Padding(4);
             this.ucJsonReprocessor1.Name = "ucJsonReprocessor1";
             this.ucJsonReprocessor1.Size = new System.Drawing.Size(1335, 714);
             this.ucJsonReprocessor1.TabIndex = 0;
-            //
+            // 
+            // tabPageDatabaseComparison
+            // 
+            this.tabPageDatabaseComparison.Controls.Add(this.ucDatabaseComparison1);
+            this.tabPageDatabaseComparison.Location = new System.Drawing.Point(4, 25);
+            this.tabPageDatabaseComparison.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPageDatabaseComparison.Name = "tabPageDatabaseComparison";
+            this.tabPageDatabaseComparison.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPageDatabaseComparison.Size = new System.Drawing.Size(1341, 718);
+            this.tabPageDatabaseComparison.TabIndex = 10;
+            this.tabPageDatabaseComparison.Text = "Validação Banco x Banco";
+            this.tabPageDatabaseComparison.UseVisualStyleBackColor = true;
+            // 
+            // ucDatabaseComparison1
+            // 
+            this.ucDatabaseComparison1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ucDatabaseComparison1.Location = new System.Drawing.Point(3, 2);
+            this.ucDatabaseComparison1.Name = "ucDatabaseComparison1";
+            this.ucDatabaseComparison1.Size = new System.Drawing.Size(1335, 714);
+            this.ucDatabaseComparison1.TabIndex = 0;
+            // 
             // frmHomeScreen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -1127,8 +1337,10 @@
             this.Text = "WMTool";
             this.Load += new System.EventHandler(this.frmHomeScreen_Load);
             this.tabPage2.ResumeLayout(false);
-            this.groupBox5.ResumeLayout(false);
-            this.groupBox5.PerformLayout();
+            this.groupBoxValidationRules.ResumeLayout(false);
+            this.groupBoxValidationRules.PerformLayout();
+            this.groupBoxDbComparisonRules.ResumeLayout(false);
+            this.groupBoxDbComparisonRules.PerformLayout();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             this.groupBox3.ResumeLayout(false);
@@ -1147,8 +1359,11 @@
             this.tabControl1.ResumeLayout(false);
             this.tabPageRequest.ResumeLayout(false);
             this.tabPageRequest.PerformLayout();
+            this.groupBoxRequestConfig.ResumeLayout(false);
+            this.groupBoxRequestConfig.PerformLayout();
             this.tabPageValidation.ResumeLayout(false);
             this.tabPageJsonReprocessor.ResumeLayout(false);
+            this.tabPageDatabaseComparison.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1228,7 +1443,20 @@
         private System.Windows.Forms.Label lblRequestStatus;
         private System.Windows.Forms.Button btnRequest;
         private System.Windows.Forms.TextBox txtRequestUser;
-        private System.Windows.Forms.GroupBox groupBox5;
+        private System.Windows.Forms.GroupBox groupBoxRequestConfig;
+        private System.Windows.Forms.Label lblRequestLogTitle;
+        private System.Windows.Forms.Button btnClearRequestLog;
+        private System.Windows.Forms.TextBox txtRequestLog;
+        private System.Windows.Forms.GroupBox groupBoxValidationRules;
+        private System.Windows.Forms.Label lblValidationRulesPath;
+        private System.Windows.Forms.TextBox txtValidationRulesPath;
+        private System.Windows.Forms.Button btnBrowseValidationRulesPath;
+        private System.Windows.Forms.Button btnSaveValidationRulesPath;
+        private System.Windows.Forms.GroupBox groupBoxDbComparisonRules;
+        private System.Windows.Forms.Label lblDbComparisonRulesPath;
+        private System.Windows.Forms.TextBox txtDbComparisonRulesPath;
+        private System.Windows.Forms.Button btnBrowseDbComparisonRulesPath;
+        private System.Windows.Forms.Button btnSaveDbComparisonRulesPath;
         private System.Windows.Forms.TextBox txtRequestURLSync;
         private System.Windows.Forms.TextBox txtRequestURLToken;
         private System.Windows.Forms.TextBox txtRequestEnvironment;
@@ -1240,13 +1468,17 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label lblRequestLastUpdate;
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.TabPage tabPageValidation;
         private WMTool.Screens.ucValidation ucValidation1;
         private System.Windows.Forms.TabPage tabPageJsonReprocessor;
         private WMTool.Screens.ucJsonReprocessor ucJsonReprocessor1;
+        private System.Windows.Forms.TabPage tabPageDatabaseComparison;
+        private WMTool.Screens.ucDatabaseComparison ucDatabaseComparison1;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.Label label15;
     }
 }
 

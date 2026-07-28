@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WMTool.Business;
 using WMTool.Reprocessing;
+using WMTool.Reprocessing.Caching;
 using WMTool.Reprocessing.CustomSql;
 using WMTool.Reprocessing.Models;
 using WMTool.Utils;
@@ -14,11 +15,66 @@ namespace WMTool.Screens
 {
     public partial class ucJsonReprocessor : UserControl
     {
+        // frmHomeScreen assina esse evento pra levar o JSON gerado (+ os 4 identificadores já digitados
+        // aqui) até a aba ucValidation — as duas telas são UserControls irmãos, sem referência direta
+        // entre si.
+        public event Action<string, string, string, string, string> ValidateJsonRequested;
+
         public ucJsonReprocessor()
         {
             InitializeComponent();
             SetupParameterOverridesGrid();
             SetupDataSourcesGrid();
+            LoadDataSourcesFromCache();
+            LoadLastInputs();
+        }
+
+        // A lista de data sources (alias/view) quase nunca muda, então a tela abre com a grid já
+        // populada a partir de um snapshot local (sem consulta ao banco) — só é atualizada de verdade
+        // quando o usuário clica em "Atualizar DataSources".
+        private void LoadDataSourcesFromCache()
+        {
+            CachedDataSourceSet cached = new DataSourceCacheStore().Load();
+            if (cached != null)
+            {
+                RefreshDataSourcesGrid(cached.DataSources);
+            }
+
+            UpdateDataSourcesLastUpdatedLabel(cached);
+        }
+
+        private void UpdateDataSourcesLastUpdatedLabel(CachedDataSourceSet cached)
+        {
+            lblDataSourcesLastUpdated.Text = cached == null
+                ? "DataSources: nunca atualizado"
+                : "DataSources atualizados em: " + cached.LastUpdatedUtc.ToLocalTime().ToString("g");
+        }
+
+        // Reabrir a tela (ou o app) com os mesmos campos da última nota reprocessada — é raro trocar de
+        // nota entre uma sessão de trabalho e outra.
+        private void LoadLastInputs()
+        {
+            LastReprocessInputs last = new LastInputsStore().Load();
+            if (last == null)
+            {
+                return;
+            }
+
+            txtCIDInvoice.Text = last.CIDInvoice;
+            txtCSerie.Text = last.CSerie;
+            txtCIDBranchInvoice.Text = last.CIDBranchInvoice;
+            txtCIDCompany.Text = last.CIDCompany;
+        }
+
+        private void SaveLastInputs()
+        {
+            new LastInputsStore().Save(new LastReprocessInputs
+            {
+                CIDInvoice = txtCIDInvoice.Text.Trim(),
+                CSerie = txtCSerie.Text.Trim(),
+                CIDBranchInvoice = txtCIDBranchInvoice.Text.Trim(),
+                CIDCompany = txtCIDCompany.Text.Trim()
+            });
         }
 
         private void SetupParameterOverridesGrid()
@@ -225,9 +281,6 @@ namespace WMTool.Screens
                 {
                     dgvParameterOverrides.Rows.Add(parameter.ParameterName, parameter.SuggestedValue, string.Empty);
                 }
-
-                IReadOnlyList<DataSourceReference> dataSources = await engine.ListDataSourcesAsync(ConnectionString);
-                RefreshDataSourcesGrid(dataSources);
             }
             catch (Exception ex)
             {
@@ -242,12 +295,56 @@ namespace WMTool.Screens
             }
         }
 
+        private async void btnRefreshDataSources_Click(object sender, EventArgs e)
+        {
+            DialogResult confirm = MessageBox.Show(
+                "Isso vai buscar a definição atual do template e de cada view no banco, traduzir a DSL de novo " +
+                "e sobrescrever o SQL customizado de cada data source (inclusive os que você já editou manualmente). Continuar?",
+                "Atualizar DataSources",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (confirm != DialogResult.Yes)
+            {
+                return;
+            }
+
+            btnDiscoverParameters.Enabled = false;
+            btnExecute.Enabled = false;
+            btnRefreshDataSources.Enabled = false;
+            progressBarReprocess.Style = ProgressBarStyle.Marquee;
+
+            try
+            {
+                var engine = new JsonReprocessingEngine(new WMBusiness());
+                IReadOnlyList<DataSourceReference> dataSources = await engine.RefreshDataSourcesAsync(ConnectionString);
+
+                RefreshDataSourcesGrid(dataSources);
+                UpdateDataSourcesLastUpdatedLabel(new DataSourceCacheStore().Load());
+                MessageBox.Show($"{dataSources.Count} data source(s) atualizado(s).");
+            }
+            catch (Exception ex)
+            {
+                LogError.Log(ex);
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                btnDiscoverParameters.Enabled = true;
+                btnExecute.Enabled = true;
+                btnRefreshDataSources.Enabled = true;
+                progressBarReprocess.Style = ProgressBarStyle.Blocks;
+            }
+        }
+
         private async void btnExecute_Click(object sender, EventArgs e)
         {
             if (!ValidateRequiredInputs())
             {
                 return;
             }
+
+            SaveLastInputs();
 
             btnDiscoverParameters.Enabled = false;
             btnExecute.Enabled = false;
@@ -272,6 +369,22 @@ namespace WMTool.Screens
                 btnExecute.Enabled = true;
                 progressBarReprocess.Style = ProgressBarStyle.Blocks;
             }
+        }
+
+        private void btnValidateJson_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtResultJson.Text))
+            {
+                MessageBox.Show("Nada para validar ainda. Execute o reprocessamento primeiro.");
+                return;
+            }
+
+            ValidateJsonRequested?.Invoke(
+                txtResultJson.Text,
+                txtCIDInvoice.Text.Trim(),
+                txtCSerie.Text.Trim(),
+                txtCIDBranchInvoice.Text.Trim(),
+                txtCIDCompany.Text.Trim());
         }
 
         private void btnSaveJson_Click(object sender, EventArgs e)

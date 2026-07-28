@@ -88,7 +88,76 @@ namespace WMTool.Reprocessing.ViewDsl
                 i++;
             }
 
-            return RewriteInStringList(RewriteEmbeddedLimits(output.ToString()));
+            return RewriteNumericCoalesce(RewriteInStringList(RewriteEmbeddedLimits(output.ToString())));
+        }
+
+        // Vários dos <column expression> somam colunas de outras views com "coalesce(X, 0)" — o padrão
+        // usual pra tratar NULL (nenhuma regra de preço bateu) como zero. Mas quando X vem de uma
+        // expressão que usa string.replace/CONCAT/etc sobre um valor numérico (ex.: ICMSUFDestValue =
+        // REPLACE(subquery_numerica, '-', '')), X fica com tipo VARCHAR. Nesse caso o SQL Server escolhe
+        // o tipo do COALESCE por precedência: como int > varchar, ele tenta converter X pra int — e
+        // qualquer valor com casas decimais (ex.: "0.00000") derruba a query inteira com "Conversion
+        // failed". Isso nunca aparece no teste manual de uma linha só porque X costuma ser NULL nesses
+        // casos; em produção, com mais linhas, X eventualmente tem valor e quebra. Reescrevemos só o
+        // caso reconhecível "coalesce(X, <literal numérico>)" para "coalesce(TRY_CONVERT(decimal(18,5),
+        // X), <literal numérico>)" — não muda nenhum valor (a leitura de X permanece a mesma, só o tipo
+        // alvo da conversão implícita passa a ser decimal, que aceita casas decimais), só evita o erro.
+        private static string RewriteNumericCoalesce(string sql)
+        {
+            if (sql.IndexOf("coalesce", StringComparison.OrdinalIgnoreCase) < 0)
+            {
+                return sql;
+            }
+
+            var output = new StringBuilder();
+            int i = 0;
+
+            while (i < sql.Length)
+            {
+                if (sql[i] == '\'')
+                {
+                    int stringEnd = SkipStringLiteral(sql, i);
+                    output.Append(sql, i, stringEnd - i);
+                    i = stringEnd;
+                    continue;
+                }
+
+                if (IsWholeWordMatch(sql, i, "coalesce"))
+                {
+                    int afterWord = i + "coalesce".Length;
+                    int afterSpaces = SkipWhitespace(sql, afterWord);
+
+                    if (afterSpaces < sql.Length && sql[afterSpaces] == '(')
+                    {
+                        int closeParen = FindMatchingParen(sql, afterSpaces);
+                        string rawArgs = sql.Substring(afterSpaces + 1, closeParen - afterSpaces - 1);
+                        List<string> args = SplitTopLevelArgs(rawArgs).Select(RewriteNumericCoalesce).ToList();
+
+                        bool isNumericDefaultPattern = args.Count == 2
+                            && Regex.IsMatch(args[1].Trim(), @"^-?\d+(\.\d+)?$")
+                            && !Regex.IsMatch(args[0].Trim(), @"^-?\d+(\.\d+)?$");
+
+                        output.Append("coalesce(");
+                        output.Append(isNumericDefaultPattern
+                            ? "TRY_CONVERT(decimal(18,5), " + args[0].Trim() + ")"
+                            : args[0].Trim());
+
+                        for (int a = 1; a < args.Count; a++)
+                        {
+                            output.Append(", ").Append(args[a].Trim());
+                        }
+
+                        output.Append(")");
+                        i = closeParen + 1;
+                        continue;
+                    }
+                }
+
+                output.Append(sql[i]);
+                i++;
+            }
+
+            return output.ToString();
         }
 
         // A DSL às vezes escreve uma lista de valores de "IN"/"NOT IN" como uma única string com itens

@@ -43,7 +43,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>5</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -99,12 +99,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Screens\FormLogin.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Screens\FormLogin.Designer.cs">
-      <DependentUpon>FormLogin.cs</DependentUpon>
-    </Compile>
     <Compile Include="Screens\frmHomeScreen.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -116,6 +110,12 @@
     </Compile>
     <Compile Include="Screens\ucValidation.Designer.cs">
       <DependentUpon>ucValidation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\ucDatabaseComparison.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Screens\ucDatabaseComparison.Designer.cs">
+      <DependentUpon>ucDatabaseComparison.cs</DependentUpon>
     </Compile>
     <Compile Include="Screens\ucJsonReprocessor.cs">
       <SubType>UserControl</SubType>
@@ -129,6 +129,12 @@
     <Compile Include="Screens\frmCustomViewSqlEditor.Designer.cs">
       <DependentUpon>frmCustomViewSqlEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="Screens\frmRuleSqlEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Screens\frmRuleSqlEditor.Designer.cs">
+      <DependentUpon>frmRuleSqlEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Integrations\WMApiClient.cs" />
@@ -137,13 +143,21 @@
     <Compile Include="Utils\GitHubRelease.cs" />
     <Compile Include="Utils\LogError.cs" />
     <Compile Include="Validation\Models\ComparisonType.cs" />
-    <Compile Include="Validation\Models\RuleParameterSource.cs" />
-    <Compile Include="Validation\Models\RuleParameter.cs" />
+    <Compile Include="Validation\Models\ComparisonSourceType.cs" />
     <Compile Include="Validation\Models\ValidationRule.cs" />
+    <Compile Include="Validation\Models\ValidationRuleSet.cs" />
     <Compile Include="Validation\Models\ValidationRuleResult.cs" />
     <Compile Include="Validation\Models\FileValidationResult.cs" />
+    <Compile Include="Validation\Models\ValidationContextInputs.cs" />
     <Compile Include="Validation\RuleParameterParser.cs" />
+    <Compile Include="Validation\SqlRuleHelper.cs" />
     <Compile Include="Validation\ValidationEngine.cs" />
+    <Compile Include="Validation\DatabaseComparisonEngine.cs" />
+    <Compile Include="Validation\Models\DbComparisonRule.cs" />
+    <Compile Include="Validation\Models\DbComparisonRuleSet.cs" />
+    <Compile Include="Validation\Models\DbRowSetComparisonRule.cs" />
+    <Compile Include="Validation\Models\DbPresenceRule.cs" />
+    <Compile Include="Validation\Models\PresenceExpectation.cs" />
     <Compile Include="Reprocessing\JsonReprocessingEngine.cs" />
     <Compile Include="Reprocessing\Models\DataSourceReference.cs" />
     <Compile Include="Reprocessing\Models\DocumentTemplateDefinition.cs" />
@@ -177,6 +191,10 @@
     <Compile Include="Reprocessing\Repositories\TripVehicleCodeRepository.cs" />
     <Compile Include="Reprocessing\CustomSql\CustomViewSqlOverride.cs" />
     <Compile Include="Reprocessing\CustomSql\CustomViewSqlOverrideStore.cs" />
+    <Compile Include="Reprocessing\Caching\CachedDataSourceSet.cs" />
+    <Compile Include="Reprocessing\Caching\DataSourceCacheStore.cs" />
+    <Compile Include="Reprocessing\Caching\LastReprocessInputs.cs" />
+    <Compile Include="Reprocessing\Caching\LastInputsStore.cs" />
     <Compile Include="Reprocessing\Execution\DataSourceExecutor.cs" />
     <Compile Include="Reprocessing\ParameterResolution\MasterParameterResolver.cs" />
     <Compile Include="Reprocessing\Templating\PlaceholderRegex.cs" />
@@ -188,22 +206,24 @@
     <Compile Include="Reprocessing\Exceptions\ViewNotFoundException.cs" />
     <Compile Include="Reprocessing\Exceptions\UnresolvedParameterException.cs" />
     <Compile Include="Reprocessing\Exceptions\UnknownDslFunctionException.cs" />
-    <Compile Include="Reprocessing\Exceptions\PlaceholderFieldNotFoundException.cs" />
     <Compile Include="Reprocessing\Exceptions\MissingColumnAliasException.cs" />
-    <EmbeddedResource Include="Screens\FormLogin.resx">
-      <DependentUpon>FormLogin.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Screens\frmHomeScreen.resx">
       <DependentUpon>frmHomeScreen.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Screens\ucValidation.resx">
       <DependentUpon>ucValidation.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Screens\ucDatabaseComparison.resx">
+      <DependentUpon>ucDatabaseComparison.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Screens\ucJsonReprocessor.resx">
       <DependentUpon>ucJsonReprocessor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Screens\frmCustomViewSqlEditor.resx">
       <DependentUpon>frmCustomViewSqlEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Screens\frmRuleSqlEditor.resx">
+      <DependentUpon>frmRuleSqlEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -223,9 +243,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="validation_rules.example.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

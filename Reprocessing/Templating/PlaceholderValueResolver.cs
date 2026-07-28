@@ -44,9 +44,13 @@ namespace WMTool.Reprocessing.Templating
                 return string.Empty;
             }
 
+            // Um campo pedido pelo template que não existe na view (descompasso de nome entre
+            // MC1_DocumentTemplate e MC1_View, cadastro do cliente — não é algo que o WMTool controla)
+            // também vira string vazia, pelo mesmo motivo do data source vazio acima: não faz sentido
+            // travar o reprocessamento inteiro por causa de um campo isolado desalinhado.
             if (!row.Table.Columns.Contains(field))
             {
-                throw new PlaceholderFieldNotFoundException(alias, field);
+                return string.Empty;
             }
 
             object value = row[field];
