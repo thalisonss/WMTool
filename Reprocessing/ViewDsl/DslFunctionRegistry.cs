@@ -33,7 +33,7 @@ namespace WMTool.Reprocessing.ViewDsl
 
         private void RegisterDefaults()
         {
-            Register("date.toString", args => $"CONVERT(varchar(23), {args[0]}, 121)");
+            Register("date.toString", TranslateDateToString);
             Register("date.truncate", args => $"CONVERT(date, {args[0]})");
             Register("number.toString", args => $"CONVERT(varchar(50), {args[0]})");
             Register("string.concat", args => $"CONCAT({string.Join(", ", args)})");
@@ -49,6 +49,28 @@ namespace WMTool.Reprocessing.ViewDsl
             Register("string.trim", args => $"LTRIM(RTRIM({args[0]}))");
             Register("string.trimend", args => $"RTRIM({args[0]})");
             Register("string.trimstart", args => $"LTRIM({args[0]})");
+        }
+
+        // O 2º argumento é um formato .NET-like ('G', 'd', ...), não um estilo de CONVERT do T-SQL — o
+        // registro anterior ignorava esse argumento por completo e sempre usava o estilo 121 (ISO com
+        // milissegundos), o que não bate com o que o motor real da plataforma produz (verificado nas
+        // views reais do template WM_Invoice_Generate: só 'G' e 'd' aparecem hoje). 'd' é data curta
+        // pt-BR (dd/MM/yyyy); 'G' é data+hora geral pt-BR (dd/MM/yyyy HH:mm:ss). Formato desconhecido ou
+        // ausente cai num ISO sem milissegundos (estilo 120) — mais previsível que 121.
+        private static string TranslateDateToString(string[] args)
+        {
+            string expr = args[0];
+            string format = args.Length > 1 ? args[1].Trim().Trim('\'') : null;
+
+            switch (format)
+            {
+                case "d":
+                    return $"CONVERT(varchar(10), {expr}, 103)";
+                case "G":
+                    return $"(CONVERT(varchar(10), {expr}, 103) + ' ' + CONVERT(varchar(8), {expr}, 108))";
+                default:
+                    return $"CONVERT(varchar(19), {expr}, 120)";
+            }
         }
 
         private static string TranslateSubstring(string[] args)

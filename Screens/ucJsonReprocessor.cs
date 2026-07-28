@@ -9,6 +9,7 @@ using WMTool.Reprocessing;
 using WMTool.Reprocessing.Caching;
 using WMTool.Reprocessing.CustomSql;
 using WMTool.Reprocessing.Models;
+using WMTool.Reprocessing.ParameterResolution;
 using WMTool.Utils;
 
 namespace WMTool.Screens
@@ -101,6 +102,64 @@ namespace WMTool.Screens
                 HeaderText = "Override (opcional)",
                 Width = 350
             });
+
+            dgvParameterOverrides.Columns.Add(new DataGridViewButtonColumn
+            {
+                Name = "colParameterDiscoveryQuery",
+                HeaderText = "Query de Descoberta",
+                Text = "Configurar",
+                UseColumnTextForButtonValue = false,
+                Width = 130
+            });
+
+            dgvParameterOverrides.CellContentClick += DgvParameterOverrides_CellContentClick;
+        }
+
+        // Igual ao "Configurar" da grid de data sources: permite cadastrar, por parâmetro (ex.:
+        // "varcIDLE"), uma query SQL que descobre o valor real em vez de cair no default estático (ex.:
+        // "LE = Customer"). Essa query tem prioridade sobre os defaults embutidos no MasterParameterResolver,
+        // mas perde pro override manual da coluna ao lado (se preenchido).
+        private void DgvParameterOverrides_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0 || dgvParameterOverrides.Columns[e.ColumnIndex].Name != "colParameterDiscoveryQuery")
+            {
+                return;
+            }
+
+            DataGridViewRow row = dgvParameterOverrides.Rows[e.RowIndex];
+            string parameterName = row.Cells["colParameterName"].Value?.ToString();
+            if (string.IsNullOrEmpty(parameterName))
+            {
+                return;
+            }
+
+            var store = new MasterParameterQueryOverrideStore();
+            string currentSql = store.GetSql(parameterName);
+
+            using (var editor = new frmCustomViewSqlEditor(parameterName, currentSql, "Parâmetro"))
+            {
+                if (editor.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+
+                if (editor.WasRemoved)
+                {
+                    store.Remove(parameterName);
+                }
+                else
+                {
+                    store.Save(parameterName, editor.ResultSql);
+                }
+
+                UpdateDiscoveryQueryButtonLabel(row, parameterName, store);
+            }
+        }
+
+        private static void UpdateDiscoveryQueryButtonLabel(DataGridViewRow row, string parameterName, MasterParameterQueryOverrideStore store)
+        {
+            bool hasQuery = store.GetSql(parameterName) != null;
+            row.Cells["colParameterDiscoveryQuery"].Value = hasQuery ? "Editar (custom)" : "Configurar";
         }
 
         private void SetupDataSourcesGrid()
@@ -276,10 +335,13 @@ namespace WMTool.Screens
                 var engine = new JsonReprocessingEngine(new WMBusiness());
                 IReadOnlyList<RequiredParameterInfo> parameters = await engine.DiscoverRequiredParametersAsync(BuildInputs(), ConnectionString);
 
+                var queryOverrideStore = new MasterParameterQueryOverrideStore();
+
                 dgvParameterOverrides.Rows.Clear();
                 foreach (RequiredParameterInfo parameter in parameters)
                 {
-                    dgvParameterOverrides.Rows.Add(parameter.ParameterName, parameter.SuggestedValue, string.Empty);
+                    bool hasQuery = queryOverrideStore.GetSql(parameter.ParameterName) != null;
+                    dgvParameterOverrides.Rows.Add(parameter.ParameterName, parameter.SuggestedValue, string.Empty, hasQuery ? "Editar (custom)" : "Configurar");
                 }
             }
             catch (Exception ex)

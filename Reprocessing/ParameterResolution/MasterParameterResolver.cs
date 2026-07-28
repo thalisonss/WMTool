@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using WMTool.Business;
 using WMTool.Reprocessing.Exceptions;
 using WMTool.Reprocessing.Models;
 using WMTool.Reprocessing.Repositories;
@@ -12,11 +15,19 @@ namespace WMTool.Reprocessing.ParameterResolution
     {
         private readonly InvoiceDerivedDataRepository _derivedDataRepository;
         private readonly TripVehicleCodeRepository _tripVehicleCodeRepository;
+        private readonly WMBusiness _business;
+        private readonly MasterParameterQueryOverrideStore _queryOverrideStore;
 
-        public MasterParameterResolver(InvoiceDerivedDataRepository derivedDataRepository, TripVehicleCodeRepository tripVehicleCodeRepository)
+        public MasterParameterResolver(
+            InvoiceDerivedDataRepository derivedDataRepository,
+            TripVehicleCodeRepository tripVehicleCodeRepository,
+            WMBusiness business,
+            MasterParameterQueryOverrideStore queryOverrideStore)
         {
             _derivedDataRepository = derivedDataRepository;
             _tripVehicleCodeRepository = tripVehicleCodeRepository;
+            _business = business;
+            _queryOverrideStore = queryOverrideStore;
         }
 
         public async Task<IReadOnlyList<RequiredParameterInfo>> SuggestAsync(
@@ -50,6 +61,56 @@ namespace WMTool.Reprocessing.ParameterResolution
             "varIDInvoice", "varcSerie", "varcIDBranchInvoice", "varcIDCustomer",
             "varcIDTrip", "varcForm", "varcIDOrder", "varcIDLE", "varcIDLI", "varcIDLD", "varxSector"
         };
+
+        // Os 4 inputs digitados na tela nunca precisam de uma query de descoberta — já são exatos por
+        // definição. Toda a variação/incerteza está nos parâmetros DERIVADOS (LE, LI, LD, xSector,
+        // cIDCustomer etc.), que é justamente onde faz sentido cadastrar uma query de descoberta.
+        private static readonly HashSet<string> BaseInputParameterNames = new HashSet<string>
+        {
+            "varIDInvoice", "varcSerie", "varcIDBranchInvoice", "cIDCompany"
+        };
+
+        // Roda a query cadastrada (se houver) pra esse parâmetro e usa a 1ª coluna da 1ª linha como
+        // valor resolvido. A query usa os mesmos binds ":varIDInvoice"/":varcSerie"/
+        // ":varcIDBranchInvoice"/":cIDCompany" das views (convertidos aqui pra "@nome"), resolvidos com
+        // os 4 inputs da tela — não dá pra usar parâmetros AINDA NÃO resolvidos (ex.: :varcIDCustomer),
+        // porque a ordem de resolução dos demais parâmetros não é garantida. Se não houver query
+        // cadastrada, ou a query falhar/não retornar linha, devolve null — quem chama cai pro próximo
+        // critério de resolução (não trava o reprocessamento por causa de uma query customizada ruim).
+        private async Task<string> TryResolveFromConfiguredQueryAsync(string parameterName, MasterParameterInputs inputs, string connectionString)
+        {
+            string sqlTemplate = _queryOverrideStore.GetSql(parameterName);
+            if (string.IsNullOrWhiteSpace(sqlTemplate))
+            {
+                return null;
+            }
+
+            string sql = Regex.Replace(sqlTemplate, @"(?<![A-Za-z0-9_@:]):([A-Za-z0-9_]+)", "@$1");
+            var parameters = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["@varIDInvoice"] = inputs.CIDInvoice,
+                ["@varcSerie"] = inputs.CSerie,
+                ["@varcIDBranchInvoice"] = inputs.CIDBranchInvoice,
+                ["@cIDCompany"] = inputs.CIDCompany
+            };
+
+            try
+            {
+                DataTable table = await _business.ConsultDB(sql, connectionString, parameters);
+                if (table.Rows.Count == 0 || table.Columns.Count == 0)
+                {
+                    return null;
+                }
+
+                object value = table.Rows[0][0];
+                return value == DBNull.Value ? string.Empty : Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture);
+            }
+            catch (Exception ex)
+            {
+                Utils.LogError.Log(ex);
+                return null;
+            }
+        }
 
         private static string Canonicalize(string name)
         {
@@ -92,7 +153,19 @@ namespace WMTool.Reprocessing.ParameterResolution
                     continue;
                 }
 
-                switch (Canonicalize(name))
+                string canonicalName = Canonicalize(name);
+
+                if (!BaseInputParameterNames.Contains(canonicalName))
+                {
+                    string configuredValue = await TryResolveFromConfiguredQueryAsync(name, inputs, connectionString);
+                    if (configuredValue != null)
+                    {
+                        values[name] = configuredValue;
+                        continue;
+                    }
+                }
+
+                switch (canonicalName)
                 {
                     case "varIDInvoice":
                         values[name] = inputs.CIDInvoice;
