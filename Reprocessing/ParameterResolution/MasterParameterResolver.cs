@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using WMTool.Business;
 using WMTool.Reprocessing.Exceptions;
 using WMTool.Reprocessing.Models;
 using WMTool.Reprocessing.Repositories;
+using WMTool.Validation;
 
 namespace WMTool.Reprocessing.ParameterResolution
 {
@@ -74,23 +74,26 @@ namespace WMTool.Reprocessing.ParameterResolution
             "varIDInvoice", "varcSerie", "varcIDBranchInvoice", "cIDCompany"
         };
 
-        // As duas formas de descoberta configurável (CustomSql e GeneralResult) usam os mesmos binds
-        // ":varIDInvoice"/":varcSerie"/":varcIDBranchInvoice"/":cIDCompany" das views (convertidos aqui
-        // pra "@nome"), resolvidos com os 4 inputs da tela — não dá pra usar parâmetros AINDA NÃO
-        // resolvidos (ex.: :varcIDCustomer), porque a ordem de resolução dos demais parâmetros não é
-        // garantida.
+        // As duas formas de descoberta configurável (CustomSql e GeneralResult) usam os mesmos
+        // placeholders "{cIDInvoice}"/"{cSerie}"/"{cIDBranchInvoice}"/"{cIDCompany}" das regras de
+        // Validação JSON x Banco e Banco x Banco (RuleParameterParser) — um único padrão em toda a
+        // aplicação pra referenciar os 4 campos do topo da tela numa query, em vez de dois (esse aqui
+        // usava ":varIDInvoice", estilo do bind das views da DSL, o que não tem nada a ver pro usuário
+        // que só quer os 4 campos digitados). Resolvidos com os 4 inputs da tela — não dá pra usar
+        // parâmetros AINDA NÃO resolvidos (ex.: {cIDCustomer}), porque a ordem de resolução dos demais
+        // parâmetros não é garantida.
         private static string ToParameterizedSql(string sqlTemplate)
         {
-            return Regex.Replace(sqlTemplate, @"(?<![A-Za-z0-9_@:]):([A-Za-z0-9_]+)", "@$1");
+            return RuleParameterParser.ToParameterizedSql(sqlTemplate);
         }
 
         private static Dictionary<string, object> BuildBaseParameters(MasterParameterInputs inputs)
         {
             return new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
             {
-                ["@varIDInvoice"] = inputs.CIDInvoice,
-                ["@varcSerie"] = inputs.CSerie,
-                ["@varcIDBranchInvoice"] = inputs.CIDBranchInvoice,
+                ["@cIDInvoice"] = inputs.CIDInvoice,
+                ["@cSerie"] = inputs.CSerie,
+                ["@cIDBranchInvoice"] = inputs.CIDBranchInvoice,
                 ["@cIDCompany"] = inputs.CIDCompany
             };
         }
