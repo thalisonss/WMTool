@@ -132,6 +132,17 @@ namespace WMTool.Screens
 
             dgvParameterOverrides.CellContentClick += DgvParameterOverrides_CellContentClick;
             dgvParameterOverrides.CellEndEdit += DgvParameterOverrides_CellEndEdit;
+            dgvParameterOverrides.DataError += DgvGrid_DataError;
+        }
+
+        // Mesma guarda do ucValidation/ucDatabaseComparison: célula de combo com um valor fora do enum
+        // (ex.: master_parameter_query_overrides.json editado à mão com um SourceType inválido) trava a
+        // grid com o diálogo padrão de erro do WinForms assim que o usuário mexe naquela célula.
+        private void DgvGrid_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            LogError.Log(e.Exception);
+            e.ThrowException = false;
+            e.Cancel = true;
         }
 
         // Botão "Configurar" (colParameterDiscoveryQuery): sempre cadastra/edita a query DEDICADA desse
@@ -220,12 +231,12 @@ namespace WMTool.Screens
 
         private static ParameterDiscoverySourceType ParseSourceType(object cellValue)
         {
-            if (cellValue is ParameterDiscoverySourceType sourceType)
+            if (cellValue is ParameterDiscoverySourceType sourceType && Enum.IsDefined(typeof(ParameterDiscoverySourceType), sourceType))
             {
                 return sourceType;
             }
 
-            if (cellValue != null && Enum.TryParse(cellValue.ToString(), out ParameterDiscoverySourceType parsed))
+            if (cellValue != null && Enum.TryParse(cellValue.ToString(), out ParameterDiscoverySourceType parsed) && Enum.IsDefined(typeof(ParameterDiscoverySourceType), parsed))
             {
                 return parsed;
             }
@@ -233,12 +244,23 @@ namespace WMTool.Screens
             return ParameterDiscoverySourceType.CustomSql;
         }
 
+        // Mesmo motivo do ucValidation/ucDatabaseComparison: master_parameter_query_overrides.json
+        // editado à mão pode ter um SourceType fora do range do enum (Newtonsoft não valida isso na
+        // desserialização), o que trava a grid assim que o usuário mexe naquela célula de combo.
+        private static ParameterDiscoverySourceType NormalizeSourceType(ParameterDiscoverySourceType? sourceType)
+        {
+            return sourceType.HasValue && Enum.IsDefined(typeof(ParameterDiscoverySourceType), sourceType.Value)
+                ? sourceType.Value
+                : ParameterDiscoverySourceType.CustomSql;
+        }
+
         private static void UpdateParameterRowFromStore(DataGridViewRow row, string parameterName, MasterParameterQueryOverrideStore store)
         {
             MasterParameterQueryOverride current = store.Get(parameterName);
-            row.Cells["colSourceType"].Value = current?.SourceType ?? ParameterDiscoverySourceType.CustomSql;
+            ParameterDiscoverySourceType sourceType = NormalizeSourceType(current?.SourceType);
+            row.Cells["colSourceType"].Value = sourceType;
             row.Cells["colResultColumn"].Value = current?.ResultColumn;
-            row.Cells["colParameterDiscoveryQuery"].Value = current?.SourceType == ParameterDiscoverySourceType.CustomSql ? "Editar (custom)" : "Configurar";
+            row.Cells["colParameterDiscoveryQuery"].Value = sourceType == ParameterDiscoverySourceType.CustomSql ? "Editar (custom)" : "Configurar";
         }
 
         private void btnConfigureParameterGeneralQuery_Click(object sender, EventArgs e)
@@ -456,8 +478,8 @@ namespace WMTool.Screens
                 foreach (RequiredParameterInfo parameter in parameters)
                 {
                     MasterParameterQueryOverride current = queryOverrideStore.Get(parameter.ParameterName);
-                    ParameterDiscoverySourceType sourceType = current?.SourceType ?? ParameterDiscoverySourceType.CustomSql;
-                    string buttonText = current?.SourceType == ParameterDiscoverySourceType.CustomSql ? "Editar (custom)" : "Configurar";
+                    ParameterDiscoverySourceType sourceType = NormalizeSourceType(current?.SourceType);
+                    string buttonText = sourceType == ParameterDiscoverySourceType.CustomSql ? "Editar (custom)" : "Configurar";
 
                     dgvParameterOverrides.Rows.Add(
                         parameter.ParameterName, parameter.SuggestedValue, string.Empty, sourceType, current?.ResultColumn, buttonText);
