@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -17,17 +18,20 @@ namespace WMTool.Reprocessing.ParameterResolution
         private readonly TripVehicleCodeRepository _tripVehicleCodeRepository;
         private readonly WMBusiness _business;
         private readonly MasterParameterQueryOverrideStore _queryOverrideStore;
+        private readonly MasterParameterGeneralQueryStore _generalQueryStore;
 
         public MasterParameterResolver(
             InvoiceDerivedDataRepository derivedDataRepository,
             TripVehicleCodeRepository tripVehicleCodeRepository,
             WMBusiness business,
-            MasterParameterQueryOverrideStore queryOverrideStore)
+            MasterParameterQueryOverrideStore queryOverrideStore,
+            MasterParameterGeneralQueryStore generalQueryStore)
         {
             _derivedDataRepository = derivedDataRepository;
             _tripVehicleCodeRepository = tripVehicleCodeRepository;
             _business = business;
             _queryOverrideStore = queryOverrideStore;
+            _generalQueryStore = generalQueryStore;
         }
 
         public async Task<IReadOnlyList<RequiredParameterInfo>> SuggestAsync(
@@ -70,45 +74,81 @@ namespace WMTool.Reprocessing.ParameterResolution
             "varIDInvoice", "varcSerie", "varcIDBranchInvoice", "cIDCompany"
         };
 
-        // Roda a query cadastrada (se houver) pra esse parâmetro e usa a 1ª coluna da 1ª linha como
-        // valor resolvido. A query usa os mesmos binds ":varIDInvoice"/":varcSerie"/
-        // ":varcIDBranchInvoice"/":cIDCompany" das views (convertidos aqui pra "@nome"), resolvidos com
-        // os 4 inputs da tela — não dá pra usar parâmetros AINDA NÃO resolvidos (ex.: :varcIDCustomer),
-        // porque a ordem de resolução dos demais parâmetros não é garantida. Se não houver query
-        // cadastrada, ou a query falhar/não retornar linha, devolve null — quem chama cai pro próximo
-        // critério de resolução (não trava o reprocessamento por causa de uma query customizada ruim).
-        private async Task<string> TryResolveFromConfiguredQueryAsync(string parameterName, MasterParameterInputs inputs, string connectionString)
+        // As duas formas de descoberta configurável (CustomSql e GeneralResult) usam os mesmos binds
+        // ":varIDInvoice"/":varcSerie"/":varcIDBranchInvoice"/":cIDCompany" das views (convertidos aqui
+        // pra "@nome"), resolvidos com os 4 inputs da tela — não dá pra usar parâmetros AINDA NÃO
+        // resolvidos (ex.: :varcIDCustomer), porque a ordem de resolução dos demais parâmetros não é
+        // garantida.
+        private static string ToParameterizedSql(string sqlTemplate)
         {
-            string sqlTemplate = _queryOverrideStore.GetSql(parameterName);
-            if (string.IsNullOrWhiteSpace(sqlTemplate))
-            {
-                return null;
-            }
+            return Regex.Replace(sqlTemplate, @"(?<![A-Za-z0-9_@:]):([A-Za-z0-9_]+)", "@$1");
+        }
 
-            string sql = Regex.Replace(sqlTemplate, @"(?<![A-Za-z0-9_@:]):([A-Za-z0-9_]+)", "@$1");
-            var parameters = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+        private static Dictionary<string, object> BuildBaseParameters(MasterParameterInputs inputs)
+        {
+            return new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
             {
                 ["@varIDInvoice"] = inputs.CIDInvoice,
                 ["@varcSerie"] = inputs.CSerie,
                 ["@varcIDBranchInvoice"] = inputs.CIDBranchInvoice,
                 ["@cIDCompany"] = inputs.CIDCompany
             };
+        }
+
+        // Roda a query dedicada de um parâmetro (SourceType == CustomSql) e usa a 1ª coluna da 1ª linha
+        // como valor resolvido. Se a query falhar/não retornar linha, devolve null — quem chama cai pro
+        // próximo critério de resolução (não trava o reprocessamento por causa de uma query ruim).
+        private async Task<string> TryResolveCustomSqlAsync(string sqlTemplate, MasterParameterInputs inputs, string connectionString)
+        {
+            if (string.IsNullOrWhiteSpace(sqlTemplate))
+            {
+                return null;
+            }
 
             try
             {
-                DataTable table = await _business.ConsultDB(sql, connectionString, parameters);
+                DataTable table = await _business.ConsultDB(ToParameterizedSql(sqlTemplate), connectionString, BuildBaseParameters(inputs));
                 if (table.Rows.Count == 0 || table.Columns.Count == 0)
                 {
                     return null;
                 }
 
                 object value = table.Rows[0][0];
-                return value == DBNull.Value ? string.Empty : Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture);
+                return value == DBNull.Value ? string.Empty : Convert.ToString(value, CultureInfo.InvariantCulture);
             }
             catch (Exception ex)
             {
                 Utils.LogError.Log(ex);
                 return null;
+            }
+        }
+
+        // A Query Geral roda uma única vez por resolução (não uma vez por parâmetro) e guarda só a
+        // primeira linha — todo parâmetro com SourceType == GeneralResult lê uma coluna dessa mesma
+        // linha. Mesmo papel do SqlRuleHelper.ResolveGeneralRowAsync (ValidationEngine/
+        // DatabaseComparisonEngine), sem a dependência cruzada com o módulo de Validation.
+        private async Task<(DataRow Row, string Error)> ResolveGeneralRowAsync(MasterParameterInputs inputs, string connectionString)
+        {
+            string sqlTemplate = _generalQueryStore.Load();
+            if (string.IsNullOrWhiteSpace(sqlTemplate))
+            {
+                return (null, "Query Geral de parâmetros não configurada.");
+            }
+
+            try
+            {
+                DataTable table = await _business.ConsultDB(ToParameterizedSql(sqlTemplate), connectionString, BuildBaseParameters(inputs));
+                if (table.Rows.Count == 0)
+                {
+                    return (null, "Query Geral de parâmetros não retornou nenhum registro.");
+                }
+
+                return (table.Rows[0], null);
+            }
+            catch (Exception ex)
+            {
+                Utils.LogError.Log(ex);
+                return (null, "Erro ao executar a Query Geral de parâmetros: " + ex.Message);
             }
         }
 
@@ -145,6 +185,24 @@ namespace WMTool.Reprocessing.ParameterResolution
                 ? await _tripVehicleCodeRepository.GetVehicleCodeAsync(derived?.CIDTrip, inputs.CIDCompany, connectionString)
                 : null;
 
+            Dictionary<string, MasterParameterQueryOverride> queryOverrides = required
+                .Select(n => _queryOverrideStore.Get(n))
+                .Where(o => o != null)
+                .ToDictionary(o => o.ParameterName, StringComparer.OrdinalIgnoreCase);
+
+            bool needsGeneralRow = queryOverrides.Values.Any(o => o.SourceType == ParameterDiscoverySourceType.GeneralResult);
+            DataRow generalRow = null;
+
+            if (needsGeneralRow)
+            {
+                (DataRow row, string error) generalRowResult = await ResolveGeneralRowAsync(inputs, connectionString);
+                generalRow = generalRowResult.row;
+                if (generalRow == null)
+                {
+                    Utils.LogError.Log(new InvalidOperationException(generalRowResult.error));
+                }
+            }
+
             foreach (string name in required)
             {
                 if (overrides.TryGetValue(name, out string overrideValue))
@@ -155,13 +213,29 @@ namespace WMTool.Reprocessing.ParameterResolution
 
                 string canonicalName = Canonicalize(name);
 
-                if (!BaseInputParameterNames.Contains(canonicalName))
+                if (!BaseInputParameterNames.Contains(canonicalName) && queryOverrides.TryGetValue(name, out MasterParameterQueryOverride queryOverride))
                 {
-                    string configuredValue = await TryResolveFromConfiguredQueryAsync(name, inputs, connectionString);
-                    if (configuredValue != null)
+                    if (queryOverride.SourceType == ParameterDiscoverySourceType.GeneralResult)
                     {
-                        values[name] = configuredValue;
-                        continue;
+                        string columnName = string.IsNullOrWhiteSpace(queryOverride.ResultColumn) ? name : queryOverride.ResultColumn;
+
+                        if (generalRow != null && generalRow.Table.Columns.Contains(columnName))
+                        {
+                            object value = generalRow[columnName];
+                            values[name] = value == DBNull.Value ? string.Empty : Convert.ToString(value, CultureInfo.InvariantCulture);
+                            continue;
+                        }
+                        // Query Geral indisponível ou sem essa coluna (generalRowError tem o motivo):
+                        // cai pro default abaixo, sem travar o reprocessamento inteiro.
+                    }
+                    else
+                    {
+                        string configuredValue = await TryResolveCustomSqlAsync(queryOverride.Sql, inputs, connectionString);
+                        if (configuredValue != null)
+                        {
+                            values[name] = configuredValue;
+                            continue;
+                        }
                     }
                 }
 

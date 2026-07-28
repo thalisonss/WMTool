@@ -199,6 +199,8 @@
     <Compile Include="Reprocessing\ParameterResolution\MasterParameterResolver.cs" />
     <Compile Include="Reprocessing\ParameterResolution\MasterParameterQueryOverride.cs" />
     <Compile Include="Reprocessing\ParameterResolution\MasterParameterQueryOverrideStore.cs" />
+    <Compile Include="Reprocessing\ParameterResolution\MasterParameterGeneralQueryStore.cs" />
+    <Compile Include="Reprocessing\ParameterResolution\ParameterDiscoverySourceType.cs" />
     <Compile Include="Reprocessing\Templating\PlaceholderRegex.cs" />
     <Compile Include="Reprocessing\Templating\PlaceholderValueResolver.cs" />
     <Compile Include="Reprocessing\Templating\TemplateEngine.cs" />

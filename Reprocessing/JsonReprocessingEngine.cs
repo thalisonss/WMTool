@@ -47,7 +47,8 @@ namespace WMTool.Reprocessing
                 new InvoiceDerivedDataRepository(business),
                 new TripVehicleCodeRepository(business),
                 business,
-                new MasterParameterQueryOverrideStore());
+                new MasterParameterQueryOverrideStore(),
+                new MasterParameterGeneralQueryStore());
             _templateEngine = new TemplateEngine();
             _mcParamsBuilder = new McParamsBuilder();
         }

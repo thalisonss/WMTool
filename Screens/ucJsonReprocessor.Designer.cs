@@ -36,6 +36,8 @@ namespace WMTool.Screens
             this.lblDataSourcesLastUpdated = new System.Windows.Forms.Label();
             this.lblResult = new System.Windows.Forms.Label();
             this.txtResultJson = new System.Windows.Forms.TextBox();
+            this.btnConfigureParameterGeneralQuery = new System.Windows.Forms.Button();
+            this.lblParameterGeneralQueryPreview = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dgvParameterOverrides)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvDataSources)).BeginInit();
             this.SuspendLayout();
@@ -172,7 +174,7 @@ namespace WMTool.Screens
             // 
             // btnSaveJson
             // 
-            this.btnSaveJson.Location = new System.Drawing.Point(16, 305);
+            this.btnSaveJson.Location = new System.Drawing.Point(16, 339);
             this.btnSaveJson.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnSaveJson.Name = "btnSaveJson";
             this.btnSaveJson.Size = new System.Drawing.Size(200, 31);
@@ -183,7 +185,7 @@ namespace WMTool.Screens
             //
             // btnValidateJson
             //
-            this.btnValidateJson.Location = new System.Drawing.Point(232, 305);
+            this.btnValidateJson.Location = new System.Drawing.Point(232, 339);
             this.btnValidateJson.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnValidateJson.Name = "btnValidateJson";
             this.btnValidateJson.Size = new System.Drawing.Size(200, 31);
@@ -195,7 +197,7 @@ namespace WMTool.Screens
             // lblDataSourcesLastUpdated
             //
             this.lblDataSourcesLastUpdated.AutoSize = true;
-            this.lblDataSourcesLastUpdated.Location = new System.Drawing.Point(522, 312);
+            this.lblDataSourcesLastUpdated.Location = new System.Drawing.Point(522, 346);
             this.lblDataSourcesLastUpdated.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblDataSourcesLastUpdated.Name = "lblDataSourcesLastUpdated";
             this.lblDataSourcesLastUpdated.Size = new System.Drawing.Size(180, 16);
@@ -205,7 +207,7 @@ namespace WMTool.Screens
             // btnRefreshDataSources
             // 
             this.btnRefreshDataSources.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRefreshDataSources.Location = new System.Drawing.Point(757, 305);
+            this.btnRefreshDataSources.Location = new System.Drawing.Point(757, 339);
             this.btnRefreshDataSources.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnRefreshDataSources.Name = "btnRefreshDataSources";
             this.btnRefreshDataSources.Size = new System.Drawing.Size(227, 31);
@@ -214,10 +216,33 @@ namespace WMTool.Screens
             this.btnRefreshDataSources.UseVisualStyleBackColor = true;
             this.btnRefreshDataSources.Click += new System.EventHandler(this.btnRefreshDataSources_Click);
             // 
+            // btnConfigureParameterGeneralQuery
+            //
+            this.btnConfigureParameterGeneralQuery.Location = new System.Drawing.Point(16, 299);
+            this.btnConfigureParameterGeneralQuery.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnConfigureParameterGeneralQuery.Name = "btnConfigureParameterGeneralQuery";
+            this.btnConfigureParameterGeneralQuery.Size = new System.Drawing.Size(280, 31);
+            this.btnConfigureParameterGeneralQuery.TabIndex = 19;
+            this.btnConfigureParameterGeneralQuery.Text = "Configurar Query Geral (Parâmetros)...";
+            this.btnConfigureParameterGeneralQuery.UseVisualStyleBackColor = true;
+            this.btnConfigureParameterGeneralQuery.Click += new System.EventHandler(this.btnConfigureParameterGeneralQuery_Click);
+            //
+            // lblParameterGeneralQueryPreview
+            //
+            this.lblParameterGeneralQueryPreview.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblParameterGeneralQueryPreview.AutoEllipsis = true;
+            this.lblParameterGeneralQueryPreview.Location = new System.Drawing.Point(304, 305);
+            this.lblParameterGeneralQueryPreview.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblParameterGeneralQueryPreview.Name = "lblParameterGeneralQueryPreview";
+            this.lblParameterGeneralQueryPreview.Size = new System.Drawing.Size(1121, 18);
+            this.lblParameterGeneralQueryPreview.TabIndex = 20;
+            this.lblParameterGeneralQueryPreview.Text = "Query Geral: não configurada";
+            //
             // lblResult
-            // 
+            //
             this.lblResult.AutoSize = true;
-            this.lblResult.Location = new System.Drawing.Point(16, 347);
+            this.lblResult.Location = new System.Drawing.Point(16, 381);
             this.lblResult.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblResult.Name = "lblResult";
             this.lblResult.Size = new System.Drawing.Size(93, 16);
@@ -230,13 +255,13 @@ namespace WMTool.Screens
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtResultJson.Font = new System.Drawing.Font("Consolas", 9F);
-            this.txtResultJson.Location = new System.Drawing.Point(16, 369);
+            this.txtResultJson.Location = new System.Drawing.Point(16, 403);
             this.txtResultJson.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.txtResultJson.Multiline = true;
             this.txtResultJson.Name = "txtResultJson";
             this.txtResultJson.ReadOnly = true;
             this.txtResultJson.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtResultJson.Size = new System.Drawing.Size(1409, 479);
+            this.txtResultJson.Size = new System.Drawing.Size(1409, 445);
             this.txtResultJson.TabIndex = 14;
             this.txtResultJson.WordWrap = false;
             // 
@@ -245,6 +270,8 @@ namespace WMTool.Screens
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.txtResultJson);
+            this.Controls.Add(this.lblParameterGeneralQueryPreview);
+            this.Controls.Add(this.btnConfigureParameterGeneralQuery);
             this.Controls.Add(this.lblResult);
             this.Controls.Add(this.btnRefreshDataSources);
             this.Controls.Add(this.lblDataSourcesLastUpdated);
@@ -294,5 +321,7 @@ namespace WMTool.Screens
         private System.Windows.Forms.Label lblDataSourcesLastUpdated;
         private System.Windows.Forms.Label lblResult;
         private System.Windows.Forms.TextBox txtResultJson;
+        private System.Windows.Forms.Button btnConfigureParameterGeneralQuery;
+        private System.Windows.Forms.Label lblParameterGeneralQueryPreview;
     }
 }
