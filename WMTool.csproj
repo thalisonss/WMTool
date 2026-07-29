@@ -29,9 +29,11 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.1.0.%2a</ApplicationVersion>
+    <ApplicationVersion>1.1.1.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <GenerateResourceMSBuildRuntime>CurrentRuntime</GenerateResourceMSBuildRuntime>
+    <GenerateResourceMSBuildArchitecture>CurrentArchitecture</GenerateResourceMSBuildArchitecture>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -41,7 +43,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>5</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -63,6 +65,12 @@
       <HintPath>packages\Microsoft.Office.Interop.Excel.15.0.4795.1001\lib\net20\Microsoft.Office.Interop.Excel.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Microsoft.Web.WebView2.Core, Version=1.0.3856.49, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Web.WebView2.1.0.3856.49\lib\net462\Microsoft.Web.WebView2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.WebView2.WinForms, Version=1.0.3856.49, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Web.WebView2.1.0.3856.49\lib\net462\Microsoft.Web.WebView2.WinForms.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -70,6 +78,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.Xml.Linq" />
@@ -96,11 +105,129 @@
     <Compile Include="Screens\frmHomeScreen.Designer.cs">
       <DependentUpon>frmHomeScreen.cs</DependentUpon>
     </Compile>
+    <Compile Include="Screens\ucValidation.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Screens\ucValidation.Designer.cs">
+      <DependentUpon>ucValidation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\ucDatabaseComparison.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Screens\ucDatabaseComparison.Designer.cs">
+      <DependentUpon>ucDatabaseComparison.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\ucJsonReprocessor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Screens\ucJsonReprocessor.Designer.cs">
+      <DependentUpon>ucJsonReprocessor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\frmCustomViewSqlEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Screens\frmCustomViewSqlEditor.Designer.cs">
+      <DependentUpon>frmCustomViewSqlEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\frmRuleSqlEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Screens\frmRuleSqlEditor.Designer.cs">
+      <DependentUpon>frmRuleSqlEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Integrations\WMApiClient.cs" />
+    <Compile Include="Integrations\WMApiService.cs" />
+    <Compile Include="Integrations\Models\TokenResponse.cs" />
+    <Compile Include="Utils\GitHubRelease.cs" />
     <Compile Include="Utils\LogError.cs" />
+    <Compile Include="Validation\Models\ComparisonType.cs" />
+    <Compile Include="Validation\Models\ComparisonSourceType.cs" />
+    <Compile Include="Validation\Models\ValidationRule.cs" />
+    <Compile Include="Validation\Models\ValidationRuleSet.cs" />
+    <Compile Include="Validation\Models\ValidationRuleResult.cs" />
+    <Compile Include="Validation\Models\FileValidationResult.cs" />
+    <Compile Include="Validation\Models\ValidationContextInputs.cs" />
+    <Compile Include="Validation\RuleParameterParser.cs" />
+    <Compile Include="Validation\SqlRuleHelper.cs" />
+    <Compile Include="Validation\ValidationEngine.cs" />
+    <Compile Include="Validation\DatabaseComparisonEngine.cs" />
+    <Compile Include="Validation\Models\DbComparisonRule.cs" />
+    <Compile Include="Validation\Models\DbComparisonRuleSet.cs" />
+    <Compile Include="Validation\Models\DbRowSetComparisonRule.cs" />
+    <Compile Include="Validation\Models\DbPresenceRule.cs" />
+    <Compile Include="Validation\Models\PresenceExpectation.cs" />
+    <Compile Include="Reprocessing\JsonReprocessingEngine.cs" />
+    <Compile Include="Reprocessing\Models\DataSourceReference.cs" />
+    <Compile Include="Reprocessing\Models\DocumentTemplateDefinition.cs" />
+    <Compile Include="Reprocessing\Models\DataSourceResult.cs" />
+    <Compile Include="Reprocessing\Models\MasterParameterInputs.cs" />
+    <Compile Include="Reprocessing\Models\MasterParameterSet.cs" />
+    <Compile Include="Reprocessing\Models\RequiredParameterInfo.cs" />
+    <Compile Include="Reprocessing\Models\DerivedInvoiceData.cs" />
+    <Compile Include="Reprocessing\Parsing\DocumentTemplateJsonParser.cs" />
+    <Compile Include="Reprocessing\ViewDsl\Models\ViewParameterDefinition.cs" />
+    <Compile Include="Reprocessing\ViewDsl\Models\ViewJoinDefinition.cs" />
+    <Compile Include="Reprocessing\ViewDsl\Models\ViewFromDefinition.cs" />
+    <Compile Include="Reprocessing\ViewDsl\Models\ViewFilterDefinition.cs" />
+    <Compile Include="Reprocessing\ViewDsl\Models\ViewColumnDefinition.cs" />
+    <Compile Include="Reprocessing\ViewDsl\Models\ViewSelectDefinition.cs" />
+    <Compile Include="Reprocessing\ViewDsl\Models\ViewDefinition.cs" />
+    <Compile Include="Reprocessing\ViewDsl\Models\ViewParameterMapping.cs" />
+    <Compile Include="Reprocessing\ViewDsl\IViewDefinitionProvider.cs" />
+    <Compile Include="Reprocessing\ViewDsl\ViewDslXmlParser.cs" />
+    <Compile Include="Reprocessing\ViewDsl\BindParameterScanner.cs" />
+    <Compile Include="Reprocessing\ViewDsl\TranslatedSqlQuery.cs" />
+    <Compile Include="Reprocessing\ViewDsl\ViewSqlBuilder.cs" />
+    <Compile Include="Reprocessing\ViewDsl\EntityExtensionResolver.cs" />
+    <Compile Include="Reprocessing\ViewDsl\DslFunctionRegistry.cs" />
+    <Compile Include="Reprocessing\ViewDsl\DslExpressionTranslator.cs" />
+    <Compile Include="Reprocessing\ViewDsl\SqlTextScanner.cs" />
+    <Compile Include="Reprocessing\ViewDsl\AggregateColumnDetector.cs" />
+    <Compile Include="Reprocessing\Repositories\DocumentTemplateRepository.cs" />
+    <Compile Include="Reprocessing\Repositories\ViewRepository.cs" />
+    <Compile Include="Reprocessing\Repositories\InvoiceDerivedDataRepository.cs" />
+    <Compile Include="Reprocessing\Repositories\TripVehicleCodeRepository.cs" />
+    <Compile Include="Reprocessing\CustomSql\CustomViewSqlOverride.cs" />
+    <Compile Include="Reprocessing\CustomSql\CustomViewSqlOverrideStore.cs" />
+    <Compile Include="Reprocessing\Caching\CachedDataSourceSet.cs" />
+    <Compile Include="Reprocessing\Caching\DataSourceCacheStore.cs" />
+    <Compile Include="Reprocessing\Caching\LastReprocessInputs.cs" />
+    <Compile Include="Reprocessing\Caching\LastInputsStore.cs" />
+    <Compile Include="Reprocessing\Execution\DataSourceExecutor.cs" />
+    <Compile Include="Reprocessing\ParameterResolution\MasterParameterResolver.cs" />
+    <Compile Include="Reprocessing\ParameterResolution\MasterParameterQueryOverride.cs" />
+    <Compile Include="Reprocessing\ParameterResolution\MasterParameterQueryOverrideStore.cs" />
+    <Compile Include="Reprocessing\ParameterResolution\MasterParameterGeneralQueryStore.cs" />
+    <Compile Include="Reprocessing\ParameterResolution\ParameterDiscoverySourceType.cs" />
+    <Compile Include="Reprocessing\Templating\PlaceholderRegex.cs" />
+    <Compile Include="Reprocessing\Templating\PlaceholderValueResolver.cs" />
+    <Compile Include="Reprocessing\Templating\TemplateEngine.cs" />
+    <Compile Include="Reprocessing\Templating\McParamsBuilder.cs" />
+    <Compile Include="Reprocessing\Exceptions\ReprocessingException.cs" />
+    <Compile Include="Reprocessing\Exceptions\TemplateNotFoundException.cs" />
+    <Compile Include="Reprocessing\Exceptions\ViewNotFoundException.cs" />
+    <Compile Include="Reprocessing\Exceptions\UnresolvedParameterException.cs" />
+    <Compile Include="Reprocessing\Exceptions\UnknownDslFunctionException.cs" />
+    <Compile Include="Reprocessing\Exceptions\MissingColumnAliasException.cs" />
     <EmbeddedResource Include="Screens\frmHomeScreen.resx">
       <DependentUpon>frmHomeScreen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Screens\ucValidation.resx">
+      <DependentUpon>ucValidation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Screens\ucDatabaseComparison.resx">
+      <DependentUpon>ucDatabaseComparison.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Screens\ucJsonReprocessor.resx">
+      <DependentUpon>ucJsonReprocessor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Screens\frmCustomViewSqlEditor.resx">
+      <DependentUpon>frmCustomViewSqlEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Screens\frmRuleSqlEditor.resx">
+      <DependentUpon>frmRuleSqlEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -120,6 +247,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="validation_rules.example.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="packages\AWSSDK.S3.3.7.405.13\analyzers\dotnet\cs\AWSSDK.S3.CodeAnalysis.dll" />
@@ -145,4 +275,11 @@
     </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="packages\Microsoft.Web.WebView2.1.0.3856.49\build\Microsoft.Web.WebView2.targets" Condition="Exists('packages\Microsoft.Web.WebView2.1.0.3856.49\build\Microsoft.Web.WebView2.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Este projeto faz referência a pacotes do NuGet que não estão presentes neste computador. Use a Restauração de Pacotes do NuGet para baixá-los. Para obter mais informações, consulte http://go.microsoft.com/fwlink/?LinkID=322105. O arquivo ausente é {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\Microsoft.Web.WebView2.1.0.3856.49\build\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.Web.WebView2.1.0.3856.49\build\Microsoft.Web.WebView2.targets'))" />
+  </Target>
 </Project>
