@@ -9,6 +9,7 @@ using WMTool.Reprocessing;
 using WMTool.Reprocessing.Caching;
 using WMTool.Reprocessing.CustomSql;
 using WMTool.Reprocessing.Models;
+using WMTool.Reprocessing.ParameterResolution;
 using WMTool.Utils;
 
 namespace WMTool.Screens
@@ -27,6 +28,7 @@ namespace WMTool.Screens
             SetupDataSourcesGrid();
             LoadDataSourcesFromCache();
             LoadLastInputs();
+            UpdateParameterGeneralQueryPreviewLabel();
         }
 
         // A lista de data sources (alias/view) quase nunca muda, então a tela abre com a grid já
@@ -99,8 +101,202 @@ namespace WMTool.Screens
             {
                 Name = "colOverrideValue",
                 HeaderText = "Override (opcional)",
-                Width = 350
+                Width = 220
             });
+
+            // Igual ao "Fonte" do ucValidation/ucDatabaseComparison: GeneralResult lê uma coluna da Query
+            // Geral (rodada uma única vez); CustomSql roda uma query dedicada só pra esse parâmetro.
+            dgvParameterOverrides.Columns.Add(new DataGridViewComboBoxColumn
+            {
+                Name = "colSourceType",
+                HeaderText = "Fonte",
+                Width = 110,
+                DataSource = Enum.GetValues(typeof(ParameterDiscoverySourceType))
+            });
+
+            dgvParameterOverrides.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "colResultColumn",
+                HeaderText = "Coluna (Query Geral)",
+                Width = 150
+            });
+
+            dgvParameterOverrides.Columns.Add(new DataGridViewButtonColumn
+            {
+                Name = "colParameterDiscoveryQuery",
+                HeaderText = "Query Dedicada",
+                Text = "Configurar",
+                UseColumnTextForButtonValue = false,
+                Width = 130
+            });
+
+            dgvParameterOverrides.CellContentClick += DgvParameterOverrides_CellContentClick;
+            dgvParameterOverrides.CellEndEdit += DgvParameterOverrides_CellEndEdit;
+            dgvParameterOverrides.DataError += DgvGrid_DataError;
+        }
+
+        // Mesma guarda do ucValidation/ucDatabaseComparison: célula de combo com um valor fora do enum
+        // (ex.: master_parameter_query_overrides.json editado à mão com um SourceType inválido) trava a
+        // grid com o diálogo padrão de erro do WinForms assim que o usuário mexe naquela célula.
+        private void DgvGrid_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            LogError.Log(e.Exception);
+            e.ThrowException = false;
+            e.Cancel = true;
+        }
+
+        // Botão "Configurar" (colParameterDiscoveryQuery): sempre cadastra/edita a query DEDICADA desse
+        // parâmetro (SourceType = CustomSql) — igual ao "Configurar" da grid de data sources.
+        private void DgvParameterOverrides_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0 || dgvParameterOverrides.Columns[e.ColumnIndex].Name != "colParameterDiscoveryQuery")
+            {
+                return;
+            }
+
+            DataGridViewRow row = dgvParameterOverrides.Rows[e.RowIndex];
+            string parameterName = row.Cells["colParameterName"].Value?.ToString();
+            if (string.IsNullOrEmpty(parameterName))
+            {
+                return;
+            }
+
+            var store = new MasterParameterQueryOverrideStore();
+            MasterParameterQueryOverride current = store.Get(parameterName);
+            string currentSql = current?.SourceType == ParameterDiscoverySourceType.CustomSql ? current.Sql : null;
+
+            using (var editor = new frmCustomViewSqlEditor(parameterName, currentSql, "Parâmetro"))
+            {
+                if (editor.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+
+                if (editor.WasRemoved)
+                {
+                    store.Remove(parameterName);
+                }
+                else
+                {
+                    store.SaveCustomSql(parameterName, editor.ResultSql);
+                }
+
+                UpdateParameterRowFromStore(row, parameterName, store);
+            }
+        }
+
+        // Fonte (combo) e Coluna Resultado (texto) persistem direto no store assim que editados — não
+        // dá pra esperar um "salvar" explícito, porque a resolução lê do store, não da grid.
+        private void DgvParameterOverrides_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0)
+            {
+                return;
+            }
+
+            string columnName = dgvParameterOverrides.Columns[e.ColumnIndex].Name;
+            if (columnName != "colSourceType" && columnName != "colResultColumn")
+            {
+                return;
+            }
+
+            DataGridViewRow row = dgvParameterOverrides.Rows[e.RowIndex];
+            string parameterName = row.Cells["colParameterName"].Value?.ToString();
+            if (string.IsNullOrEmpty(parameterName))
+            {
+                return;
+            }
+
+            var store = new MasterParameterQueryOverrideStore();
+            ParameterDiscoverySourceType sourceType = ParseSourceType(row.Cells["colSourceType"].Value);
+
+            if (sourceType == ParameterDiscoverySourceType.GeneralResult)
+            {
+                string resultColumn = row.Cells["colResultColumn"].Value?.ToString();
+                store.SaveGeneralResult(parameterName, resultColumn);
+            }
+            else if (columnName == "colSourceType")
+            {
+                // Voltou pra CustomSql: se já havia uma query dedicada cadastrada, mantém; senão não
+                // cria nada (fica sem override até o usuário clicar em "Configurar").
+                MasterParameterQueryOverride current = store.Get(parameterName);
+                if (current == null || current.SourceType != ParameterDiscoverySourceType.CustomSql)
+                {
+                    store.Remove(parameterName);
+                }
+            }
+
+            UpdateParameterRowFromStore(row, parameterName, store);
+        }
+
+        private static ParameterDiscoverySourceType ParseSourceType(object cellValue)
+        {
+            if (cellValue is ParameterDiscoverySourceType sourceType && Enum.IsDefined(typeof(ParameterDiscoverySourceType), sourceType))
+            {
+                return sourceType;
+            }
+
+            if (cellValue != null && Enum.TryParse(cellValue.ToString(), out ParameterDiscoverySourceType parsed) && Enum.IsDefined(typeof(ParameterDiscoverySourceType), parsed))
+            {
+                return parsed;
+            }
+
+            return ParameterDiscoverySourceType.CustomSql;
+        }
+
+        // Mesmo motivo do ucValidation/ucDatabaseComparison: master_parameter_query_overrides.json
+        // editado à mão pode ter um SourceType fora do range do enum (Newtonsoft não valida isso na
+        // desserialização), o que trava a grid assim que o usuário mexe naquela célula de combo.
+        private static ParameterDiscoverySourceType NormalizeSourceType(ParameterDiscoverySourceType? sourceType)
+        {
+            return sourceType.HasValue && Enum.IsDefined(typeof(ParameterDiscoverySourceType), sourceType.Value)
+                ? sourceType.Value
+                : ParameterDiscoverySourceType.CustomSql;
+        }
+
+        private static void UpdateParameterRowFromStore(DataGridViewRow row, string parameterName, MasterParameterQueryOverrideStore store)
+        {
+            MasterParameterQueryOverride current = store.Get(parameterName);
+            ParameterDiscoverySourceType sourceType = NormalizeSourceType(current?.SourceType);
+            row.Cells["colSourceType"].Value = sourceType;
+            row.Cells["colResultColumn"].Value = current?.ResultColumn;
+            row.Cells["colParameterDiscoveryQuery"].Value = sourceType == ParameterDiscoverySourceType.CustomSql ? "Editar (custom)" : "Configurar";
+        }
+
+        private void btnConfigureParameterGeneralQuery_Click(object sender, EventArgs e)
+        {
+            var store = new MasterParameterGeneralQueryStore();
+
+            using (var editor = new frmRuleSqlEditor("Query Geral de Parâmetros (uma coluna por parâmetro)", store.Load()))
+            {
+                if (editor.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+
+                store.Save(editor.ResultSql);
+                UpdateParameterGeneralQueryPreviewLabel();
+            }
+        }
+
+        private void UpdateParameterGeneralQueryPreviewLabel()
+        {
+            string sql = new MasterParameterGeneralQueryStore().Load();
+            lblParameterGeneralQueryPreview.Text = string.IsNullOrEmpty(sql)
+                ? "Query Geral: não configurada"
+                : "Query Geral: " + BuildSqlPreview(sql);
+        }
+
+        private static string BuildSqlPreview(string sql)
+        {
+            string singleLine = sql.Replace("\r", " ").Replace("\n", " ");
+            while (singleLine.Contains("  "))
+            {
+                singleLine = singleLine.Replace("  ", " ");
+            }
+
+            const int maxLength = 160;
+            return singleLine.Length > maxLength ? singleLine.Substring(0, maxLength) + "..." : singleLine;
         }
 
         private void SetupDataSourcesGrid()
@@ -276,10 +472,17 @@ namespace WMTool.Screens
                 var engine = new JsonReprocessingEngine(new WMBusiness());
                 IReadOnlyList<RequiredParameterInfo> parameters = await engine.DiscoverRequiredParametersAsync(BuildInputs(), ConnectionString);
 
+                var queryOverrideStore = new MasterParameterQueryOverrideStore();
+
                 dgvParameterOverrides.Rows.Clear();
                 foreach (RequiredParameterInfo parameter in parameters)
                 {
-                    dgvParameterOverrides.Rows.Add(parameter.ParameterName, parameter.SuggestedValue, string.Empty);
+                    MasterParameterQueryOverride current = queryOverrideStore.Get(parameter.ParameterName);
+                    ParameterDiscoverySourceType sourceType = NormalizeSourceType(current?.SourceType);
+                    string buttonText = sourceType == ParameterDiscoverySourceType.CustomSql ? "Editar (custom)" : "Configurar";
+
+                    dgvParameterOverrides.Rows.Add(
+                        parameter.ParameterName, parameter.SuggestedValue, string.Empty, sourceType, current?.ResultColumn, buttonText);
                 }
             }
             catch (Exception ex)

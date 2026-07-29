@@ -8,10 +8,10 @@ namespace WMTool.Screens
         public string ResultSql { get; private set; }
         public bool WasRemoved { get; private set; }
 
-        public frmCustomViewSqlEditor(string viewName, string currentSql)
+        public frmCustomViewSqlEditor(string viewName, string currentSql, string labelPrefix = "View")
         {
             InitializeComponent();
-            lblViewName.Text = "View: " + viewName;
+            lblViewName.Text = labelPrefix + ": " + viewName;
             txtSql.Text = currentSql ?? string.Empty;
         }
 

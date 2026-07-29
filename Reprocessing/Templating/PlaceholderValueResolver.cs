@@ -54,7 +54,33 @@ namespace WMTool.Reprocessing.Templating
             }
 
             object value = row[field];
-            return value == DBNull.Value ? string.Empty : Convert.ToString(value, CultureInfo.InvariantCulture);
+            return FormatValue(value);
+        }
+
+        // Colunas datetime "cruas" (sem passar por date.toString na view) chegam aqui como DateTime do
+        // .NET; Convert.ToString(DateTime, InvariantCulture) usa o padrão "MM/dd/yyyy HH:mm:ss" da
+        // cultura invariante, que não bate com o que a plataforma real produz para esses campos
+        // (verificado em dhEmi/dhSaiEnt/dVenc: sempre "yyyy-MM-dd HH:mm:ss"). Strings vindas de colunas
+        // CHAR (largura fixa) chegam com espaços de preenchimento à direita — SqlClient não recorta isso
+        // sozinho, então aparecia um "RODRIGO BENDER DETTENBORN  " em vez do valor real.
+        private static string FormatValue(object value)
+        {
+            if (value == null || value == DBNull.Value)
+            {
+                return string.Empty;
+            }
+
+            if (value is DateTime dateTime)
+            {
+                return dateTime.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+            }
+
+            if (value is string text)
+            {
+                return text.Trim();
+            }
+
+            return Convert.ToString(value, CultureInfo.InvariantCulture);
         }
 
         private DataRow GetFirstRow(string alias)

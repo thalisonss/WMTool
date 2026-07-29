@@ -43,7 +43,12 @@ namespace WMTool.Reprocessing
             _dataSourceCacheStore = new DataSourceCacheStore();
             _sqlBuilder = new ViewSqlBuilder(expressionTranslator, extensionResolver, _viewRepository, _overrideStore);
             _dataSourceExecutor = new DataSourceExecutor(business);
-            _parameterResolver = new MasterParameterResolver(new InvoiceDerivedDataRepository(business), new TripVehicleCodeRepository(business));
+            _parameterResolver = new MasterParameterResolver(
+                new InvoiceDerivedDataRepository(business),
+                new TripVehicleCodeRepository(business),
+                business,
+                new MasterParameterQueryOverrideStore(),
+                new MasterParameterGeneralQueryStore());
             _templateEngine = new TemplateEngine();
             _mcParamsBuilder = new McParamsBuilder();
         }

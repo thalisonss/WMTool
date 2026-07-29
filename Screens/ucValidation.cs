@@ -109,6 +109,19 @@ namespace WMTool.Screens
             dgvRules.Columns.Add(comparisonColumn);
 
             dgvRules.CellDoubleClick += DgvRules_CellDoubleClick;
+            dgvRules.DataError += DgvRules_DataError;
+        }
+
+        // Guarda contra o "Caixa de Diálogo de Erro Padrão de DataGridView" (ex.: célula de combo com um
+        // valor que não bate com nenhum item da lista — acontece com regras carregadas de um arquivo
+        // antigo/editado à mão, onde "Fonte"/"Comparação" vieram com um valor fora do enum). Sem esse
+        // handler, o WinForms mostra um diálogo genérico e trava a edição da grid; aqui só logamos e
+        // cancelamos a operação, sem derrubar a tela.
+        private void DgvRules_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            LogError.Log(e.Exception);
+            e.ThrowException = false;
+            e.Cancel = true;
         }
 
         // Igual ao "Configurar" da grid de data sources da aba Reprocessar JSON: a query de uma regra
@@ -272,9 +285,31 @@ namespace WMTool.Screens
             ValidationRuleSet loaded = ValidationEngine.LoadRules(path);
             _rules.Clear();
             _rules.AddRange(loaded.Rules);
+            NormalizeRuleEnums(_rules);
             _generalSqlTemplate = loaded.GeneralSqlTemplate ?? string.Empty;
             RefreshRulesGrid();
             UpdateGeneralSqlPreviewLabel();
+        }
+
+        // Um arquivo de regras antigo/editado à mão pode ter "SourceType"/"Comparison" como um número
+        // fora do enum (Newtonsoft não valida isso na desserialização) — o valor entra "válido" pro C#,
+        // mas não bate com nenhum item do DataGridViewComboBoxColumn, e a grid trava com o diálogo padrão
+        // de erro assim que o usuário mexe naquela célula. Normalizamos pro default aqui, na carga,
+        // pra nunca deixar um valor fora do enum chegar na grid.
+        private static void NormalizeRuleEnums(List<ValidationRule> rules)
+        {
+            foreach (ValidationRule rule in rules)
+            {
+                if (!Enum.IsDefined(typeof(ComparisonSourceType), rule.SourceType))
+                {
+                    rule.SourceType = ComparisonSourceType.CustomSql;
+                }
+
+                if (!Enum.IsDefined(typeof(ComparisonType), rule.Comparison))
+                {
+                    rule.Comparison = ComparisonType.EqualsTrimmed;
+                }
+            }
         }
 
         private void btnSaveRules_Click(object sender, EventArgs e)

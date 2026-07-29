@@ -111,6 +111,19 @@ namespace WMTool.Screens
             });
 
             dgvRules.CellDoubleClick += DgvRules_CellDoubleClick;
+            dgvRules.DataError += DgvGrid_DataError;
+        }
+
+        // Guarda contra o "Caixa de Diálogo de Erro Padrão de DataGridView" (ex.: célula de combo com um
+        // valor que não bate com nenhum item da lista — acontece com regras carregadas de um arquivo
+        // antigo/editado à mão, onde "Fonte"/"Comparação"/"Expectativa" vieram com um valor fora do
+        // enum). Compartilhado pelas 3 grids de regra desta tela; sem esse handler, o WinForms mostra um
+        // diálogo genérico e trava a edição da grid.
+        private void DgvGrid_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            LogError.Log(e.Exception);
+            e.ThrowException = false;
+            e.Cancel = true;
         }
 
         private void DgvRules_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
@@ -290,6 +303,7 @@ namespace WMTool.Screens
             });
 
             dgvRowSetRules.CellDoubleClick += DgvRowSetRules_CellDoubleClick;
+            dgvRowSetRules.DataError += DgvGrid_DataError;
         }
 
         private void DgvRowSetRules_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
@@ -446,6 +460,7 @@ namespace WMTool.Screens
             dgvPresenceRules.Columns.Add(new DataGridViewTextBoxColumn { Name = "colMessageColumn", HeaderText = "Coluna de mensagem (opcional)", Width = 220 });
 
             dgvPresenceRules.CellDoubleClick += DgvPresenceRules_CellDoubleClick;
+            dgvPresenceRules.DataError += DgvGrid_DataError;
         }
 
         private void DgvPresenceRules_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
@@ -588,6 +603,7 @@ namespace WMTool.Screens
             _rowSetRules.AddRange(loaded.RowSetRules);
             _presenceRules.Clear();
             _presenceRules.AddRange(loaded.PresenceRules);
+            NormalizeRuleEnums();
 
             _generalOriginSqlTemplate = loaded.GeneralOriginSqlTemplate ?? string.Empty;
             _generalDestinationSqlTemplate = loaded.GeneralDestinationSqlTemplate ?? string.Empty;
@@ -598,6 +614,56 @@ namespace WMTool.Screens
             RefreshRowSetRulesGrid();
             RefreshPresenceRulesGrid();
             UpdateGeneralPreviewLabels();
+        }
+
+        // Mesmo motivo do ucValidation: um arquivo de regras antigo/editado à mão pode ter um enum fora
+        // do range válido (Newtonsoft não valida isso na desserialização), o que trava a grid com o
+        // diálogo padrão de erro assim que o usuário mexe naquela célula de combo.
+        private void NormalizeRuleEnums()
+        {
+            foreach (DbComparisonRule rule in _rules)
+            {
+                if (!Enum.IsDefined(typeof(ComparisonSourceType), rule.OriginSourceType))
+                {
+                    rule.OriginSourceType = ComparisonSourceType.CustomSql;
+                }
+
+                if (!Enum.IsDefined(typeof(ComparisonSourceType), rule.DestinationSourceType))
+                {
+                    rule.DestinationSourceType = ComparisonSourceType.CustomSql;
+                }
+
+                if (!Enum.IsDefined(typeof(ComparisonType), rule.Comparison))
+                {
+                    rule.Comparison = ComparisonType.EqualsTrimmed;
+                }
+            }
+
+            foreach (DbRowSetComparisonRule rule in _rowSetRules)
+            {
+                if (!Enum.IsDefined(typeof(ComparisonSourceType), rule.OriginSourceType))
+                {
+                    rule.OriginSourceType = ComparisonSourceType.CustomSql;
+                }
+
+                if (!Enum.IsDefined(typeof(ComparisonSourceType), rule.DestinationSourceType))
+                {
+                    rule.DestinationSourceType = ComparisonSourceType.CustomSql;
+                }
+
+                if (!Enum.IsDefined(typeof(ComparisonType), rule.Comparison))
+                {
+                    rule.Comparison = ComparisonType.EqualsTrimmed;
+                }
+            }
+
+            foreach (DbPresenceRule rule in _presenceRules)
+            {
+                if (!Enum.IsDefined(typeof(PresenceExpectation), rule.Expectation))
+                {
+                    rule.Expectation = PresenceExpectation.RowsMustNotExist;
+                }
+            }
         }
 
         private void btnSaveRules_Click(object sender, EventArgs e)
