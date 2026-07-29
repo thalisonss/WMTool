@@ -1,0 +1,160 @@
+{
+  "GeneralOriginSqlTemplate": ";WITH XMLNAMESPACES ('http://www.portalfiscal.inf.br/nfe' AS ns)\nSELECT TOP 1\n    CONVERT(DATETIME, LEFT(Cab.value('(ns:ide/ns:dhEmi/text())[1]', 'NVARCHAR(30)'), 19), 126) AS dhEmi,\n    TRIM(LEFT(\n        STUFF(P.infCpl_Raw, 1, PATINDEX('%VIAGEM: %', P.infCpl_Raw) + 7, ''),\n        PATINDEX('%[^0-9]%', STUFF(P.infCpl_Raw, 1, PATINDEX('%VIAGEM: %', P.infCpl_Raw) + 7, '')) - 1\n    )) AS infCpl_Trip,\n    TRIM(SUBSTRING(P.infCpl_Raw, PATINDEX('%Tipo de Ordem: %', P.infCpl_Raw) + 15, PATINDEX('%,%', STUFF(P.infCpl_Raw, 1, PATINDEX('%Tipo de Ordem: %', P.infCpl_Raw) + 15, '')))) AS infCpl_OrderType,\n    C.cIDCustomer AS cIDCustomer_DEST_XML\nFROM MC1_InvoiceResponseContent IRC WITH (NOLOCK)\nCROSS APPLY (SELECT TRY_CAST(SUBSTRING(REPLACE(IRC.cContent, 'XML convertido do JSON recebido: ', ''), CHARINDEX('<', REPLACE(IRC.cContent, 'XML convertido do JSON recebido: ', '')), LEN(IRC.cContent)) AS XML) AS XmlDoc) X\nCROSS APPLY X.XmlDoc.nodes('/ns:NFe/ns:infNFe') AS T(Cab)\nOUTER APPLY Cab.nodes('ns:infAdic') AS A(Adic)\nCROSS APPLY (SELECT Adic.value('(ns:infCpl/text())[1]', 'NVARCHAR(MAX)') AS infCpl_Raw) P\nLEFT JOIN MC1_Customer C WITH (NOLOCK)\n    ON C.cIDCompany = IRC.cIDCompany\n    AND C.mc1Enabled = 1\n    AND (COALESCE(Cab.value('(ns:dest/ns:CNPJ/text())[1]', 'NVARCHAR(20)'), Cab.value('(ns:dest/ns:CPF/text())[1]', 'NVARCHAR(20)')) = C.cDocument1\n      OR COALESCE(Cab.value('(ns:dest/ns:CNPJ/text())[1]', 'NVARCHAR(20)'), Cab.value('(ns:dest/ns:CPF/text())[1]', 'NVARCHAR(20)')) = C.cDocument2)\n    AND C.cCustomerName = Cab.value('(ns:dest/ns:xNome/text())[1]', 'NVARCHAR(MAX)')\nWHERE IRC.cIDCompany = {cIDCompany}\n  AND IRC.cIDInvoice = {cIDInvoice}\n  AND IRC.cSerie = {cSerie}\n  AND IRC.cIDBranchInvoice = {cIDBranchInvoice}\n  AND IRC.cContent IS NOT NULL\n  AND IRC.cContent NOT LIKE '%error%'",
+  "GeneralDestinationSqlTemplate": "SELECT TOP 1\n    I.dEmission,\n    I.cIDTrip AS cIDTrip_Invoice,\n    I.cIDCustomer AS cIDCustomer_Invoice,\n    O.xOrderType AS xOrderType_Order,\n    O.cIDTrip AS cIDTrip_Order,\n    O.cIDCustomer AS cIDCustomer_Order\nFROM MC1_Invoice I WITH (NOLOCK)\nLEFT JOIN MC1_OrderInvoice OI WITH (NOLOCK)\n    ON OI.cIDCompany = I.cIDCompany AND OI.cIDInvoice = I.cIDInvoice AND OI.cSerie = I.cSerie AND OI.cIDBranchInvoice = I.cIDBranchInvoice AND OI.mc1Enabled = 1\nLEFT JOIN MC1_Order O WITH (NOLOCK)\n    ON O.cIDCompany = OI.cIDCompany AND O.cIDOrder = OI.cIDOrder\nWHERE I.cIDCompany = {cIDCompany}\n  AND I.cIDInvoice = {cIDInvoice}\n  AND I.cSerie = {cSerie}\n  AND I.cIDBranchInvoice = {cIDBranchInvoice}",
+  "Rules": [
+    {
+      "Name": "dEmission (MC1_Invoice x XML)",
+      "OriginSourceType": "GeneralResult",
+      "OriginSqlTemplate": "",
+      "OriginResultColumn": "dhEmi",
+      "DestinationSourceType": "GeneralResult",
+      "DestinationSqlTemplate": "",
+      "DestinationResultColumn": "dEmission",
+      "Comparison": "EqualsTrimmed"
+    },
+    {
+      "Name": "cIDTrip (MC1_Invoice x XML)",
+      "OriginSourceType": "GeneralResult",
+      "OriginSqlTemplate": "",
+      "OriginResultColumn": "infCpl_Trip",
+      "DestinationSourceType": "GeneralResult",
+      "DestinationSqlTemplate": "",
+      "DestinationResultColumn": "cIDTrip_Invoice",
+      "Comparison": "NumericEquals"
+    },
+    {
+      "Name": "cIDTrip (MC1_Order x XML)",
+      "OriginSourceType": "GeneralResult",
+      "OriginSqlTemplate": "",
+      "OriginResultColumn": "infCpl_Trip",
+      "DestinationSourceType": "GeneralResult",
+      "DestinationSqlTemplate": "",
+      "DestinationResultColumn": "cIDTrip_Order",
+      "Comparison": "NumericEquals"
+    },
+    {
+      "Name": "cIDCustomer (MC1_Invoice x XML)",
+      "OriginSourceType": "GeneralResult",
+      "OriginSqlTemplate": "",
+      "OriginResultColumn": "cIDCustomer_DEST_XML",
+      "DestinationSourceType": "GeneralResult",
+      "DestinationSqlTemplate": "",
+      "DestinationResultColumn": "cIDCustomer_Invoice",
+      "Comparison": "EqualsTrimmed"
+    },
+    {
+      "Name": "cIDCustomer (MC1_Order x XML)",
+      "OriginSourceType": "GeneralResult",
+      "OriginSqlTemplate": "",
+      "OriginResultColumn": "cIDCustomer_DEST_XML",
+      "DestinationSourceType": "GeneralResult",
+      "DestinationSqlTemplate": "",
+      "DestinationResultColumn": "cIDCustomer_Order",
+      "Comparison": "EqualsTrimmed"
+    },
+    {
+      "Name": "xOrderType (MC1_Order x XML)",
+      "OriginSourceType": "GeneralResult",
+      "OriginSqlTemplate": "",
+      "OriginResultColumn": "infCpl_OrderType",
+      "DestinationSourceType": "GeneralResult",
+      "DestinationSqlTemplate": "",
+      "DestinationResultColumn": "xOrderType_Order",
+      "Comparison": "EqualsTrimmed"
+    },
+    {
+      "Name": "Qtd Itens: MC1_OrderItem x MC1_InvoiceItem",
+      "OriginSourceType": "CustomSql",
+      "OriginSqlTemplate": "SELECT COUNT(*) AS Qtd FROM MC1_OrderItem I INNER JOIN MC1_OrderInvoice OI ON OI.cIDCompany = I.cIDCompany AND OI.cIDOrder = I.cIDOrder WHERE I.mc1Enabled = 1 AND OI.mc1Enabled = 1 AND OI.cIDCompany = {cIDCompany} AND OI.cIDInvoice = {cIDInvoice} AND OI.cSerie = {cSerie} AND OI.cIDBranchInvoice = {cIDBranchInvoice}",
+      "OriginResultColumn": "Qtd",
+      "DestinationSourceType": "CustomSql",
+      "DestinationSqlTemplate": "SELECT COUNT(*) AS Qtd FROM MC1_InvoiceItem WHERE mc1Enabled = 1 AND cIDCompany = {cIDCompany} AND cIDInvoice = {cIDInvoice} AND cSerie = {cSerie} AND cIDBranchInvoice = {cIDBranchInvoice}",
+      "DestinationResultColumn": "Qtd",
+      "Comparison": "NumericEquals"
+    },
+    {
+      "Name": "Qtd Itens: MC1_InvoiceItem x MC1_InvoiceItemExt",
+      "OriginSourceType": "CustomSql",
+      "OriginSqlTemplate": "SELECT COUNT(*) AS Qtd FROM MC1_InvoiceItem WHERE mc1Enabled = 1 AND cIDCompany = {cIDCompany} AND cIDInvoice = {cIDInvoice} AND cSerie = {cSerie} AND cIDBranchInvoice = {cIDBranchInvoice}",
+      "OriginResultColumn": "Qtd",
+      "DestinationSourceType": "CustomSql",
+      "DestinationSqlTemplate": "SELECT COUNT(*) AS Qtd FROM MC1_InvoiceItemExt WHERE mc1Enabled = 1 AND cIDCompany = {cIDCompany} AND cIDInvoice = {cIDInvoice} AND cSerie = {cSerie} AND cIDBranchInvoice = {cIDBranchInvoice}",
+      "DestinationResultColumn": "Qtd",
+      "Comparison": "NumericEquals"
+    },
+    {
+      "Name": "Qtd Itens: MC1_OrderItem x MC1_OrderItemExt",
+      "OriginSourceType": "CustomSql",
+      "OriginSqlTemplate": "SELECT COUNT(*) AS Qtd FROM MC1_OrderItem I INNER JOIN MC1_OrderInvoice OI ON OI.cIDCompany = I.cIDCompany AND OI.cIDOrder = I.cIDOrder WHERE I.mc1Enabled = 1 AND OI.mc1Enabled = 1 AND OI.cIDCompany = {cIDCompany} AND OI.cIDInvoice = {cIDInvoice} AND OI.cSerie = {cSerie} AND OI.cIDBranchInvoice = {cIDBranchInvoice}",
+      "OriginResultColumn": "Qtd",
+      "DestinationSourceType": "CustomSql",
+      "DestinationSqlTemplate": "SELECT COUNT(*) AS Qtd FROM MC1_OrderItemExt I INNER JOIN MC1_OrderInvoice OI ON OI.cIDCompany = I.cIDCompany AND OI.cIDOrder = I.cIDOrder WHERE I.mc1Enabled = 1 AND OI.mc1Enabled = 1 AND OI.cIDCompany = {cIDCompany} AND OI.cIDInvoice = {cIDInvoice} AND OI.cSerie = {cSerie} AND OI.cIDBranchInvoice = {cIDBranchInvoice}",
+      "DestinationResultColumn": "Qtd",
+      "Comparison": "NumericEquals"
+    },
+    {
+      "Name": "Qtd Itens: MC1_InvoiceItem x XML",
+      "OriginSourceType": "CustomSql",
+      "OriginSqlTemplate": "SELECT COUNT(*) AS Qtd FROM MC1_InvoiceItem WHERE mc1Enabled = 1 AND cIDCompany = {cIDCompany} AND cIDInvoice = {cIDInvoice} AND cSerie = {cSerie} AND cIDBranchInvoice = {cIDBranchInvoice}",
+      "OriginResultColumn": "Qtd",
+      "DestinationSourceType": "CustomSql",
+      "DestinationSqlTemplate": ";WITH XMLNAMESPACES ('http://www.portalfiscal.inf.br/nfe' AS ns)\nSELECT COUNT(*) AS Qtd\nFROM MC1_InvoiceResponseContent IRC WITH (NOLOCK)\nCROSS APPLY (SELECT TRY_CAST(SUBSTRING(REPLACE(IRC.cContent, 'XML convertido do JSON recebido: ', ''), CHARINDEX('<', REPLACE(IRC.cContent, 'XML convertido do JSON recebido: ', '')), LEN(IRC.cContent)) AS XML) AS XmlDoc) X\nCROSS APPLY X.XmlDoc.nodes('/ns:NFe/ns:infNFe/ns:det') AS Itens(Det)\nWHERE IRC.cIDCompany = {cIDCompany} AND IRC.cIDInvoice = {cIDInvoice} AND IRC.cSerie = {cSerie} AND IRC.cIDBranchInvoice = {cIDBranchInvoice} AND IRC.cContent IS NOT NULL AND IRC.cContent NOT LIKE '%error%'",
+      "DestinationResultColumn": "Qtd",
+      "Comparison": "NumericEquals"
+    }
+  ],
+  "GeneralOriginRowSetSqlTemplate": ";WITH XMLNAMESPACES ('http://www.portalfiscal.inf.br/nfe' AS ns)\nSELECT\n    CAST(Det.value('(ns:prod/ns:cProd/text())[1]', 'NVARCHAR(50)') AS INT) AS cProd,\n    Det.value('(ns:prod/ns:qCom/text())[1]', 'DECIMAL(18,4)') AS qCom,\n    ISNULL(TRY_CONVERT(DECIMAL(18,4), Det.value('(ns:prod/ns:vFrete/text())[1]', 'NVARCHAR(50)')), 0.00) AS vFrete\nFROM MC1_InvoiceResponseContent IRC WITH (NOLOCK)\nCROSS APPLY (SELECT TRY_CAST(SUBSTRING(REPLACE(IRC.cContent, 'XML convertido do JSON recebido: ', ''), CHARINDEX('<', REPLACE(IRC.cContent, 'XML convertido do JSON recebido: ', '')), LEN(IRC.cContent)) AS XML) AS XmlDoc) X\nCROSS APPLY X.XmlDoc.nodes('/ns:NFe/ns:infNFe/ns:det') AS Itens(Det)\nWHERE IRC.cIDCompany = {cIDCompany} AND IRC.cIDInvoice = {cIDInvoice} AND IRC.cSerie = {cSerie} AND IRC.cIDBranchInvoice = {cIDBranchInvoice} AND IRC.cContent IS NOT NULL AND IRC.cContent NOT LIKE '%error%'",
+  "GeneralDestinationRowSetSqlTemplate": "SELECT\n    CAST(OI.cIDProduct AS INT) AS cProd,\n    OI.nAmount AS qCom,\n    OIE.nValueShip AS vFrete\nFROM MC1_OrderItem OI WITH (NOLOCK)\nINNER JOIN MC1_OrderInvoice OINV WITH (NOLOCK) ON OINV.cIDCompany = OI.cIDCompany AND OINV.cIDOrder = OI.cIDOrder AND OINV.mc1Enabled = 1\nLEFT JOIN MC1_OrderItemExt OIE WITH (NOLOCK) ON OIE.cIDCompany = OI.cIDCompany AND OIE.cIDOrder = OI.cIDOrder AND OIE.nSeq = OI.nSeq\nWHERE OI.mc1Enabled = 1 AND OINV.cIDCompany = {cIDCompany} AND OINV.cIDInvoice = {cIDInvoice} AND OINV.cSerie = {cSerie} AND OINV.cIDBranchInvoice = {cIDBranchInvoice}",
+  "RowSetRules": [
+    {
+      "Name": "Quantidade (qCom) por produto",
+      "OriginSourceType": "GeneralResult",
+      "OriginSqlTemplate": "",
+      "OriginKeyColumn": "cProd",
+      "OriginValueColumn": "qCom",
+      "DestinationSourceType": "GeneralResult",
+      "DestinationSqlTemplate": "",
+      "DestinationKeyColumn": "cProd",
+      "DestinationValueColumn": "qCom",
+      "Comparison": "NumericEquals"
+    },
+    {
+      "Name": "Frete (vFrete) por produto",
+      "OriginSourceType": "GeneralResult",
+      "OriginSqlTemplate": "",
+      "OriginKeyColumn": "cProd",
+      "OriginValueColumn": "vFrete",
+      "DestinationSourceType": "GeneralResult",
+      "DestinationSqlTemplate": "",
+      "DestinationKeyColumn": "cProd",
+      "DestinationValueColumn": "vFrete",
+      "Comparison": "NumericEquals"
+    }
+  ],
+  "PresenceRules": [
+    {
+      "Name": "XML com erro",
+      "SqlTemplate": "SELECT 1 AS Achou FROM MC1_InvoiceResponseContent WHERE cIDCompany = {cIDCompany} AND cIDInvoice = {cIDInvoice} AND cSerie = {cSerie} AND cIDBranchInvoice = {cIDBranchInvoice} AND cContent LIKE '%error%'",
+      "Expectation": "RowsMustNotExist",
+      "MessageColumn": ""
+    },
+    {
+      "Name": "Pedido Split (MC1_OrderExt.lOrderSplit)",
+      "SqlTemplate": "SELECT 1 AS Achou FROM MC1_OrderInvoice OI INNER JOIN MC1_OrderExt OE ON OE.cIDCompany = OI.cIDCompany AND OE.cIDOrder = OI.cIDOrder AND OE.lOrderSplit = '1' WHERE OI.cIDCompany = {cIDCompany} AND OI.cIDInvoice = {cIDInvoice} AND OI.cSerie = {cSerie} AND OI.cIDBranchInvoice = {cIDBranchInvoice}",
+      "Expectation": "RowsMustNotExist",
+      "MessageColumn": ""
+    },
+    {
+      "Name": "MC1_OrderInvoice deve existir",
+      "SqlTemplate": "SELECT 1 AS Achou FROM MC1_OrderInvoice WHERE mc1Enabled = 1 AND cIDCompany = {cIDCompany} AND cIDInvoice = {cIDInvoice} AND cSerie = {cSerie} AND cIDBranchInvoice = {cIDBranchInvoice}",
+      "Expectation": "RowsMustExist",
+      "MessageColumn": ""
+    },
+    {
+      "Name": "Itens do XML não existentes no MC1_InvoiceItem",
+      "SqlTemplate": ";WITH XMLNAMESPACES ('http://www.portalfiscal.inf.br/nfe' AS ns)\nSELECT 'Produto ' + Det.value('(ns:prod/ns:cProd/text())[1]', 'NVARCHAR(50)') + ' do XML não existe na MC1_InvoiceItem' AS Mensagem\nFROM MC1_InvoiceResponseContent IRC WITH (NOLOCK)\nCROSS APPLY (SELECT TRY_CAST(SUBSTRING(REPLACE(IRC.cContent, 'XML convertido do JSON recebido: ', ''), CHARINDEX('<', REPLACE(IRC.cContent, 'XML convertido do JSON recebido: ', '')), LEN(IRC.cContent)) AS XML) AS XmlDoc) X\nCROSS APPLY X.XmlDoc.nodes('/ns:NFe/ns:infNFe/ns:det') AS Itens(Det)\nWHERE IRC.cIDCompany = {cIDCompany} AND IRC.cIDInvoice = {cIDInvoice} AND IRC.cSerie = {cSerie} AND IRC.cIDBranchInvoice = {cIDBranchInvoice} AND IRC.cContent IS NOT NULL AND IRC.cContent NOT LIKE '%error%'\nAND NOT EXISTS (\n    SELECT 1 FROM MC1_InvoiceItem II WITH (NOLOCK)\n    WHERE II.cIDCompany = IRC.cIDCompany AND II.cIDInvoice = IRC.cIDInvoice AND II.cSerie = IRC.cSerie AND II.cIDBranchInvoice = IRC.cIDBranchInvoice\n      AND II.mc1Enabled = 1 AND CAST(II.cIDProduct AS INT) = CAST(Det.value('(ns:prod/ns:cProd/text())[1]', 'NVARCHAR(50)') AS INT)\n)",
+      "Expectation": "RowsMustNotExist",
+      "MessageColumn": "Mensagem"
+    }
+  ]
+}
