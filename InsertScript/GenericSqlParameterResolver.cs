@@ -92,7 +92,7 @@ namespace WMTool.InsertScript
             }
 
             object value = row[0];
-            string result = value == DBNull.Value ? string.Empty : Convert.ToString(value, CultureInfo.InvariantCulture);
+            string result = value == DBNull.Value ? null : Convert.ToString(value, CultureInfo.InvariantCulture);
             return (result, null);
         }
     }
