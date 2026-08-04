@@ -207,8 +207,10 @@
     <Compile Include="InsertScript\Models\TableInsertRule.cs" />
     <Compile Include="InsertScript\Models\ParameterValue.cs" />
     <Compile Include="InsertScript\Models\InsertScriptRuleSet.cs" />
+    <Compile Include="InsertScript\Models\InsertScriptGenerationResult.cs" />
     <Compile Include="InsertScript\InsertScriptRuleSetStore.cs" />
     <Compile Include="InsertScript\GenericSqlParameterResolver.cs" />
+    <Compile Include="InsertScript\InsertScriptGenerationEngine.cs" />
     <Compile Include="Reprocessing\Templating\PlaceholderRegex.cs" />
     <Compile Include="Reprocessing\Templating\PlaceholderValueResolver.cs" />
     <Compile Include="Reprocessing\Templating\TemplateEngine.cs" />
