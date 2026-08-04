@@ -21,6 +21,11 @@ namespace WMTool.Screens
         // entre si.
         public event Action<string, string, string, string, string> ValidateJsonRequested;
 
+        // frmHomeScreen assina esse evento pra levar o JSON gerado até a aba do Gerador de Script
+        // INSERT — só o JSON em si (a nova tela tem seu próprio jeito genérico de parâmetros
+        // "Localizar/Substituir", não os 4 campos fixos desta tela).
+        public event Action<string> GenerateInsertScriptRequested;
+
         public ucJsonReprocessor()
         {
             InitializeComponent();
@@ -588,6 +593,17 @@ namespace WMTool.Screens
                 txtCSerie.Text.Trim(),
                 txtCIDBranchInvoice.Text.Trim(),
                 txtCIDCompany.Text.Trim());
+        }
+
+        private void btnGenerateInsertScript_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtResultJson.Text))
+            {
+                MessageBox.Show("Nada para gerar ainda. Execute o reprocessamento primeiro.");
+                return;
+            }
+
+            GenerateInsertScriptRequested?.Invoke(txtResultJson.Text);
         }
 
         private void btnSaveJson_Click(object sender, EventArgs e)

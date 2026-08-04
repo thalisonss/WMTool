@@ -37,6 +37,16 @@ namespace WMTool
             LoadInitial();
 
             ucJsonReprocessor1.ValidateJsonRequested += OnValidateJsonRequested;
+            ucJsonReprocessor1.GenerateInsertScriptRequested += OnGenerateInsertScriptRequested;
+        }
+
+        // Botão "Gerar Script INSERT" da aba Reprocessar JSON: leva o JSON gerado direto pra aba do
+        // Gerador de Script INSERT e troca de aba — as regras (parâmetros/tabelas) continuam sendo
+        // configuradas lá, essa tela só evita ter que copiar/colar o JSON manualmente.
+        private void OnGenerateInsertScriptRequested(string json)
+        {
+            tabControl1.SelectedTab = tabPageInsertScript;
+            ucInsertScriptGenerator1.LoadJson(json);
         }
 
         // Botão "Validar JSON" da aba Reprocessar JSON: manda o JSON gerado (+ os 4 identificadores)
@@ -114,6 +124,7 @@ namespace WMTool
             txtRequestPassword.Text = password;
             txtValidationRulesPath.Text = Properties.Settings.Default.configValidationRulesPath;
             txtDbComparisonRulesPath.Text = Properties.Settings.Default.configDbComparisonRulesPath;
+            txtInsertScriptRulesPath.Text = Properties.Settings.Default.configInsertScriptRulesPath;
         }
 
       
@@ -521,6 +532,25 @@ namespace WMTool
             WMTool.Properties.Settings.Default.Save();
 
             MessageBox.Show("Caminho das regras de comparação Banco x Banco salvo com sucesso!");
+        }
+
+        private void btnBrowseInsertScriptRulesPath_Click(object sender, EventArgs e)
+        {
+            using (var dialog = new OpenFileDialog { Filter = "Arquivos JSON (*.json)|*.json" })
+            {
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    txtInsertScriptRulesPath.Text = dialog.FileName;
+                }
+            }
+        }
+
+        private void btnSaveInsertScriptRulesPath_Click(object sender, EventArgs e)
+        {
+            WMTool.Properties.Settings.Default.configInsertScriptRulesPath = txtInsertScriptRulesPath.Text;
+            WMTool.Properties.Settings.Default.Save();
+
+            MessageBox.Show("Caminho das regras do Gerador de Script INSERT salvo com sucesso!");
         }
 
         private void btnSetDirectoryTripExceptionCSV_Click(object sender, EventArgs e)
