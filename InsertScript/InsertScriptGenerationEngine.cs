@@ -48,9 +48,9 @@ namespace WMTool.InsertScript
 
                 var rowStatements = new List<string>();
 
-                foreach (JToken row in rows)
+                for (int rowIndex = 0; rowIndex < rows.Count; rowIndex++)
                 {
-                    rowStatements.Add(await BuildInsertStatementAsync(table, row, globalParameters, connectionString, result.Warnings));
+                    rowStatements.Add(await BuildInsertStatementAsync(table, rows[rowIndex], rowIndex, json, globalParameters, connectionString, result.Warnings));
                 }
 
                 tableBlocks.Add($"-- {table.TableName} ({rowStatements.Count} registro(s))\r\n" + string.Join("\r\n", rowStatements));
@@ -92,10 +92,23 @@ namespace WMTool.InsertScript
             return array.Cast<JToken>().ToList();
         }
 
+        // Prefixo que marca um JSON Path como relativo ao DOCUMENTO INTEIRO em vez da linha atual —
+        // necessário pra tabelas JsonArray lerem um valor de cabeçalho (ex.: identificadores da nota,
+        // peso total em transp.pesoB) de dentro de um item de array, já que "$." sozinho resolve a
+        // partir do item (é assim que o Newtonsoft.Json interpreta SelectToken: "$" é o próprio token
+        // em que o método foi chamado, não a raiz absoluta do documento).
+        private const string RootPathPrefix = "root:";
+
         private async Task<string> BuildInsertStatementAsync(
-            TableInsertRule table, JToken row, IDictionary<string, string> globalParameters, string connectionString, List<string> warnings)
+            TableInsertRule table, JToken row, int rowIndex, JObject rootJson, IDictionary<string, string> globalParameters, string connectionString, List<string> warnings)
         {
-            var rowParameters = new Dictionary<string, string>(globalParameters, StringComparer.OrdinalIgnoreCase);
+            var rowParameters = new Dictionary<string, string>(globalParameters, StringComparer.OrdinalIgnoreCase)
+            {
+                // Disponível pra qualquer Query Geral/Customizada precisar montar um nSeq (ex.:
+                // "SELECT ({RowIndex} + 1) * 10") — 0 (SingleRow) ou a posição no array (JsonArray).
+                ["RowIndex"] = rowIndex.ToString(CultureInfo.InvariantCulture),
+                ["RowNumber"] = (rowIndex + 1).ToString(CultureInfo.InvariantCulture)
+            };
             var resolvedValues = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             List<ColumnRule> columns = table.Columns ?? new List<ColumnRule>();
 
@@ -111,7 +124,11 @@ namespace WMTool.InsertScript
                     continue;
                 }
 
-                JToken token = string.IsNullOrWhiteSpace(column.JsonPath) ? null : row.SelectToken(column.JsonPath);
+                bool isRootPath = !string.IsNullOrWhiteSpace(column.JsonPath) && column.JsonPath.StartsWith(RootPathPrefix, StringComparison.OrdinalIgnoreCase);
+                JToken context = isRootPath ? rootJson : row;
+                string path = isRootPath ? column.JsonPath.Substring(RootPathPrefix.Length) : column.JsonPath;
+
+                JToken token = string.IsNullOrWhiteSpace(path) ? null : context.SelectToken(path);
                 if (token == null || token.Type == JTokenType.Null)
                 {
                     if (token == null)
