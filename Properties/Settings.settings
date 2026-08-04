@@ -68,5 +68,8 @@
     <Setting Name="configDbComparisonRulesPath" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="configInsertScriptRulesPath" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

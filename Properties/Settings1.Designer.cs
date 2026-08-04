@@ -186,6 +186,11 @@ namespace WMTool.Properties {
             set { SetString((x, v) => x.configDbComparisonRulesPath = v, value); }
         }
 
+        public string configInsertScriptRulesPath {
+            get { return GetString(x => x.configInsertScriptRulesPath); }
+            set { SetString((x, v) => x.configInsertScriptRulesPath = v, value); }
+        }
+
         private sealed class SettingsData {
             public string configSaveImageFolder { get; set; } = string.Empty;
             public string configServer { get; set; } = string.Empty;
@@ -209,6 +214,7 @@ namespace WMTool.Properties {
             public string configEnvironment { get; set; } = string.Empty;
             public string configValidationRulesPath { get; set; } = string.Empty;
             public string configDbComparisonRulesPath { get; set; } = string.Empty;
+            public string configInsertScriptRulesPath { get; set; } = string.Empty;
         }
     }
 }
