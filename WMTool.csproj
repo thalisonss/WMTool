@@ -141,6 +141,12 @@
     <Compile Include="Screens\frmTableColumnsEditor.Designer.cs">
       <DependentUpon>frmTableColumnsEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="Screens\ucInsertScriptGenerator.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Screens\ucInsertScriptGenerator.Designer.cs">
+      <DependentUpon>ucInsertScriptGenerator.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Integrations\WMApiClient.cs" />
@@ -247,6 +253,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Screens\frmTableColumnsEditor.resx">
       <DependentUpon>frmTableColumnsEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Screens\ucInsertScriptGenerator.resx">
+      <DependentUpon>ucInsertScriptGenerator.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
