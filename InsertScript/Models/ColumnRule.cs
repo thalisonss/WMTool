@@ -9,6 +9,11 @@ namespace WMTool.InsertScript.Models
         // pra tabela SingleRow, ou o item do array pra tabela JsonArray).
         public string JsonPath { get; set; }
 
+        // Usado quando SourceType == Parameter: nome (com ou sem chaves) a buscar direto no pool de
+        // parâmetros da linha — globais da grid Localizar/Substituir, RowIndex/RowNumber, ou outra
+        // coluna Literal/JsonPath já resolvida da mesma tabela. Não toca o banco.
+        public string ParameterName { get; set; }
+
         // Usado quando SourceType == CustomSql: query dedicada só pra essa coluna, com placeholders
         // {nome} resolvidos pelo pool de parâmetros da linha (globais do rule set + colunas
         // Literal/JsonPath já resolvidas da mesma linha).

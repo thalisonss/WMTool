@@ -30,7 +30,8 @@ namespace WMTool.Screens
                     SqlTemplate = c.SqlTemplate,
                     ResultColumn = c.ResultColumn,
                     LiteralValue = c.LiteralValue,
-                    IncludeInInsert = c.IncludeInInsert
+                    IncludeInInsert = c.IncludeInInsert,
+                    ParameterName = c.ParameterName
                 })
                 .ToList();
 
@@ -52,6 +53,7 @@ namespace WMTool.Screens
             dgvColumns.Columns.Add(sourceTypeColumn);
 
             dgvColumns.Columns.Add(new DataGridViewTextBoxColumn { Name = "colJsonPath", HeaderText = "JSON Path", Width = 200 });
+            dgvColumns.Columns.Add(new DataGridViewTextBoxColumn { Name = "colParameterName", HeaderText = "Nome do Parâmetro", Width = 150 });
             dgvColumns.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "colSql",
@@ -150,6 +152,7 @@ namespace WMTool.Screens
                     column.ColumnName,
                     column.SourceType,
                     column.JsonPath,
+                    column.ParameterName,
                     BuildSqlPreview(column.SqlTemplate),
                     column.ResultColumn,
                     column.LiteralValue,
@@ -186,6 +189,7 @@ namespace WMTool.Screens
                 column.ColumnName = row.Cells["colColumnName"].Value?.ToString();
                 column.SourceType = ParseSourceType(row.Cells["colSourceType"].Value);
                 column.JsonPath = row.Cells["colJsonPath"].Value?.ToString();
+                column.ParameterName = row.Cells["colParameterName"].Value?.ToString();
                 column.ResultColumn = row.Cells["colResultColumn"].Value?.ToString();
                 column.LiteralValue = row.Cells["colLiteralValue"].Value?.ToString();
                 column.IncludeInInsert = row.Cells["colIncludeInInsert"].Value == null || Convert.ToBoolean(row.Cells["colIncludeInInsert"].Value);
