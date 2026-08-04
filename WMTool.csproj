@@ -201,6 +201,14 @@
     <Compile Include="Reprocessing\ParameterResolution\MasterParameterQueryOverrideStore.cs" />
     <Compile Include="Reprocessing\ParameterResolution\MasterParameterGeneralQueryStore.cs" />
     <Compile Include="Reprocessing\ParameterResolution\ParameterDiscoverySourceType.cs" />
+    <Compile Include="InsertScript\Models\ColumnValueSourceType.cs" />
+    <Compile Include="InsertScript\Models\RowSourceType.cs" />
+    <Compile Include="InsertScript\Models\ColumnRule.cs" />
+    <Compile Include="InsertScript\Models\TableInsertRule.cs" />
+    <Compile Include="InsertScript\Models\ParameterValue.cs" />
+    <Compile Include="InsertScript\Models\InsertScriptRuleSet.cs" />
+    <Compile Include="InsertScript\InsertScriptRuleSetStore.cs" />
+    <Compile Include="InsertScript\GenericSqlParameterResolver.cs" />
     <Compile Include="Reprocessing\Templating\PlaceholderRegex.cs" />
     <Compile Include="Reprocessing\Templating\PlaceholderValueResolver.cs" />
     <Compile Include="Reprocessing\Templating\TemplateEngine.cs" />
