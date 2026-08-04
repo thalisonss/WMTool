@@ -112,15 +112,34 @@ namespace WMTool.InsertScript
             var resolvedValues = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             List<ColumnRule> columns = table.Columns ?? new List<ColumnRule>();
 
-            // 1ª passada: Literal e JsonPath não dependem de banco — resolvem antes e alimentam o
-            // pool de parâmetros da linha, pra que GeneralResult/CustomSql possam referenciá-los
-            // via {NomeDaColuna} (essencial pro caso de array: cada item expõe seus próprios campos
-            // como parâmetro pras queries de resolução dessa mesma linha).
-            foreach (ColumnRule column in columns.Where(c => c.SourceType == ColumnValueSourceType.Literal || c.SourceType == ColumnValueSourceType.JsonPath))
+            // 1ª passada: Literal, JsonPath e Parameter não dependem de banco — resolvem antes e
+            // alimentam o pool de parâmetros da linha, pra que GeneralResult/CustomSql possam
+            // referenciá-los via {NomeDaColuna} (essencial pro caso de array: cada item expõe seus
+            // próprios campos como parâmetro pras queries de resolução dessa mesma linha).
+            foreach (ColumnRule column in columns.Where(c =>
+                c.SourceType == ColumnValueSourceType.Literal
+                || c.SourceType == ColumnValueSourceType.JsonPath
+                || c.SourceType == ColumnValueSourceType.Parameter))
             {
                 if (column.SourceType == ColumnValueSourceType.Literal)
                 {
                     resolvedValues[column.ColumnName] = string.IsNullOrEmpty(column.LiteralValue) ? "NULL" : column.LiteralValue;
+                    continue;
+                }
+
+                if (column.SourceType == ColumnValueSourceType.Parameter)
+                {
+                    string parameterName = (column.ParameterName ?? string.Empty).Trim().TrimStart('{').TrimEnd('}');
+
+                    if (string.IsNullOrEmpty(parameterName) || !rowParameters.TryGetValue(parameterName, out string parameterValue))
+                    {
+                        warnings.Add($"Tabela {table.TableName}, coluna {column.ColumnName}: parâmetro '{{{parameterName}}}' não encontrado no pool — usando NULL.");
+                        resolvedValues[column.ColumnName] = "NULL";
+                        continue;
+                    }
+
+                    rowParameters[column.ColumnName] = parameterValue;
+                    resolvedValues[column.ColumnName] = QuoteSqlLiteral(parameterValue);
                     continue;
                 }
 
