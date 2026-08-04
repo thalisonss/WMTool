@@ -21,5 +21,12 @@ namespace WMTool.InsertScript.Models
         // Usado quando SourceType == Literal: expressão SQL inserida verbatim (sem aspas/escape),
         // ex.: NULL, GETDATE(), 1, '0'.
         public string LiteralValue { get; set; }
+
+        // Quando false, essa entrada resolve normalmente e alimenta o pool de parâmetros da linha
+        // (vira {ColumnName} pras demais colunas) mas NÃO entra na lista de colunas/valores do
+        // INSERT final — útil pra expor um campo do JSON (ex.: cIDTrip) que a tabela de destino não
+        // possui, mas que é necessário como {placeholder} de uma Query Geral/Customizada de outra
+        // coluna dessa mesma tabela.
+        public bool IncludeInInsert { get; set; } = true;
     }
 }

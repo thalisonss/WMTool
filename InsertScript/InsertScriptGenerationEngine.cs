@@ -197,8 +197,11 @@ namespace WMTool.InsertScript
                 resolvedValues[column.ColumnName] = QuoteSqlLiteral(customValue);
             }
 
-            string columnList = string.Join(", ", columns.Select(c => c.ColumnName));
-            string valueList = string.Join(", ", columns.Select(c => resolvedValues.TryGetValue(c.ColumnName, out string v) ? v : "NULL"));
+            // Colunas com IncludeInInsert = false só existem pra alimentar o pool (viram {placeholder}
+            // pras demais) — resolvidas normalmente acima, mas fora da lista final do INSERT.
+            List<ColumnRule> insertedColumns = columns.Where(c => c.IncludeInInsert).ToList();
+            string columnList = string.Join(", ", insertedColumns.Select(c => c.ColumnName));
+            string valueList = string.Join(", ", insertedColumns.Select(c => resolvedValues.TryGetValue(c.ColumnName, out string v) ? v : "NULL"));
 
             return $"INSERT INTO {table.TableName} ({columnList}) VALUES ({valueList});";
         }
