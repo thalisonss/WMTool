@@ -29,7 +29,8 @@ namespace WMTool.Screens
                     JsonPath = c.JsonPath,
                     SqlTemplate = c.SqlTemplate,
                     ResultColumn = c.ResultColumn,
-                    LiteralValue = c.LiteralValue
+                    LiteralValue = c.LiteralValue,
+                    IncludeInInsert = c.IncludeInInsert
                 })
                 .ToList();
 
@@ -60,6 +61,12 @@ namespace WMTool.Screens
             });
             dgvColumns.Columns.Add(new DataGridViewTextBoxColumn { Name = "colResultColumn", HeaderText = "Coluna (Query Geral)", Width = 150 });
             dgvColumns.Columns.Add(new DataGridViewTextBoxColumn { Name = "colLiteralValue", HeaderText = "Valor Literal (SQL cru)", Width = 150 });
+            dgvColumns.Columns.Add(new DataGridViewCheckBoxColumn
+            {
+                Name = "colIncludeInInsert",
+                HeaderText = "Inserir?",
+                Width = 60
+            });
 
             dgvColumns.CellDoubleClick += DgvColumns_CellDoubleClick;
             dgvColumns.DataError += DgvColumns_DataError;
@@ -145,7 +152,8 @@ namespace WMTool.Screens
                     column.JsonPath,
                     BuildSqlPreview(column.SqlTemplate),
                     column.ResultColumn,
-                    column.LiteralValue);
+                    column.LiteralValue,
+                    column.IncludeInInsert);
             }
         }
 
@@ -180,6 +188,7 @@ namespace WMTool.Screens
                 column.JsonPath = row.Cells["colJsonPath"].Value?.ToString();
                 column.ResultColumn = row.Cells["colResultColumn"].Value?.ToString();
                 column.LiteralValue = row.Cells["colLiteralValue"].Value?.ToString();
+                column.IncludeInInsert = row.Cells["colIncludeInInsert"].Value == null || Convert.ToBoolean(row.Cells["colIncludeInInsert"].Value);
             }
         }
 
