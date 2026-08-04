@@ -133,12 +133,12 @@
             this.lblRequestLogTitle = new System.Windows.Forms.Label();
             this.btnClearRequestLog = new System.Windows.Forms.Button();
             this.txtRequestLog = new System.Windows.Forms.TextBox();
-            this.tabPageValidation = new System.Windows.Forms.TabPage();
-            this.ucValidation1 = new WMTool.Screens.ucValidation();
             this.tabPageJsonReprocessor = new System.Windows.Forms.TabPage();
             this.ucJsonReprocessor1 = new WMTool.Screens.ucJsonReprocessor();
             this.tabPageInsertScript = new System.Windows.Forms.TabPage();
             this.ucInsertScriptGenerator1 = new WMTool.Screens.ucInsertScriptGenerator();
+            this.tabPageValidation = new System.Windows.Forms.TabPage();
+            this.ucValidation1 = new WMTool.Screens.ucValidation();
             this.tabPageDatabaseComparison = new System.Windows.Forms.TabPage();
             this.ucDatabaseComparison1 = new WMTool.Screens.ucDatabaseComparison();
             this.printDocument1 = new System.Drawing.Printing.PrintDocument();
@@ -158,8 +158,9 @@
             this.tabControl1.SuspendLayout();
             this.tabPageRequest.SuspendLayout();
             this.groupBoxRequestConfig.SuspendLayout();
-            this.tabPageValidation.SuspendLayout();
             this.tabPageJsonReprocessor.SuspendLayout();
+            this.tabPageInsertScript.SuspendLayout();
+            this.tabPageValidation.SuspendLayout();
             this.tabPageDatabaseComparison.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -297,9 +298,9 @@
             this.btnSaveDbComparisonRulesPath.Text = "Salvar";
             this.btnSaveDbComparisonRulesPath.UseVisualStyleBackColor = true;
             this.btnSaveDbComparisonRulesPath.Click += new System.EventHandler(this.btnSaveDbComparisonRulesPath_Click);
-            //
+            // 
             // groupBoxInsertScriptRules
-            //
+            // 
             this.groupBoxInsertScriptRules.Controls.Add(this.lblInsertScriptRulesPath);
             this.groupBoxInsertScriptRules.Controls.Add(this.txtInsertScriptRulesPath);
             this.groupBoxInsertScriptRules.Controls.Add(this.btnBrowseInsertScriptRulesPath);
@@ -312,26 +313,26 @@
             this.groupBoxInsertScriptRules.TabIndex = 38;
             this.groupBoxInsertScriptRules.TabStop = false;
             this.groupBoxInsertScriptRules.Text = "Gerador de Script INSERT — Regras";
-            //
+            // 
             // lblInsertScriptRulesPath
-            //
+            // 
             this.lblInsertScriptRulesPath.AutoSize = true;
             this.lblInsertScriptRulesPath.Location = new System.Drawing.Point(9, 25);
             this.lblInsertScriptRulesPath.Name = "lblInsertScriptRulesPath";
             this.lblInsertScriptRulesPath.Size = new System.Drawing.Size(277, 16);
             this.lblInsertScriptRulesPath.TabIndex = 0;
             this.lblInsertScriptRulesPath.Text = "Caminho do arquivo de regras padrão (.json):";
-            //
+            // 
             // txtInsertScriptRulesPath
-            //
+            // 
             this.txtInsertScriptRulesPath.Location = new System.Drawing.Point(11, 50);
             this.txtInsertScriptRulesPath.Margin = new System.Windows.Forms.Padding(4);
             this.txtInsertScriptRulesPath.Name = "txtInsertScriptRulesPath";
             this.txtInsertScriptRulesPath.Size = new System.Drawing.Size(300, 22);
             this.txtInsertScriptRulesPath.TabIndex = 1;
-            //
+            // 
             // btnBrowseInsertScriptRulesPath
-            //
+            // 
             this.btnBrowseInsertScriptRulesPath.Location = new System.Drawing.Point(317, 49);
             this.btnBrowseInsertScriptRulesPath.Name = "btnBrowseInsertScriptRulesPath";
             this.btnBrowseInsertScriptRulesPath.Size = new System.Drawing.Size(60, 23);
@@ -339,9 +340,9 @@
             this.btnBrowseInsertScriptRulesPath.Text = "...";
             this.btnBrowseInsertScriptRulesPath.UseVisualStyleBackColor = true;
             this.btnBrowseInsertScriptRulesPath.Click += new System.EventHandler(this.btnBrowseInsertScriptRulesPath_Click);
-            //
+            // 
             // btnSaveInsertScriptRulesPath
-            //
+            // 
             this.btnSaveInsertScriptRulesPath.Location = new System.Drawing.Point(13, 90);
             this.btnSaveInsertScriptRulesPath.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnSaveInsertScriptRulesPath.Name = "btnSaveInsertScriptRulesPath";
@@ -1326,6 +1327,47 @@
             this.txtRequestLog.Size = new System.Drawing.Size(899, 662);
             this.txtRequestLog.TabIndex = 56;
             // 
+            // tabPageJsonReprocessor
+            // 
+            this.tabPageJsonReprocessor.Controls.Add(this.ucJsonReprocessor1);
+            this.tabPageJsonReprocessor.Location = new System.Drawing.Point(4, 25);
+            this.tabPageJsonReprocessor.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPageJsonReprocessor.Name = "tabPageJsonReprocessor";
+            this.tabPageJsonReprocessor.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPageJsonReprocessor.Size = new System.Drawing.Size(1341, 718);
+            this.tabPageJsonReprocessor.TabIndex = 9;
+            this.tabPageJsonReprocessor.Text = "Reprocessar JSON";
+            this.tabPageJsonReprocessor.UseVisualStyleBackColor = true;
+            // 
+            // ucJsonReprocessor1
+            // 
+            this.ucJsonReprocessor1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ucJsonReprocessor1.Location = new System.Drawing.Point(3, 2);
+            this.ucJsonReprocessor1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ucJsonReprocessor1.Name = "ucJsonReprocessor1";
+            this.ucJsonReprocessor1.Size = new System.Drawing.Size(1335, 714);
+            this.ucJsonReprocessor1.TabIndex = 0;
+            // 
+            // tabPageInsertScript
+            // 
+            this.tabPageInsertScript.Controls.Add(this.ucInsertScriptGenerator1);
+            this.tabPageInsertScript.Location = new System.Drawing.Point(4, 25);
+            this.tabPageInsertScript.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPageInsertScript.Name = "tabPageInsertScript";
+            this.tabPageInsertScript.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPageInsertScript.Size = new System.Drawing.Size(1341, 718);
+            this.tabPageInsertScript.TabIndex = 10;
+            this.tabPageInsertScript.Text = "Gerar Script INSERT";
+            this.tabPageInsertScript.UseVisualStyleBackColor = true;
+            // 
+            // ucInsertScriptGenerator1
+            // 
+            this.ucInsertScriptGenerator1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ucInsertScriptGenerator1.Location = new System.Drawing.Point(3, 2);
+            this.ucInsertScriptGenerator1.Name = "ucInsertScriptGenerator1";
+            this.ucInsertScriptGenerator1.Size = new System.Drawing.Size(1335, 714);
+            this.ucInsertScriptGenerator1.TabIndex = 0;
+            // 
             // tabPageValidation
             // 
             this.tabPageValidation.Controls.Add(this.ucValidation1);
@@ -1346,47 +1388,6 @@
             this.ucValidation1.Size = new System.Drawing.Size(1335, 714);
             this.ucValidation1.TabIndex = 0;
             // 
-            // tabPageJsonReprocessor
-            // 
-            this.tabPageJsonReprocessor.Controls.Add(this.ucJsonReprocessor1);
-            this.tabPageJsonReprocessor.Location = new System.Drawing.Point(4, 25);
-            this.tabPageJsonReprocessor.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPageJsonReprocessor.Name = "tabPageJsonReprocessor";
-            this.tabPageJsonReprocessor.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPageJsonReprocessor.Size = new System.Drawing.Size(1341, 718);
-            this.tabPageJsonReprocessor.TabIndex = 9;
-            this.tabPageJsonReprocessor.Text = "Reprocessar JSON";
-            this.tabPageJsonReprocessor.UseVisualStyleBackColor = true;
-            // 
-            // ucJsonReprocessor1
-            // 
-            this.ucJsonReprocessor1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ucJsonReprocessor1.Location = new System.Drawing.Point(3, 2);
-            this.ucJsonReprocessor1.Margin = new System.Windows.Forms.Padding(4);
-            this.ucJsonReprocessor1.Name = "ucJsonReprocessor1";
-            this.ucJsonReprocessor1.Size = new System.Drawing.Size(1335, 714);
-            this.ucJsonReprocessor1.TabIndex = 0;
-            //
-            // tabPageInsertScript
-            //
-            this.tabPageInsertScript.Controls.Add(this.ucInsertScriptGenerator1);
-            this.tabPageInsertScript.Location = new System.Drawing.Point(4, 25);
-            this.tabPageInsertScript.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPageInsertScript.Name = "tabPageInsertScript";
-            this.tabPageInsertScript.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPageInsertScript.Size = new System.Drawing.Size(1341, 718);
-            this.tabPageInsertScript.TabIndex = 10;
-            this.tabPageInsertScript.Text = "Gerar Script INSERT";
-            this.tabPageInsertScript.UseVisualStyleBackColor = true;
-            //
-            // ucInsertScriptGenerator1
-            //
-            this.ucInsertScriptGenerator1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ucInsertScriptGenerator1.Location = new System.Drawing.Point(3, 2);
-            this.ucInsertScriptGenerator1.Name = "ucInsertScriptGenerator1";
-            this.ucInsertScriptGenerator1.Size = new System.Drawing.Size(1335, 714);
-            this.ucInsertScriptGenerator1.TabIndex = 0;
-            //
             // tabPageDatabaseComparison
             // 
             this.tabPageDatabaseComparison.Controls.Add(this.ucDatabaseComparison1);
@@ -1446,8 +1447,9 @@
             this.tabPageRequest.PerformLayout();
             this.groupBoxRequestConfig.ResumeLayout(false);
             this.groupBoxRequestConfig.PerformLayout();
-            this.tabPageValidation.ResumeLayout(false);
             this.tabPageJsonReprocessor.ResumeLayout(false);
+            this.tabPageInsertScript.ResumeLayout(false);
+            this.tabPageValidation.ResumeLayout(false);
             this.tabPageDatabaseComparison.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
