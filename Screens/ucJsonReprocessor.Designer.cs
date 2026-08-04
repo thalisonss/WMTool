@@ -32,6 +32,7 @@ namespace WMTool.Screens
             this.dgvDataSources = new System.Windows.Forms.DataGridView();
             this.btnSaveJson = new System.Windows.Forms.Button();
             this.btnValidateJson = new System.Windows.Forms.Button();
+            this.btnGenerateInsertScript = new System.Windows.Forms.Button();
             this.btnRefreshDataSources = new System.Windows.Forms.Button();
             this.lblDataSourcesLastUpdated = new System.Windows.Forms.Label();
             this.lblResult = new System.Windows.Forms.Label();
@@ -178,7 +179,17 @@ namespace WMTool.Screens
             this.btnValidateJson.Text = "Validar JSON";
             this.btnValidateJson.UseVisualStyleBackColor = true;
             this.btnValidateJson.Click += new System.EventHandler(this.btnValidateJson_Click);
-            // 
+            //
+            // btnGenerateInsertScript
+            //
+            this.btnGenerateInsertScript.Location = new System.Drawing.Point(330, 275);
+            this.btnGenerateInsertScript.Name = "btnGenerateInsertScript";
+            this.btnGenerateInsertScript.Size = new System.Drawing.Size(170, 25);
+            this.btnGenerateInsertScript.TabIndex = 20;
+            this.btnGenerateInsertScript.Text = "Gerar Script INSERT";
+            this.btnGenerateInsertScript.UseVisualStyleBackColor = true;
+            this.btnGenerateInsertScript.Click += new System.EventHandler(this.btnGenerateInsertScript_Click);
+            //
             // btnRefreshDataSources
             // 
             this.btnRefreshDataSources.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -255,6 +266,7 @@ namespace WMTool.Screens
             this.Controls.Add(this.btnRefreshDataSources);
             this.Controls.Add(this.lblDataSourcesLastUpdated);
             this.Controls.Add(this.btnValidateJson);
+            this.Controls.Add(this.btnGenerateInsertScript);
             this.Controls.Add(this.btnSaveJson);
             this.Controls.Add(this.dgvDataSources);
             this.Controls.Add(this.dgvParameterOverrides);
@@ -295,6 +307,7 @@ namespace WMTool.Screens
         private System.Windows.Forms.DataGridView dgvDataSources;
         private System.Windows.Forms.Button btnSaveJson;
         private System.Windows.Forms.Button btnValidateJson;
+        private System.Windows.Forms.Button btnGenerateInsertScript;
         private System.Windows.Forms.Button btnRefreshDataSources;
         private System.Windows.Forms.Label lblDataSourcesLastUpdated;
         private System.Windows.Forms.Label lblResult;
